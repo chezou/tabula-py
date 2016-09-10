@@ -13,6 +13,13 @@ You can read tables from PDF and convert into pandas's DataFrame.
 
 # Usage
 
+## Install
+
+```
+pip install tabula-py
+```
+## Example
+
 See [example notebook](./examples/tabula_example.ipynb)
 
 Options are described in [official usage](https://github.com/tabulapdf/tabula-java#usage-examples)
