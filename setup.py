@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 __author__ = 'Michiaki Ariga'
 
 setup(
-  name='tabula',
+  name='tabula-py',
   version='0.1',
   description='Simple wrapper for tabula, read tables from PDF into DataFrame',
   author=__author__,
