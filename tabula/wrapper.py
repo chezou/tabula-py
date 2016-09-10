@@ -2,9 +2,10 @@ import subprocess, io, shlex, os
 import pandas as pd
 
 def read_pdf_table(input_path, options=""):
-  jar_path = os.path.abspath(os.path.dirname(__file__))
   JAR_NAME = "tabula-0.9.1-jar-with-dependencies.jar"
-  args = ["java", "-jar"] + [jar_path + "/" + JAR_NAME] + shlex.split(options) + [input_path]
+  jar_dir = os.path.abspath(os.path.dirname(__file__))
+  jar_path = os.path.join(jar_dir, JAR_NAME)
+  args = ["java", "-jar", jar_path] + shlex.split(options) + [input_path]
 
   result = subprocess.run(args, stdout=subprocess.PIPE)
 
