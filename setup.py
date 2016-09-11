@@ -17,8 +17,7 @@ setup(
     'Programming Language :: Python :: 3 :: Only',
   ],
   include_package_data=True,
-  packages=['tabula'],
-  package_data={'tabula': ['tabula-0.9.1-jar-with-dependencies.jar']},
+  packages=find_packages(),
   license='MIT License',
   keywords=['data frame', 'pdf', 'table'],
   install_requires=[
