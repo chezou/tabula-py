@@ -4,7 +4,7 @@ __author__ = 'Michiaki Ariga'
 
 setup(
   name='tabula-py',
-  version='0.2.0',
+  version='0.2.1',
   description='Simple wrapper for tabula, read tables from PDF into DataFrame',
   author=__author__,
   author_email='chezou@gmail.com',
@@ -14,7 +14,7 @@ setup(
     'Topic :: Text Processing :: General',
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 2.7',
   ],
   include_package_data=True,
   packages=find_packages(),
