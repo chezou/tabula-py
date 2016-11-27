@@ -42,3 +42,12 @@ See [example notebook](./examples/tabula_example.ipynb)
 - silent (bool, optional):
   - Suppress all stderr output.
 
+## FAQ
+
+### Can I use option `xxx`?
+
+Yes. You can use `options` argument as following. The format is same as cli of tabula-java.
+
+```py
+read_pdf_table(file_path, options="--columns 10.1,20.2,30.3")
+```
