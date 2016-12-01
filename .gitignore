@@ -60,3 +60,9 @@ target/
 
 #Pycharm settings
 .idea/
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/tabula-py.iml
+/.idea/workspace.xml
+/.idea/encodings.xml
