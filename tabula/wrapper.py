@@ -8,74 +8,95 @@ Todo:
 
 '''
 
-import subprocess, io, shlex, os
+import subprocess
+import io
+import shlex
+import os
 import pandas as pd
 
 JAR_NAME = "tabula-0.9.1-jar-with-dependencies.jar"
 jar_dir = os.path.abspath(os.path.dirname(__file__))
 jar_path = os.path.join(jar_dir, JAR_NAME)
 
-def read_pdf_table(input_path, options="", pages=1, guess=True, area=None, spreadsheet=None, password=None, nospreadsheet=None, silent=None):
-  '''Read tables in PDF.
 
-  Args:
-    input_path (str): File path of tareget PDF file.
-    options (str, optional): Option string for tabula-java.
-    pages (str, int, :obj:`list` of :obj:`int`, optional): An optional values specifying pages to extract from. It allows `str`, `int`, :obj:`list` of :obj:`int`. Example: '1-2,3', 'all' or [1,2]
-    guess (bool, optional): Guess the portion of the page to analyze per page.
-    area (:obj:`list` of :obj:`float`, optional): Portion of the page to analyze(top,left,bottom,right). Example: [269.875,12.75,790.5,561]. Default is entire page
-    spreadsheet (bool, optional): Force PDF to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
-    nospreadsheet (bool, optional): Force PDF not to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
-    password (bool, optional): Password to decrypt document. Default is empty
-    silent (bool, optional): Suppress all stderr output.
+def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
+                   spreadsheet=None, password=None, nospreadsheet=None,
+                   silent=None):
+    '''Read tables in PDF.
 
-  Returns:
-    Extracted pandas DataFrame.
-  '''
+    Args:
+        input_path (str):
+            File path of tareget PDF file.
+        options (str, optional):
+            Option string for tabula-java.
+        pages (str, int, :obj:`list` of :obj:`int`, optional):
+            An optional values specifying pages to extract from. It allows
+            `str`,`int`, :obj:`list` of :obj:`int`.
+            Example: '1-2,3', 'all' or [1,2]
+        guess (bool, optional):
+            Guess the portion of the page to analyze per page.
+        area (:obj:`list` of :obj:`float`, optional):
+            Portion of the page to analyze(top,left,bottom,right).
+            Example: [269.875,12.75,790.5,561]. Default is entire page
+        spreadsheet (bool, optional):
+            Force PDF to be extracted using spreadsheet-style extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        nospreadsheet (bool, optional):
+            Force PDF not to be extracted using spreadsheet-style extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+             Excel spreadsheet)
+        password (bool, optional):
+            Password to decrypt document. Default is empty
+        silent (bool, optional):
+            Suppress all stderr output.
 
-  __options = []
-  # handle options described in string for backward compatibility
-  __options += shlex.split(options)
+    Returns:
+        Extracted pandas DataFrame.
+    '''
 
-  # parse options
-  if pages:
-    __pages = pages
-    if type(pages) == int:
-      __pages = str(pages)
-    elif type(pages) in [list, tuple]:
-      __pages = ",".join(map(str, pages))
+    __options = []
+    # handle options described in string for backward compatibility
+    __options += shlex.split(options)
 
-    __options += ["--pages", __pages]
+    # parse options
+    if pages:
+        __pages = pages
+        if type(pages) == int:
+            __pages = str(pages)
+        elif type(pages) in [list, tuple]:
+            __pages = ",".join(map(str, pages))
 
-  if guess:
-    __options.append("--guess")
+        __options += ["--pages", __pages]
 
-  if area:
-    __area = area
-    if type(area) in [list, tuple]:
-      __area = ",".join(map(str, area))
+    if guess:
+        __options.append("--guess")
 
-    __options += ["--area", __area]
+    if area:
+        __area = area
+        if type(area) in [list, tuple]:
+            __area = ",".join(map(str, area))
 
-  if spreadsheet:
-    __options.append("--spreadsheet")
+        __options += ["--area", __area]
 
-  if nospreadsheet:
-    __options.append("--no-spreadsheet")
+    if spreadsheet:
+        __options.append("--spreadsheet")
 
-  if password:
-    __options += ["--password", password]
+    if nospreadsheet:
+        __options.append("--no-spreadsheet")
 
-  if silent:
-    __options.append("--silent")
+    if password:
+        __options += ["--password", password]
 
-  args = ["java", "-jar", jar_path] + __options + [input_path]
+    if silent:
+        __options.append("--silent")
 
-  output = subprocess.check_output(
-    args,
-    stderr=subprocess.STDOUT)
+    args = ["java", "-jar", jar_path] + __options + [input_path]
 
-  if len(output) == 0:
-    return
+    output = subprocess.check_output(
+        args, stderr=subprocess.STDOUT)
 
-  return pd.read_csv(io.BytesIO(output))
+    if len(output) == 0:
+        return
+
+    return pd.read_csv(io.BytesIO(output))
