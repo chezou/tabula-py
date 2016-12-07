@@ -21,7 +21,7 @@ jar_path = os.path.join(jar_dir, JAR_NAME)
 
 def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
                    spreadsheet=None, password=None, nospreadsheet=None,
-                   silent=None):
+                   silent=None,outfile=None):
     '''Read tables in PDF.
 
     Args:
@@ -50,6 +50,7 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
             Password to decrypt document. Default is empty
         silent (bool, optional):
             Suppress all stderr output.
+        outfile (str): Write output to a file.
 
     Returns:
         Extracted pandas DataFrame.
@@ -91,12 +92,17 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
     if silent:
         __options.append("--silent")
 
+    if outfile:
+        __options += ["--outfile", outfile]
+
     args = ["java", "-jar", jar_path] + __options + [input_path]
+    stdoutput = subprocess.check_output(
+        args,
+        stderr=subprocess.STDOUT)
 
-    output = subprocess.check_output(
-        args, stderr=subprocess.STDOUT)
-
-    if len(output) == 0:
+    if len(stdoutput) == 0:
         return
+    if outfile:
+        return pd.read_csv(outfile)
 
-    return pd.read_csv(io.BytesIO(output))
+    return pd.read_csv(io.BytesIO(stdoutput))
