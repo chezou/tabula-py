@@ -21,7 +21,7 @@ jar_path = os.path.join(jar_dir, JAR_NAME)
 
 def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
                    spreadsheet=None, password=None, nospreadsheet=None,
-                   silent=None,outfile=None):
+                   silent=None, outfile=None):
     '''Read tables in PDF.
 
     Args:
