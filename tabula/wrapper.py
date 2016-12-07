@@ -77,10 +77,12 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
     if silent:
         __options.append("--silent")
 
-  if outfile:
-        __options += ["--outfile", outfile]args = ["java", "-jar", jar_path] + __options + [input_path]
+    if outfile:
+        __options += ["--outfile", outfile]
 
-  stdoutput = subprocess.check_output(
+    args = ["java", "-jar", jar_path] + __options + [input_path]
+
+    stdoutput = subprocess.check_output(
     args,
     stderr=subprocess.STDOUT)
 
