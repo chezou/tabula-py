@@ -34,6 +34,7 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None, sprea
       nospreadsheet (bool, optional): Force PDF not to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
       password (bool, optional): Password to decrypt document. Default is empty
       silent (bool, optional): Suppress all stderr output.
+      outfile (str): Write output to a file.
 
     Returns:
       Extracted pandas DataFrame.
