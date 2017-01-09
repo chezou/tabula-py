@@ -82,6 +82,31 @@ def read_pdf_table(input_path, **kwargs):
 read_pdf = read_pdf_table
 
 
+def convert_from(input_path, output_path, **kwargs):
+    if output_path is None or len(output_path) is 0:
+        raise AttributeError("'output_path' shoud not be None or empty")
+
+    kwargs['output_path'] = output_path
+
+    output_format = kwargs.get('output_format', 'csv')
+    if output_format == 'csv':
+        kwargs['format'] = 'CSV'
+
+    elif output_format == 'json':
+        kwargs['format'] = 'JSON'
+
+    elif output_format == 'tsv':
+        kwargs['format'] = 'TSV'
+
+    elif output_format == 'dataframe':
+        raise AttributeError("'output_format' has no attribute 'dataframe'")
+
+    options = build_options(kwargs)
+    args = ["java", "-jar", jar_path] + options + [input_path]
+
+    output = subprocess.check_output(args)
+
+
 def build_options(kwargs={}):
     __options = []
     options = kwargs.get('options', '')
