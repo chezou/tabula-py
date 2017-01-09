@@ -38,21 +38,21 @@ class TestReadPdfTable(unittest.TestCase):
         expected_tsv = 'tests/resources/data_1.tsv'
         expected_json = 'tests/resources/data_1.json'
         temp = tempfile.NamedTemporaryFile()
-        tabula.convert_from(pdf_path, temp.name, output_format='csv')
+        tabula.convert_into(pdf_path, temp.name, output_format='csv')
         self.assertTrue(filecmp.cmp(temp.name, expected_csv))
-        tabula.convert_from(pdf_path, temp.name, output_format='tsv')
+        tabula.convert_into(pdf_path, temp.name, output_format='tsv')
         self.assertTrue(filecmp.cmp(temp.name, expected_tsv))
-        tabula.convert_from(pdf_path, temp.name, output_format='json')
+        tabula.convert_into(pdf_path, temp.name, output_format='json')
         self.assertTrue(filecmp.cmp(temp.name, expected_json))
 
-    def test_convert_from_exception(self):
+    def test_convert_into_exception(self):
         pdf_path = 'tests/resources/data.pdf'
         with self.assertRaises(AttributeError):
-            tabula.convert_from(pdf_path, 'test.csv', output_format='dataframe')
+            tabula.convert_into(pdf_path, 'test.csv', output_format='dataframe')
         with self.assertRaises(AttributeError):
-            tabula.convert_from(pdf_path, None)
+            tabula.convert_into(pdf_path, None)
         with self.assertRaises(AttributeError):
-            tabula.convert_from(pdf_path, '')
+            tabula.convert_into(pdf_path, '')
 
 
 if __name__ == '__main__':

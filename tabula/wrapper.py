@@ -61,7 +61,7 @@ def read_pdf_table(input_path, **kwargs):
 read_pdf = read_pdf_table
 
 
-def convert_from(input_path, output_path, **kwargs):
+def convert_into(input_path, output_path, **kwargs):
     '''Convert tables from PDF into a file.
 
     Args:
