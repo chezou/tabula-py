@@ -45,6 +45,15 @@ class TestReadPdfTable(unittest.TestCase):
         tabula.convert_from(pdf_path, temp.name, output_format='json')
         self.assertTrue(filecmp.cmp(temp.name, expected_json))
 
+    def test_convert_from_exception(self):
+        pdf_path = 'tests/resources/data.pdf'
+        with self.assertRaises(AttributeError):
+            tabula.convert_from(pdf_path, 'test.csv', output_format='dataframe')
+        with self.assertRaises(AttributeError):
+            tabula.convert_from(pdf_path, None)
+        with self.assertRaises(AttributeError):
+            tabula.convert_from(pdf_path, '')
+
 
 if __name__ == '__main__':
     unittest.main()
