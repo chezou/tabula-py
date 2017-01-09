@@ -94,9 +94,10 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
     args = ["java", "-jar", jar_path] + __options + [input_path]
 
     output = subprocess.check_output(
-        args, stderr=subprocess.STDOUT)
+        args)
 
     if len(output) == 0:
         return
 
     return pd.read_csv(io.BytesIO(output))
+
