@@ -127,9 +127,11 @@ def build_options(kwargs={}):
             Password to decrypt document. Default is empty
         silent (bool, optional):
             Suppress all stderr output.
+        columns (list, optional):
+            X coordinates of column boundaries.
+            Example: [10.1, 20.2, 30.3]
         format (str, optional):
-            Format for output file or extracted object
-            CSV, TSV, JSON
+            Format for output file or extracted object. (CSV, TSV, JSON)
         output_path (str, optional):
             Output file path. File format of it is depends on `format`.
             Same as `--outfile` option of tabula-java.
@@ -180,6 +182,11 @@ def build_options(kwargs={}):
     nospreadsheet = kwargs.get('nospreadsheet')
     if nospreadsheet:
         __options.append("--no-spreadsheet")
+
+    columns = kwargs.get('columns')
+    if columns:
+        __columns = ",".join(map(str, columns))
+        __options += ["--columns", __columns]
 
     password = kwargs.get('password')
     if password:
