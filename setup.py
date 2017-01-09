@@ -4,7 +4,7 @@ __author__ = 'Michiaki Ariga'
 
 setup(
     name='tabula-py',
-    version='0.2.1',
+    version='0.2.2',
     description='Simple wrapper for tabula, read tables from PDF into DataFrame',
     author=__author__,
     author_email='chezou@gmail.com',
