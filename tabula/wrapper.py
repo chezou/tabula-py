@@ -13,15 +13,14 @@ import io
 import shlex
 import os
 import pandas as pd
+import json
 
 JAR_NAME = "tabula-0.9.1-jar-with-dependencies.jar"
 jar_dir = os.path.abspath(os.path.dirname(__file__))
 jar_path = os.path.join(jar_dir, JAR_NAME)
 
 
-def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
-                   spreadsheet=None, password=None, nospreadsheet=None,
-                   silent=None):
+def read_pdf_table(input_path, **kwargs):
     '''Read tables in PDF.
 
     Args:
@@ -52,14 +51,45 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
             Suppress all stderr output.
 
     Returns:
-        Extracted pandas DataFrame.
+        Extracted pandas DataFrame or list.
     '''
 
+    output_format = kwargs.get('output_format', 'dataframe')
+
+    if output_format == 'dataframe':
+        kwargs.pop('format', None)
+
+    elif output_format == 'json':
+        kwargs['format'] = 'JSON'
+
+    options = build_options(kwargs)
+    args = ["java", "-jar", jar_path] + options + [input_path]
+
+    output = subprocess.check_output(args)
+
+    if len(output) == 0:
+        return
+
+    fmt = kwargs.get('format')
+    if fmt == 'JSON':
+        return json.loads(output.decode('utf-8'))
+
+    else:
+        return pd.read_csv(io.BytesIO(output))
+
+
+# Set alias for future rename from `read_pdf_table` to `read_pdf`
+read_pdf = read_pdf_table
+
+
+def build_options(kwargs={}):
     __options = []
+    options = kwargs.get('options', '')
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
 
     # parse options
+    pages = kwargs.get('pages', 1)
     if pages:
         __pages = pages
         if type(pages) == int:
@@ -69,9 +99,11 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
 
         __options += ["--pages", __pages]
 
+    guess = kwargs.get('guess', True)
     if guess:
         __options.append("--guess")
 
+    area = kwargs.get('area')
     if area:
         __area = area
         if type(area) in [list, tuple]:
@@ -79,24 +111,28 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
 
         __options += ["--area", __area]
 
+    fmt = kwargs.get('format')
+    if fmt:
+        __options += ["--format", fmt]
+
+    output_path = kwargs.get('output_path')
+    if output_path:
+        __options += ["--outfile", output_path]
+
+    spreadsheet = kwargs.get('spreadsheet')
     if spreadsheet:
         __options.append("--spreadsheet")
 
+    nospreadsheet = kwargs.get('nospreadsheet')
     if nospreadsheet:
         __options.append("--no-spreadsheet")
 
+    password = kwargs.get('password')
     if password:
         __options += ["--password", password]
 
+    silent = kwargs.get('silent')
     if silent:
         __options.append("--silent")
 
-    args = ["java", "-jar", jar_path] + __options + [input_path]
-
-    output = subprocess.check_output(
-        args)
-
-    if len(output) == 0:
-        return
-
-    return pd.read_csv(io.BytesIO(output))
+    return __options
