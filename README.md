@@ -1,5 +1,7 @@
 # tabula-py
 
+[![Build Status](https://travis-ci.org/chezou/tabula-py.svg?branch=master)](https://travis-ci.org/chezou/tabula-py)
+
 `tabula-py` is a simple Python wrapper of [tabula-java](https://github.com/tabulapdf/tabula-java), which can read table of PDF.
 You can read tables from PDF and convert into pandas's DataFrame.
 
