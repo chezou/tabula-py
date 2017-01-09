@@ -2,6 +2,7 @@ import unittest
 import tabula
 import pandas as pd
 
+
 class TestReadPdfTable(unittest.TestCase):
 
     def test_read_pdf(self):

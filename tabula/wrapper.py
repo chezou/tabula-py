@@ -100,4 +100,3 @@ def read_pdf_table(input_path, options="", pages=1, guess=True, area=None,
         return
 
     return pd.read_csv(io.BytesIO(output))
-
