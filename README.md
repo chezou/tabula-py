@@ -23,6 +23,8 @@ pip install tabula-py
 
 ## Example
 
+tabula-py enables you to extract table from PDF into DataFrame and JSON. It also can extract tables from PDF and save file as CSV, TSV or JSON.
+
 See [example notebook](./examples/tabula_example.ipynb)
 
 ## Options
