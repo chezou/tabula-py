@@ -8,12 +8,13 @@ Todo:
 
 '''
 
-import subprocess
 import io
-import shlex
-import os
-import pandas as pd
 import json
+import os
+import shlex
+import subprocess
+import requests
+import pandas as pd
 
 JAR_NAME = "tabula-0.9.1-jar-with-dependencies.jar"
 jar_dir = os.path.abspath(os.path.dirname(__file__))
@@ -42,9 +43,14 @@ def read_pdf_table(input_path, **kwargs):
         kwargs['format'] = 'JSON'
 
     options = build_options(kwargs)
-    args = ["java", "-jar", jar_path] + options + [input_path]
+    path, is_url = localize_file(input_path)
+    args = ["java", "-jar", jar_path] + options + [path]
 
-    output = subprocess.check_output(args)
+    try:
+        output = subprocess.check_output(args)
+    finally:
+        if is_url:
+            os.unlink(path)
 
     if len(output) == 0:
         return
@@ -95,9 +101,34 @@ def convert_into(input_path, output_path, **kwargs):
         raise AttributeError("'output_format' has no attribute 'dataframe'")
 
     options = build_options(kwargs)
-    args = ["java", "-jar", jar_path] + options + [input_path]
+    path, is_url = localize_file(input_path)
+    args = ["java", "-jar", jar_path] + options + [path]
 
-    output = subprocess.check_output(args)
+    try:
+        subprocess.check_output(args)
+    finally:
+        if is_url:
+            os.unlink(path)
+
+
+
+def localize_file(path):
+    is_url = False
+    try:
+        pid = os.getpid()
+        r = requests.get(path)
+        filename = os.path.basename(r.url)
+        if os.path.splitext(filename)[-1] is not ".pdf":
+            filename = "{0}.pdf".format(pid)
+
+        with open(filename, 'wb') as f:
+            f.write(r.content)
+
+        is_url = True
+        return filename, is_url
+
+    except:
+        return path, is_url
 
 
 def build_options(kwargs={}):

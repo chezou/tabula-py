@@ -3,6 +3,7 @@ import tabula
 import tempfile
 import filecmp
 import json
+import os
 import pandas as pd
 
 
@@ -14,6 +15,11 @@ class TestReadPdfTable(unittest.TestCase):
         df = tabula.read_pdf(pdf_path)
         self.assertTrue(isinstance(df, pd.DataFrame))
         self.assertTrue(df.equals(pd.read_csv(expected_csv1)))
+
+    def test_read_remote_pdf(self):
+        uri = "https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/12s0324.pdf"
+        df = tabula.read_pdf(uri)
+        self.assertTrue(isinstance(df, pd.DataFrame))
 
     def test_read_pdf_into_json(self):
         pdf_path = 'tests/resources/data.pdf'
@@ -44,6 +50,12 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(filecmp.cmp(temp.name, expected_tsv))
         tabula.convert_into(pdf_path, temp.name, output_format='json')
         self.assertTrue(filecmp.cmp(temp.name, expected_json))
+
+    def test_convert_remote_file(self):
+        uri = "https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/12s0324.pdf"
+        temp = tempfile.NamedTemporaryFile()
+        tabula.convert_into(uri, temp.name, output_format='csv')
+        self.assertTrue(os.path.exists(temp.name))
 
     def test_convert_into_exception(self):
         pdf_path = 'tests/resources/data.pdf'
