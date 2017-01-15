@@ -67,5 +67,6 @@ class TestReadPdfTable(unittest.TestCase):
             tabula.convert_into(pdf_path, '')
 
 
+
 if __name__ == '__main__':
     unittest.main()

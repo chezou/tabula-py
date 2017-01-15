@@ -1,5 +1,7 @@
+mccabe==0.5.3
 numpy==1.11.3
 pandas==0.19.2
 python-dateutil==2.6.0
 pytz==2016.10
+requests==2.12.4
 six==1.10.0
