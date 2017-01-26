@@ -77,3 +77,56 @@ Yes. You can use `options` argument as following. The format is same as cli of t
 ```py
 read_pdf_table(file_path, options="--columns 10.1,20.2,30.3")
 ```
+
+### How can I ignore useless area?
+
+In short, you can extract with `area` and `spreadsheet` option.
+
+```py
+In [4]: tabula.read_pdf('./table.pdf', spreadsheet=True, area=(337.29, 226.49, 472.85, 384.91))
+Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
+Out[4]:
+  Unnamed: 0 Col2 Col3 Col4 Col5
+0          A    B   12    R    G
+1        NaN    R    T   23    H
+2          B    B   33    R    A
+3          C    T   99    E    M
+4          D    I   12   34    M
+5          E    I    I    W   90
+6        NaN    1    2    W    h
+7        NaN    4    3    E    H
+8          F    E   E4    R    4
+```
+
+*How to use `area` option*
+
+According to tabula-java wiki, there is a explain how to specify the area:
+https://github.com/tabulapdf/tabula-java/wiki/Using-the-command-line-tabula-extractor-tool#grab-coordinates-of-the-table-you-want
+
+For example, using macOS's preview, I got area information of this [PDF](https://github.com/chezou/tabula-py/files/711877/table.pdf):
+
+![image](https://cloud.githubusercontent.com/assets/916653/22047470/b201de24-dd6a-11e6-9cfc-7bc73e33e3b2.png)
+
+
+```
+java -jar ./target/tabula-0.9.0-jar-with-dependencies.jar -p all -a $y1,$x1,$y2,$x2 -o $csvfile $filename
+```
+
+given 
+
+```
+Note the left, top, height, and width parameters and calculate the following:
+
+y1 = top
+x1 = left
+y2 = top + height
+x2 = left + width
+```
+
+I confirmed with tabula-java:
+
+```
+java -jar ./tabula/tabula-0.9.1-jar-with-dependencies.jar -g -r -a "337.29,226.49,472.85,384.91" table.pdf
+```
+
+Without `-r`(same as `--spreadsheet`) option, it does not work properly.
