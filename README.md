@@ -11,6 +11,7 @@ You can read tables from PDF and convert into pandas's DataFrame.
 # Requirements
 
 - Java
+  - Confirmed working with Java 7, 8
 - pandas
 
 # Usage
@@ -112,7 +113,7 @@ For example, using macOS's preview, I got area information of this [PDF](https:/
 java -jar ./target/tabula-0.9.0-jar-with-dependencies.jar -p all -a $y1,$x1,$y2,$x2 -o $csvfile $filename
 ```
 
-given 
+given
 
 ```
 Note the left, top, height, and width parameters and calculate the following:
