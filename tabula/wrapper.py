@@ -27,6 +27,10 @@ def read_pdf_table(input_path, **kwargs):
     Args:
         input_path (str):
             File path of tareget PDF file.
+        output_format (str, optional):
+            Output format of this function (dataframe or json)
+        encoding (str, optional):
+            Encoding type for pandas. Default is 'utf-8'
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
