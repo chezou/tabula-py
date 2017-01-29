@@ -55,12 +55,14 @@ def read_pdf_table(input_path, **kwargs):
     if len(output) == 0:
         return
 
+    encoding = kwargs.get('encoding', 'utf-8')
+
     fmt = kwargs.get('format')
     if fmt == 'JSON':
-        return json.loads(output.decode('utf-8'))
+        return json.loads(output.decode(encoding))
 
     else:
-        return pd.read_csv(io.BytesIO(output))
+        return pd.read_csv(io.BytesIO(output), encoding = encoding)
 
 
 # Set alias for future rename from `read_pdf_table` to `read_pdf`
