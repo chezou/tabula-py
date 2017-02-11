@@ -16,7 +16,7 @@ import subprocess
 import requests
 import pandas as pd
 
-JAR_NAME = "tabula-0.9.1-jar-with-dependencies.jar"
+JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
 jar_dir = os.path.abspath(os.path.dirname(__file__))
 jar_path = os.path.join(jar_dir, JAR_NAME)
 
