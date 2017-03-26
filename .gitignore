@@ -59,3 +59,4 @@ target/
 .python-version
 
 venv
+*~

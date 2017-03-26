@@ -16,7 +16,7 @@ import subprocess
 import requests
 import pandas as pd
 
-JAR_NAME = "tabula-0.9.1-jar-with-dependencies.jar"
+JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
 jar_dir = os.path.abspath(os.path.dirname(__file__))
 jar_path = os.path.join(jar_dir, JAR_NAME)
 
@@ -66,7 +66,7 @@ def read_pdf_table(input_path, **kwargs):
         return json.loads(output.decode(encoding))
 
     else:
-        return pd.read_csv(io.BytesIO(output), encoding = encoding)
+        return pd.read_csv(io.BytesIO(output), encoding=encoding)
 
 
 # Set alias for future rename from `read_pdf_table` to `read_pdf`
@@ -115,7 +115,6 @@ def convert_into(input_path, output_path, **kwargs):
     finally:
         if is_url:
             os.unlink(path)
-
 
 
 def localize_file(path):
