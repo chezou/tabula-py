@@ -40,7 +40,7 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(tabula.read_pdf(pdf_path, pages=(2, 3), nospreadsheet=True,
                                         guess=False).equals(pd.read_csv(expected_csv2)))
 
-    def test_conver_from(self):
+    def test_convert_from(self):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv = 'tests/resources/data_1.csv'
         expected_tsv = 'tests/resources/data_1.tsv'
