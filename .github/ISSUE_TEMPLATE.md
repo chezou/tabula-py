@@ -2,6 +2,8 @@
 
 # Environment
 
+Write and check your environment.
+
 - [ ] `python --version`: ?
 - [ ] `java -version`: ?
 - [ ] OS and it's version: ?
