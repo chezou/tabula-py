@@ -127,7 +127,7 @@ x2 = left + width
 I confirmed with tabula-java:
 
 ```
-java -jar ./tabula/tabula-0.9.1-jar-with-dependencies.jar -g -r -a "337.29,226.49,472.85,384.91" table.pdf
+java -jar ./tabula/tabula-0.9.1-jar-with-dependencies.jar -a "337.29,226.49,472.85,384.91" table.pdf
 ```
 
 Without `-r`(same as `--spreadsheet`) option, it does not work properly.
