@@ -14,6 +14,10 @@ You can read tables from PDF and convert into pandas's DataFrame.
   - Confirmed working with Java 7, 8
 - pandas
 
+## OS
+
+I confirmed working on macOS and Ubuntu. I can't fully support Windows environment.
+
 # Usage
 
 ## Install
