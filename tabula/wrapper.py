@@ -15,13 +15,13 @@ import shlex
 import subprocess
 import requests
 import pandas as pd
+from .util import deprecated
 
 JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
 jar_dir = os.path.abspath(os.path.dirname(__file__))
 jar_path = os.path.join(jar_dir, JAR_NAME)
 
-
-def read_pdf_table(input_path, **kwargs):
+def read_pdf(input_path, **kwargs):
     '''Read tables in PDF.
 
     Args:
@@ -70,7 +70,7 @@ def read_pdf_table(input_path, **kwargs):
 
 
 # Set alias for future rename from `read_pdf_table` to `read_pdf`
-read_pdf = read_pdf_table
+read_pdf_table = deprecated(read_pdf)
 
 
 def convert_into(input_path, output_path, **kwargs):
