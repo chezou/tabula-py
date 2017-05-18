@@ -46,9 +46,13 @@ def read_pdf(input_path, **kwargs):
     elif output_format == 'json':
         kwargs['format'] = 'JSON'
 
+    java_options = kwargs.get('java_options', [])
+    if isinstance(java_options, str):
+        java_options = [java_options]
+
     options = build_options(kwargs)
     path, is_url = localize_file(input_path)
-    args = ["java", "-jar", jar_path] + options + [path]
+    args = ["java"] + java_options + ["-jar", jar_path] + options + [path]
 
     try:
         output = subprocess.check_output(args)
@@ -106,9 +110,13 @@ def convert_into(input_path, output_path, **kwargs):
     elif output_format == 'dataframe':
         raise AttributeError("'output_format' has no attribute 'dataframe'")
 
+    java_options = kwargs.get('java_options', [])
+    if isinstance(java_options, str):
+        java_options = [java_options]
+
     options = build_options(kwargs)
     path, is_url = localize_file(input_path)
-    args = ["java", "-jar", jar_path] + options + [path]
+    args = ["java"] + java_options + ["-jar", jar_path] + options + [path]
 
     try:
         subprocess.check_output(args)
