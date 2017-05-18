@@ -71,6 +71,8 @@ See [example notebook](./examples/tabula_example.ipynb)
 - output_path (str, optional):
   - Output file path. File format of it is depends on `format`.
   - Same as `--outfile` option of tabula-java.
+- java_options (`list`, optional):
+  - Set java options like `-Xmx256m`.
 
 
 ## FAQ
