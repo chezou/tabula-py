@@ -87,6 +87,8 @@ def convert_into(input_path, output_path, **kwargs):
             File path of tareget PDF file.
         output_path (str):
             File path of output file.
+        output_format (str, optional):
+            Output format of this function (csv, json or tsv)
         java_options (list, optional):
             Set java options like `-Xmx256m`.
         kwargs (dict):

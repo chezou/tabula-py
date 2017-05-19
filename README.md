@@ -66,8 +66,10 @@ See [example notebook](./examples/tabula_example.ipynb)
 - columns (list, optional):
   - X coordinates of column boundaries.
   - Example: [10.1, 20.2, 30.3]
-- format (str, optional):
-  - Format for output file or extracted object. (CSV, TSV, JSON)
+- output_format (str, optional):
+  - Format for output file or extracted object. 
+  - For `read_pdf()`: `json`, `dataframe`
+  - For `convert_into()`: `csv`, `tsv`, `json`
 - output_path (str, optional):
   - Output file path. File format of it is depends on `format`.
   - Same as `--outfile` option of tabula-java.
