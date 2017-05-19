@@ -31,6 +31,8 @@ def read_pdf(input_path, **kwargs):
             Output format of this function (dataframe or json)
         encoding (str, optional):
             Encoding type for pandas. Default is 'utf-8'
+        java_options (list, optional):
+            Set java options like `-Xmx256m`.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
@@ -85,6 +87,8 @@ def convert_into(input_path, output_path, **kwargs):
             File path of tareget PDF file.
         output_path (str):
             File path of output file.
+        java_options (list, optional):
+            Set java options like `-Xmx256m`.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
