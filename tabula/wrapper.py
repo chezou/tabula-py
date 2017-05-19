@@ -18,8 +18,8 @@ import pandas as pd
 from .util import deprecated
 
 JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
-jar_dir = os.path.abspath(os.path.dirname(__file__))
-jar_path = os.path.join(jar_dir, JAR_NAME)
+JAR_DIR = os.path.abspath(os.path.dirname(__file__))
+JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
 def read_pdf(input_path, **kwargs):
     '''Read tables in PDF.
@@ -52,7 +52,7 @@ def read_pdf(input_path, **kwargs):
 
     options = build_options(kwargs)
     path, is_url = localize_file(input_path)
-    args = ["java"] + java_options + ["-jar", jar_path] + options + [path]
+    args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
         output = subprocess.check_output(args)
@@ -116,7 +116,7 @@ def convert_into(input_path, output_path, **kwargs):
 
     options = build_options(kwargs)
     path, is_url = localize_file(input_path)
-    args = ["java"] + java_options + ["-jar", jar_path] + options + [path]
+    args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
         subprocess.check_output(args)
@@ -192,7 +192,7 @@ def build_options(kwargs={}):
     pages = kwargs.get('pages', 1)
     if pages:
         __pages = pages
-        if type(pages) == int:
+        if isinstance(pages, int):
             __pages = str(pages)
         elif type(pages) in [list, tuple]:
             __pages = ",".join(map(str, pages))
