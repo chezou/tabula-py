@@ -156,6 +156,15 @@ def extract_from(raw_json):
     return data_frames
 
 def localize_file(path):
+    '''Ensure localize target file.
+    
+    If the target file is URI, this function fetches into local storage.
+
+    Args:
+        path (str):
+            File path or URI of target file.
+    '''
+
     is_url = False
     try:
         pid = os.getpid()
