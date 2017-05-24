@@ -48,6 +48,11 @@ def read_pdf(input_path, **kwargs):
     elif output_format == 'json':
         kwargs['format'] = 'JSON'
 
+    multiple_tables = kwargs.get('multiple_tables')
+    if multiple_tables:
+        kwargs.pop('multiple_tables', None)
+        kwargs['format'] = 'JSON'
+
     java_options = kwargs.get('java_options', [])
     if isinstance(java_options, str):
         java_options = [java_options]
@@ -69,7 +74,11 @@ def read_pdf(input_path, **kwargs):
 
     fmt = kwargs.get('format')
     if fmt == 'JSON':
-        return json.loads(output.decode(encoding))
+        if multiple_tables:
+            return extract_from(json.loads(output.decode(encoding)))
+
+        else:
+            return json.loads(output.decode(encoding))
 
     else:
         return pd.read_csv(io.BytesIO(output), encoding=encoding)
@@ -130,6 +139,21 @@ def convert_into(input_path, output_path, **kwargs):
         if is_url:
             os.unlink(path)
 
+def extract_from(raw_json):
+    '''Extract tables from json.
+
+    Args:
+        raw_json (list):
+            Decoded list from tabula-java JSON.
+    '''
+
+    data_frames = []
+
+    for table in raw_json:
+        list_data = [[e['text'] for e in row] for row in table['data']]
+        data_frames.append(pd.DataFrame(list_data[1:-1], columns=list_data[0]))
+
+    return data_frames
 
 def localize_file(path):
     is_url = False

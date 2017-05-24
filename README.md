@@ -75,6 +75,9 @@ See [example notebook](./examples/tabula_example.ipynb)
   - Same as `--outfile` option of tabula-java.
 - java_options (`list`, optional):
   - Set java options like `-Xmx256m`.
+- multiple_tables (bool, optional):
+  - (Experimental) Extract multiple tables. 
+  - This option uses JSON as an intermediate format, so if tabula-java output format will change, this option doesn't work.
 
 
 ## FAQ

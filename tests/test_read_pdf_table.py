@@ -46,6 +46,12 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1, java_options=['-Xmx256m']
                                        ).equals(pd.read_csv(expected_csv1)))
 
+    def test_read_pdf_for_multiple_tables(self):
+        pdf_path = 'tests/resources/data.pdf'
+        self.assertEqual(len(tabula.read_pdf(pdf_path, pages=2, multiple_tables=True)), 2)
+        with self.assertRaises(pd.parser.CParserError):
+            tabula.read_pdf(pdf_path, pages=2)
+
     def test_convert_from(self):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv = 'tests/resources/data_1.csv'
