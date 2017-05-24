@@ -60,3 +60,5 @@ target/
 
 venv
 *~
+
+.vscode
