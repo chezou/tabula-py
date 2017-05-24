@@ -142,3 +142,7 @@ java -jar ./tabula/tabula-0.9.1-jar-with-dependencies.jar -a "337.29,226.49,472.
 ```
 
 Without `-r`(same as `--spreadsheet`) option, it does not work properly.
+
+### I faced `CParserError`. How can I extract multiple tables?
+
+Use `mutiple_tables` option. Note: This option is experimental.
