@@ -158,11 +158,11 @@ def extract_from(raw_json):
 def localize_file(path):
     '''Ensure localize target file.
     
-    If the target file is URI, this function fetches into local storage.
+    If the target file is remote, this function fetches into local storage.
 
     Args:
         path (str):
-            File path or URI of target file.
+            File path or URL of target file.
     '''
 
     is_url = False
