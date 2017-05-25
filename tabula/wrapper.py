@@ -151,13 +151,13 @@ def extract_from(raw_json):
 
     for table in raw_json:
         list_data = [[e['text'] for e in row] for row in table['data']]
-        data_frames.append(pd.DataFrame(list_data[1:-1], columns=list_data[0]))
+        data_frames.append(pd.DataFrame(list_data))
 
     return data_frames
 
 def localize_file(path):
     '''Ensure localize target file.
-    
+
     If the target file is remote, this function fetches into local storage.
 
     Args:
