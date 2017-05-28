@@ -104,7 +104,7 @@ def convert_into(input_path, output_path, **kwargs):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list.
+        Nothing. Output file will be saved into `output_path`
     '''
 
     if output_path is None or len(output_path) is 0:
@@ -244,7 +244,7 @@ def build_options(kwargs={}):
             Force PDF not to be extracted using spreadsheet-style extraction
             (if there are ruling lines separating each cell, as in a PDF of an
              Excel spreadsheet)
-        password (bool, optional):
+        password (str, optional):
             Password to decrypt document. Default is empty
         silent (bool, optional):
             Suppress all stderr output.
