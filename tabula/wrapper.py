@@ -104,26 +104,14 @@ def convert_into(input_path, output_path, **kwargs):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list.
+        Nothing. Output file will be saved into `output_path`
     '''
 
     if output_path is None or len(output_path) is 0:
         raise AttributeError("'output_path' shoud not be None or empty")
 
     kwargs['output_path'] = output_path
-
-    output_format = kwargs.get('output_format', 'csv')
-    if output_format == 'csv':
-        kwargs['format'] = 'CSV'
-
-    elif output_format == 'json':
-        kwargs['format'] = 'JSON'
-
-    elif output_format == 'tsv':
-        kwargs['format'] = 'TSV'
-
-    elif output_format == 'dataframe':
-        raise AttributeError("'output_format' has no attribute 'dataframe'")
+    kwargs['format'] = extract_format_for_conversion(kwargs.get('output_format'))
 
     java_options = kwargs.get('java_options', [])
     if isinstance(java_options, str):
@@ -138,6 +126,56 @@ def convert_into(input_path, output_path, **kwargs):
     finally:
         if is_url:
             os.unlink(path)
+
+def convert_into_by_batch(input_dir, **kwargs):
+    '''Convert tables from PDFs in a directory.
+
+    Args:
+        input_dir (str):
+            Directory path.
+        output_format (str, optional):
+            Output format of this function (csv, json or tsv)
+        java_options (list, optional):
+            Set java options like `-Xmx256m`.
+        kwargs (dict):
+            Dictionary of option for tabula-java. Details are shown in `build_options()`
+
+    Returns:
+        Nothing. Outputs are saved into the same directory with `input_dir`
+    '''
+
+    if input_dir is None or not os.path.isdir(input_dir):
+        raise AttributeError("'input_dir' shoud be directory path")
+
+    kwargs['format'] = extract_format_for_conversion(kwargs.get('output_format'))
+
+    java_options = kwargs.get('java_options', [])
+    if isinstance(java_options, str):
+        java_options = [java_options]
+
+    # Option for batch
+    kwargs['batch'] = input_dir
+
+    options = build_options(kwargs)
+
+    args = ["java"] + java_options + ["-jar", JAR_PATH] + options
+
+    subprocess.check_output(args)
+
+
+def extract_format_for_conversion(output_format='csv'):
+    if output_format == 'csv':
+        return 'CSV'
+
+    if output_format == 'json':
+        return 'JSON'
+
+    if output_format == 'tsv':
+        return 'TSV'
+
+    if output_format == 'dataframe':
+        raise AttributeError("'output_format' has no attribute 'dataframe'")
+
 
 def extract_from(raw_json):
     '''Extract tables from json.
@@ -206,7 +244,7 @@ def build_options(kwargs={}):
             Force PDF not to be extracted using spreadsheet-style extraction
             (if there are ruling lines separating each cell, as in a PDF of an
              Excel spreadsheet)
-        password (bool, optional):
+        password (str, optional):
             Password to decrypt document. Default is empty
         silent (bool, optional):
             Suppress all stderr output.
@@ -215,6 +253,8 @@ def build_options(kwargs={}):
             Example: [10.1, 20.2, 30.3]
         format (str, optional):
             Format for output file or extracted object. (CSV, TSV, JSON)
+        batch (str, optional):
+            Convert all .pdfs in the provided directory. This argument should be direcotry.
         output_path (str, optional):
             Output file path. File format of it is depends on `format`.
             Same as `--outfile` option of tabula-java.
@@ -274,6 +314,10 @@ def build_options(kwargs={}):
     password = kwargs.get('password')
     if password:
         __options += ["--password", password]
+
+    batch = kwargs.get('batch')
+    if batch:
+        __options += ["--batch", batch]
 
     silent = kwargs.get('silent')
     if silent:

@@ -5,10 +5,10 @@ import filecmp
 import json
 import os
 import pandas as pd
+import shutil
 
 
 class TestReadPdfTable(unittest.TestCase):
-
     def test_read_pdf(self):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv1 = 'tests/resources/data_1.csv'
@@ -64,6 +64,20 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(filecmp.cmp(temp.name, expected_tsv))
         tabula.convert_into(pdf_path, temp.name, output_format='json')
         self.assertTrue(filecmp.cmp(temp.name, expected_json))
+
+    def test_convert_into_by_batch(self):
+        pdf_path = 'tests/resources/data.pdf'
+        expected_csv = 'tests/resources/data_1.csv'
+        temp_dir = tempfile.mkdtemp()
+        temp_pdf = temp_dir + '/data.pdf'
+        converted_csv = temp_dir + '/data.csv'
+        shutil.copyfile(pdf_path, temp_pdf)
+
+        try:
+            tabula.convert_into_by_batch(temp_dir, output_format='csv')
+            self.assertTrue(filecmp.cmp(converted_csv, expected_csv))
+        finally:
+            shutil.rmtree(temp_dir)
 
     def test_convert_remote_file(self):
         uri = "https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/12s0324.pdf"
