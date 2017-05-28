@@ -15,6 +15,7 @@ import shlex
 import subprocess
 import requests
 import pandas as pd
+import numpy as np
 from .util import deprecated
 
 JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
@@ -188,7 +189,7 @@ def extract_from(raw_json):
     data_frames = []
 
     for table in raw_json:
-        list_data = [[e['text'] for e in row] for row in table['data']]
+        list_data = [[np.nan if not e['text'] else e['text'] for e in row] for row in table['data']]
         data_frames.append(pd.DataFrame(list_data))
 
     return data_frames
