@@ -22,7 +22,12 @@ JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
-def read_pdf(input_path, **kwargs):
+def read_pdf(input_path,
+             output_format='dataframe',
+             encoding='utf-8',
+             java_options=None,
+             pandas_options=None,
+             multiple_tables=False, **kwargs):
     '''Read tables in PDF.
 
     Args:
@@ -47,20 +52,19 @@ def read_pdf(input_path, **kwargs):
         Extracted pandas DataFrame or list.
     '''
 
-    output_format = kwargs.get('output_format', 'dataframe')
-
     if output_format == 'dataframe':
         kwargs.pop('format', None)
 
     elif output_format == 'json':
         kwargs['format'] = 'JSON'
 
-    multiple_tables = kwargs.pop('multiple_tables', None)
     if multiple_tables:
         kwargs['format'] = 'JSON'
 
-    java_options = kwargs.get('java_options', [])
-    if isinstance(java_options, str):
+    if java_options is None:
+        java_options = []
+
+    elif isinstance(java_options, str):
         java_options = [java_options]
 
     options = build_options(kwargs)
@@ -76,9 +80,8 @@ def read_pdf(input_path, **kwargs):
     if len(output) == 0:
         return
 
-    encoding = kwargs.get('encoding', 'utf-8')
-
-    pandas_options = kwargs.get('pandas_options', {})
+    if pandas_options is None:
+        pandas_options = {}
 
     fmt = kwargs.get('format')
     if fmt == 'JSON':
@@ -98,7 +101,7 @@ def read_pdf(input_path, **kwargs):
 read_pdf_table = deprecated(read_pdf)
 
 
-def convert_into(input_path, output_path, **kwargs):
+def convert_into(input_path, output_path, output_format='csv', java_options=None, **kwargs):
     '''Convert tables from PDF into a file.
 
     Args:
@@ -107,7 +110,7 @@ def convert_into(input_path, output_path, **kwargs):
         output_path (str):
             File path of output file.
         output_format (str, optional):
-            Output format of this function (csv, json or tsv)
+            Output format of this function (csv, json or tsv). Default: csv
         java_options (list, optional):
             Set java options like `-Xmx256m`.
         kwargs (dict):
@@ -121,10 +124,12 @@ def convert_into(input_path, output_path, **kwargs):
         raise AttributeError("'output_path' shoud not be None or empty")
 
     kwargs['output_path'] = output_path
-    kwargs['format'] = extract_format_for_conversion(kwargs.get('output_format'))
+    kwargs['format'] = extract_format_for_conversion(output_format)
 
-    java_options = kwargs.get('java_options', [])
-    if isinstance(java_options, str):
+    if java_options is None:
+        java_options = []
+
+    elif isinstance(java_options, str):
         java_options = [java_options]
 
     options = build_options(kwargs)
@@ -137,7 +142,7 @@ def convert_into(input_path, output_path, **kwargs):
         if is_url:
             os.unlink(path)
 
-def convert_into_by_batch(input_dir, **kwargs):
+def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **kwargs):
     '''Convert tables from PDFs in a directory.
 
     Args:
@@ -157,10 +162,12 @@ def convert_into_by_batch(input_dir, **kwargs):
     if input_dir is None or not os.path.isdir(input_dir):
         raise AttributeError("'input_dir' shoud be directory path")
 
-    kwargs['format'] = extract_format_for_conversion(kwargs.get('output_format'))
+    kwargs['format'] = extract_format_for_conversion(output_format)
 
-    java_options = kwargs.get('java_options', [])
-    if isinstance(java_options, str):
+    if java_options is None:
+        java_options = []
+
+    elif isinstance(java_options, str):
         java_options = [java_options]
 
     # Option for batch
@@ -187,15 +194,20 @@ def extract_format_for_conversion(output_format='csv'):
         raise AttributeError("'output_format' has no attribute 'dataframe'")
 
 
-def extract_from(raw_json, pandas_options={}):
+def extract_from(raw_json, pandas_options=None):
     '''Extract tables from json.
 
     Args:
         raw_json (list):
             Decoded list from tabula-java JSON.
+        pandas_options (dict optional):
+            pandas options for `pd.DataFrame()`
     '''
 
     data_frames = []
+    if pandas_options is None:
+        pandas_options = {}
+
     columns = pandas_options.pop('columns', None)
     columns, header_line_number = convert_pandas_csv_options(pandas_options, columns)
 
@@ -260,7 +272,7 @@ def localize_file(path):
         return path, is_url
 
 
-def build_options(kwargs={}):
+def build_options(kwargs=None):
     '''Build options for tabula-java
 
     Args:
@@ -302,6 +314,8 @@ def build_options(kwargs={}):
         Built dictionary of options
     '''
     __options = []
+    if kwargs is None:
+        kwargs = {}
     options = kwargs.get('options', '')
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
