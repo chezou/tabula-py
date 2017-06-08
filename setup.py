@@ -15,7 +15,7 @@ __author__ = 'Michiaki Ariga'
 
 setup(
     name='tabula-py',
-    version='0.8.0',
+    version='0.9.0',
     description='Simple wrapper for tabula, read tables from PDF into DataFrame',
     long_description=read_file('README.md'),
     author=__author__,
