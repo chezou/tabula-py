@@ -34,6 +34,12 @@ def read_pdf(input_path, **kwargs):
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
             Set java options like `-Xmx256m`.
+        pandas_options (dict, optional):
+            Set pandas options like {'header': None}.
+        multiple_tables (bool, optional):
+            This is experimental option. It enables to handle multple tables within a page.
+            Note: If `multiple_tables` option is enabled, tabula-py uses not `pd.read_csv()`,
+             but `pd.DataFrame()`. Make sure to pass appropreate `pandas_options`.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
@@ -49,9 +55,8 @@ def read_pdf(input_path, **kwargs):
     elif output_format == 'json':
         kwargs['format'] = 'JSON'
 
-    multiple_tables = kwargs.get('multiple_tables')
+    multiple_tables = kwargs.pop('multiple_tables', None)
     if multiple_tables:
-        kwargs.pop('multiple_tables', None)
         kwargs['format'] = 'JSON'
 
     java_options = kwargs.get('java_options', [])
@@ -73,16 +78,20 @@ def read_pdf(input_path, **kwargs):
 
     encoding = kwargs.get('encoding', 'utf-8')
 
+    pandas_options = kwargs.get('pandas_options', {})
+
     fmt = kwargs.get('format')
     if fmt == 'JSON':
         if multiple_tables:
-            return extract_from(json.loads(output.decode(encoding)))
+            return extract_from(json.loads(output.decode(encoding)), pandas_options)
 
         else:
             return json.loads(output.decode(encoding))
 
     else:
-        return pd.read_csv(io.BytesIO(output), encoding=encoding)
+        pandas_options['encoding'] = pandas_options.get('encoding', encoding)
+
+        return pd.read_csv(io.BytesIO(output), **pandas_options)
 
 
 # Set alias for future rename from `read_pdf_table` to `read_pdf`
@@ -178,7 +187,7 @@ def extract_format_for_conversion(output_format='csv'):
         raise AttributeError("'output_format' has no attribute 'dataframe'")
 
 
-def extract_from(raw_json):
+def extract_from(raw_json, pandas_options={}):
     '''Extract tables from json.
 
     Args:
@@ -187,12 +196,41 @@ def extract_from(raw_json):
     '''
 
     data_frames = []
+    columns = pandas_options.pop('columns', None)
+    columns, header_line_number = convert_pandas_csv_options(pandas_options, columns)
 
     for table in raw_json:
         list_data = [[np.nan if not e['text'] else e['text'] for e in row] for row in table['data']]
-        data_frames.append(pd.DataFrame(list_data))
+        _columns = columns
+
+        if isinstance(header_line_number, int) and not columns:
+            _columns = list_data.pop(header_line_number)
+            _columns = ['' if e is np.nan else e for e in _columns]
+
+        data_frames.append(pd.DataFrame(data=list_data, columns=_columns, **pandas_options))
 
     return data_frames
+
+def convert_pandas_csv_options(pandas_options, columns):
+    ''' Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
+
+    Args:
+        pandas_option (dict):
+            pandas options like {'header': None}.
+        columns (list):
+            list of column name.
+    '''
+
+    _columns = pandas_options.pop('names', columns)
+    header = pandas_options.pop('header', None)
+
+    if header == 'infer':
+        header_line_number = 0 if not bool(_columns) else None
+    else:
+        header_line_number = header
+
+    return _columns, header_line_number
+
 
 def localize_file(path):
     '''Ensure localize target file.
