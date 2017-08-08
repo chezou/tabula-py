@@ -26,6 +26,12 @@ I confirmed working on macOS and Ubuntu. I can't fully support Windows environme
 pip install tabula-py
 ```
 
+If you want to become a contributor, you can install dependency for development of tabula-py as follows:
+
+```
+pip install -r requirements.txt -c constraints.txt
+```
+
 ## Example
 
 tabula-py enables you to extract table from PDF into DataFrame and JSON. It also can extract tables from PDF and save file as CSV, TSV or JSON.
@@ -58,10 +64,10 @@ See [example notebook](./examples/tabula_example.ipynb)
 - area (`list` of `float`, optional):
   - Portion of the page to analyze(top,left,bottom,right).
   - Example: [269.875, 12.75, 790.5, 561]. Default is entire page
-- spreadsheet (bool, optional):
-  - Force PDF to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
-- nospreadsheet (bool, optional):
-  - Force PDF not to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
+- lattice (bool, optional):
+  - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet). 
+- stream (bool, optional):
+  - [`nospreadsheet` option is deprecated] Force PDF to be extracted using stream-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
 - password (bool, optional):
   - Password to decrypt document. Default is empty
 - silent (bool, optional):
@@ -126,7 +132,7 @@ For example, using macOS's preview, I got area information of this [PDF](https:/
 
 
 ```
-java -jar ./target/tabula-0.9.0-jar-with-dependencies.jar -p all -a $y1,$x1,$y2,$x2 -o $csvfile $filename
+java -jar ./target/tabula-1.0.1-jar-with-dependencies.jar -p all -a $y1,$x1,$y2,$x2 -o $csvfile $filename
 ```
 
 given
@@ -143,7 +149,7 @@ x2 = left + width
 I confirmed with tabula-java:
 
 ```
-java -jar ./tabula/tabula-0.9.1-jar-with-dependencies.jar -a "337.29,226.49,472.85,384.91" table.pdf
+java -jar ./tabula/tabula-1.0.1-jar-with-dependencies.jar -a "337.29,226.49,472.85,384.91" table.pdf
 ```
 
 Without `-r`(same as `--spreadsheet`) option, it does not work properly.

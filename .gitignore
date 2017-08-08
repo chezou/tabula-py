@@ -59,6 +59,7 @@ target/
 .python-version
 
 venv
+.venv
 *~
 
 .vscode

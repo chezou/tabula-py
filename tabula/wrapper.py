@@ -16,9 +16,9 @@ import subprocess
 import requests
 import pandas as pd
 import numpy as np
-from .util import deprecated
+from .util import deprecated_option
 
-JAR_NAME = "tabula-0.9.2-jar-with-dependencies.jar"
+JAR_NAME = "tabula-1.0.1-jar-with-dependencies.jar"
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
@@ -95,10 +95,6 @@ def read_pdf(input_path,
         pandas_options['encoding'] = pandas_options.get('encoding', encoding)
 
         return pd.read_csv(io.BytesIO(output), **pandas_options)
-
-
-# Set alias for future rename from `read_pdf_table` to `read_pdf`
-read_pdf_table = deprecated(read_pdf)
 
 
 def convert_into(input_path, output_path, output_format='csv', java_options=None, **kwargs):
@@ -287,12 +283,12 @@ def build_options(kwargs=None):
         area (:obj:`list` of :obj:`float`, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Example: [269.875,12.75,790.5,561]. Default is entire page
-        spreadsheet (bool, optional):
-            Force PDF to be extracted using spreadsheet-style extraction
+        lattice (bool, optional):
+            Force PDF to be extracted using lattice-mode extraction
             (if there are ruling lines separating each cell, as in a PDF of an
             Excel spreadsheet)
-        nospreadsheet (bool, optional):
-            Force PDF not to be extracted using spreadsheet-style extraction
+        stream (bool, optional):
+            Force PDF to be extracted using stream-mode extraction
             (if there are ruling lines separating each cell, as in a PDF of an
              Excel spreadsheet)
         password (str, optional):
@@ -319,6 +315,10 @@ def build_options(kwargs=None):
     options = kwargs.get('options', '')
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
+
+    DEPRECATED_OPTIONS = ['spreadsheet', 'nospreadsheet']
+    for option in kwargs.keys() and DEPRECATED_OPTIONS:
+        deprecated_option(option)
 
     # parse options
     pages = kwargs.get('pages', 1)
@@ -351,13 +351,13 @@ def build_options(kwargs=None):
     if output_path:
         __options += ["--outfile", output_path]
 
-    spreadsheet = kwargs.get('spreadsheet')
-    if spreadsheet:
-        __options.append("--spreadsheet")
+    lattice = kwargs.get('lattice') or kwargs.get('spreadsheet')
+    if lattice:
+        __options.append("--lattice")
 
-    nospreadsheet = kwargs.get('nospreadsheet')
-    if nospreadsheet:
-        __options.append("--no-spreadsheet")
+    stream = kwargs.get('stream') or kwargs.get('nospreadsheet')
+    if stream:
+        __options.append("--stream")
 
     columns = kwargs.get('columns')
     if columns:
