@@ -58,10 +58,10 @@ See [example notebook](./examples/tabula_example.ipynb)
 - area (`list` of `float`, optional):
   - Portion of the page to analyze(top,left,bottom,right).
   - Example: [269.875, 12.75, 790.5, 561]. Default is entire page
-- spreadsheet (bool, optional):
-  - Force PDF to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
-- nospreadsheet (bool, optional):
-  - Force PDF not to be extracted using spreadsheet-style extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
+- lattice (bool, optional):
+  - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet). 
+- stream (bool, optional):
+  - [`nospreadsheet` option is deprecated] Force PDF to be extracted using stream-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
 - password (bool, optional):
   - Password to decrypt document. Default is empty
 - silent (bool, optional):

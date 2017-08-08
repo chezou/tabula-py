@@ -12,3 +12,7 @@ def deprecated(func):
     newFunc.__doc__ = func.__doc__
     newFunc.__dict__.update(func.__dict__)
     return newFunc
+
+def deprecated_option(option):
+    warnings.warn("Call to deprecated option {}.".format(option),
+                  category=DeprecationWarning, stacklevel=2)
