@@ -97,10 +97,6 @@ def read_pdf(input_path,
         return pd.read_csv(io.BytesIO(output), **pandas_options)
 
 
-# Set alias for future rename from `read_pdf_table` to `read_pdf`
-read_pdf_table = deprecated(read_pdf)
-
-
 def convert_into(input_path, output_path, output_format='csv', java_options=None, **kwargs):
     '''Convert tables from PDF into a file.
 
