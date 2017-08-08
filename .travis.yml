@@ -3,6 +3,8 @@ language: python
 python:
   - 2.7
   - 3.5
+before_install:
+  - pip install --upgrade setuptools
 install:
 # Avoid pkg_resources.VersionConflict see also: https://github.com/ryanhiebert/tox-travis/issues/26
   - pip install tox
