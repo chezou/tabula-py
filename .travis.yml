@@ -4,6 +4,8 @@ python:
   - 2.7
   - 3.5
 install:
+# Avoid pkg_resources.VersionConflict see also: https://github.com/ryanhiebert/tox-travis/issues/26
+  - pip install tox
   - pip install tox-travis
   - pip install coverage coveralls
 script:
