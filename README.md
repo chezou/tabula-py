@@ -93,6 +93,16 @@ See [example notebook](./examples/tabula_example.ipynb)
 
 ## FAQ
 
+### I can't `from tabula import read_pdf`
+
+If you've installed `tabula`, it will be conflict the namespace. You should install `tabula-py` after removing `tabula`.
+
+```
+pip uninstall tabula
+pip install tabula-py
+```
+
+
 ### Can I use option `xxx`?
 
 Yes. You can use `options` argument as following. The format is same as cli of tabula-java.
