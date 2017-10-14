@@ -93,6 +93,10 @@ See [example notebook](./examples/tabula_example.ipynb)
 
 ## FAQ
 
+### `tabula-py` does not work
+
+There are several possible reasons, but `tabula-py` is just a wrapper of [`tabula-java`](https://github.com/tabulapdf/tabula-java), make sure you've installed Java and you can use `java` command on your terminal. Many issue reporters forget to set PATH for `java` command.
+
 ### I can't `from tabula import read_pdf`
 
 If you've installed `tabula`, it will be conflict the namespace. You should install `tabula-py` after removing `tabula`.
