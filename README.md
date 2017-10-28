@@ -54,6 +54,19 @@ tabula.convert_into_by_batch("input_directory", output_format='csv')
 
 See [example notebook](./examples/tabula_example.ipynb)
 
+## Get tabula-py working (Windows 10)
+
+This instruction is originally written by @lahoffm. Thanks!
+
+- If you don't have it already, install [Java](https://www.java.com/en/download/manual.jsp)
+- Try to run example code (replace the appropriate PDF file name).
+- If there's a `FileNotFoundError` when it calls `read_pdf()`, and when you type `java` on command line it says
+`'java' is not recognized as an internal or external command, operable program or batch file`, you should set `PATH` environment variable to point to the Java directory.
+- Find the main Java folder like `jre...` or `jdk...`. On Windows 10 it was under `C:\Program Files\Java`
+- On Windows 10: **Control Panel** -> **System and Security** -> **System** -> **Advanced System Settings** -> **Environment Variables** -> Select **PATH** --> **Edit**
+- Add the `bin` folder like `C:\Program Files\Java\jre1.8.0_144\bin`, hit OK a bunch of times.
+- On command line, `java` should now print a list of options, and `tabula.read_pdf()` should run.
+
 ## Options
 
 - pages (str, int, `list` of `int`, optional)
