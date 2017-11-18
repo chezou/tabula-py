@@ -279,7 +279,7 @@ def build_options(kwargs=None):
             `str`,`int`, :obj:`list` of :obj:`int`.
             Example: '1-2,3', 'all' or [1,2]
         guess (bool, optional):
-            Guess the portion of the page to analyze per page.
+            Guess the portion of the page to analyze per page. Default `True`
         area (:obj:`list` of :obj:`float`, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Example: [269.875,12.75,790.5,561]. Default is entire page

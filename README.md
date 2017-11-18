@@ -56,7 +56,7 @@ See [example notebook](./examples/tabula_example.ipynb)
 
 ## Get tabula-py working (Windows 10)
 
-This instruction is originally written by @lahoffm. Thanks!
+This instruction is originally written by [@lahoffm](https://github.com/lahoffm). Thanks!
 
 - If you don't have it already, install [Java](https://www.java.com/en/download/manual.jsp)
 - Try to run example code (replace the appropriate PDF file name).
@@ -73,7 +73,7 @@ This instruction is originally written by @lahoffm. Thanks!
   - An optional values specifying pages to extract from. It allows `str`, `int`, `list` of `int`.
   - Example: 1, '1-2,3', 'all' or [1,2]. Default is 1
 - guess (bool, optional):
-  - Guess the portion of the page to analyze per page.
+  - Guess the portion of the page to analyze per page. Default `True`
 - area (`list` of `float`, optional):
   - Portion of the page to analyze(top,left,bottom,right).
   - Example: [269.875, 12.75, 790.5, 561]. Default is entire page
@@ -119,6 +119,9 @@ pip uninstall tabula
 pip install tabula-py
 ```
 
+### The result is different from `tabula-java`. Or, `stream` option seems not to work appropreately
+
+`tabula-py` set `guess` option `True` by default, for beginners. It is known to make a conflict between `stream` option. If you feel something strange with your result, please set `guess=False`.
 
 ### Can I use option `xxx`?
 
