@@ -44,36 +44,35 @@ class TestReadPdfTable(unittest.TestCase):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv1 = 'tests/resources/data_1.csv'
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1, java_options=['-Xmx256m']
-                                       ).equals(pd.read_csv(expected_csv1)))
+                                        ).equals(pd.read_csv(expected_csv1)))
 
     def test_read_pdf_with_pandas_option(self):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv1 = 'tests/resources/data_1.csv'
         column_name = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1, pandas_options={'header': None}
-                                       ).equals(pd.read_csv(expected_csv1, header=None)))
+                                        ).equals(pd.read_csv(expected_csv1, header=None)))
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1, pandas_options={'header': 0}
-                                       ).equals(pd.read_csv(expected_csv1, header=0)))
+                                        ).equals(pd.read_csv(expected_csv1, header=0)))
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1, pandas_options={'header': 'infer'}
-                                       ).equals(pd.read_csv(expected_csv1, header='infer')))
+                                        ).equals(pd.read_csv(expected_csv1, header='infer')))
         self.assertTrue(
             tabula.read_pdf(
                 pdf_path, pages=1, pandas_options={'header': 'infer', 'names': column_name}
-                ).equals(pd.read_csv(expected_csv1, header='infer', names=column_name))
+            ).equals(pd.read_csv(expected_csv1, header='infer', names=column_name))
         )
         self.assertTrue(
             tabula.read_pdf(
                 pdf_path, pages=1, multiple_tables=True,
                 pandas_options={'header': 'infer', 'names': column_name}
-                )[0].equals(pd.read_csv(expected_csv1, header='infer', names=column_name))
+            )[0].equals(pd.read_csv(expected_csv1, header='infer', names=column_name))
         )
         self.assertTrue(
             tabula.read_pdf(
                 pdf_path, pages=1, multiple_tables=True,
                 pandas_options={'header': 'infer', 'columns': column_name}
-                )[0].equals(pd.read_csv(expected_csv1, header='infer', names=column_name))
+            )[0].equals(pd.read_csv(expected_csv1, header='infer', names=column_name))
         )
-
 
     def test_read_pdf_for_multiple_tables(self):
         pdf_path = 'tests/resources/data.pdf'
