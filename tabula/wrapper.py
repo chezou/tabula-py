@@ -22,6 +22,7 @@ JAR_NAME = "tabula-1.0.1-jar-with-dependencies.jar"
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
+
 def read_pdf(input_path,
              output_format='dataframe',
              encoding='utf-8',
@@ -138,6 +139,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         if is_url:
             os.unlink(path)
 
+
 def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **kwargs):
     '''Convert tables from PDFs in a directory.
 
@@ -219,6 +221,7 @@ def extract_from(raw_json, pandas_options=None):
 
     return data_frames
 
+
 def convert_pandas_csv_options(pandas_options, columns):
     ''' Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
@@ -252,10 +255,10 @@ def localize_file(path):
 
     is_url = False
     try:
-        pid = os.getpid()
         r = requests.get(path)
         filename = os.path.basename(r.url)
         if os.path.splitext(filename)[-1] is not ".pdf":
+            pid = os.getpid()
             filename = "{0}.pdf".format(pid)
 
         with open(filename, 'wb') as f:
@@ -264,7 +267,7 @@ def localize_file(path):
         is_url = True
         return filename, is_url
 
-    except:
+    except requests.exceptions.RequestException as e:
         return path, is_url
 
 
