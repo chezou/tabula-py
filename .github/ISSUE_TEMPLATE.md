@@ -12,7 +12,7 @@ Please comply following issue template with your bug report. Since tabula-py is 
 
 # Environment
 
-Write and check your environment.
+Write and check your environment. Please paste outputs of specific commands if required.
 
 - [ ] Paste the output of `python --version` command on your terminal: ?
 - [ ] Paste the output of `java -version` command on your terminal: ?
