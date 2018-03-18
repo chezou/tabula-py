@@ -80,7 +80,7 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 - lattice (bool, optional):
   - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet). 
 - stream (bool, optional):
-  - [`nospreadsheet` option is deprecated] Force PDF to be extracted using stream-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
+  - [`nospreadsheet` option is deprecated] Force PDF to be extracted using stream-mode extraction (if there are no ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
 - password (bool, optional):
   - Password to decrypt document. Default is empty
 - silent (bool, optional):
