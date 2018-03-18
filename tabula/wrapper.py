@@ -292,7 +292,7 @@ def build_options(kwargs=None):
             Excel spreadsheet)
         stream (bool, optional):
             Force PDF to be extracted using stream-mode extraction
-            (if there are ruling lines separating each cell, as in a PDF of an
+            (if there are no ruling lines separating each cell, as in a PDF of an
              Excel spreadsheet)
         password (str, optional):
             Password to decrypt document. Default is empty
