@@ -18,6 +18,7 @@ setup(
     version='1.0.0',
     description='Simple wrapper for tabula, read tables from PDF into DataFrame',
     long_description=read_file('README.md'),
+    long_description_content_type="text/markdown",
     author=__author__,
     author_email='chezou@gmail.com',
     url='https://github.com/chezou/tabula-py',
