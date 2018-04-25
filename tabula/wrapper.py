@@ -73,7 +73,12 @@ def read_pdf(input_path,
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
-        output = subprocess.check_output(args)
+        output = subprocess.check_output(args, stderr=subprocess.STDOUT)
+
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        raise(ValueError)
+
     finally:
         if is_url:
             os.unlink(path)
@@ -134,7 +139,12 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
-        subprocess.check_output(args)
+        subprocess.check_output(args, stderr=subprocess.STDOUT)
+
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        raise(ValueError)
+
     finally:
         if is_url:
             os.unlink(path)

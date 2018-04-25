@@ -84,6 +84,11 @@ class TestReadPdfTable(unittest.TestCase):
         with self.assertRaises(pd.errors.ParserError):
             tabula.read_pdf(pdf_path, pages=2)
 
+    def test_read_pdf_exception(self):
+        invalid_pdf_path = 'notexist.pdf'
+        with self.assertRaises(ValueError):
+            tabula.read_pdf(invalid_pdf_path)
+
     def test_convert_from(self):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv = 'tests/resources/data_1.csv'
