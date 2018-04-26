@@ -77,7 +77,7 @@ def read_pdf(input_path,
 
     except subprocess.CalledProcessError as e:
         print(e.output)
-        raise(ValueError)
+        raise
 
     finally:
         if is_url:
@@ -143,7 +143,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
 
     except subprocess.CalledProcessError as e:
         print(e.output)
-        raise(ValueError)
+        raise
 
     finally:
         if is_url:

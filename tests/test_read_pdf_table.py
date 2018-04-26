@@ -6,7 +6,7 @@ import json
 import os
 import pandas as pd
 import shutil
-
+import subprocess
 
 class TestReadPdfTable(unittest.TestCase):
     def test_read_pdf(self):
@@ -86,7 +86,7 @@ class TestReadPdfTable(unittest.TestCase):
 
     def test_read_pdf_exception(self):
         invalid_pdf_path = 'notexist.pdf'
-        with self.assertRaises(ValueError):
+        with self.assertRaises(subprocess.CalledProcessError):
             tabula.read_pdf(invalid_pdf_path)
 
     def test_convert_from(self):
