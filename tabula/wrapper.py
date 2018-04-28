@@ -73,10 +73,10 @@ def read_pdf(input_path,
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
-        output = subprocess.check_output(args, stderr=subprocess.STDOUT)
+        output = subprocess.check_output(args)
 
     except subprocess.CalledProcessError as e:
-        print(e.output)
+        print("Error: {}".format(e.output))
         raise
 
     finally:
@@ -139,7 +139,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
-        subprocess.check_output(args, stderr=subprocess.STDOUT)
+        subprocess.check_output(args)
 
     except subprocess.CalledProcessError as e:
         print(e.output)
