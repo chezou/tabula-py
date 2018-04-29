@@ -128,7 +128,7 @@ pip install tabula-py
 Yes. You can use `options` argument as following. The format is same as cli of tabula-java.
 
 ```py
-read_pdf_table(file_path, options="--columns 10.1,20.2,30.3")
+read_pdf(file_path, options="--columns 10.1,20.2,30.3")
 ```
 
 ### How can I ignore useless area?
