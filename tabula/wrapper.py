@@ -76,7 +76,7 @@ def read_pdf(input_path,
         output = subprocess.check_output(args)
 
     except subprocess.CalledProcessError as e:
-        print("Error: {}".format(e.output))
+        print("Error: {}".format(e.output.decode(encoding)))
         raise
 
     finally:
@@ -142,7 +142,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         subprocess.check_output(args)
 
     except subprocess.CalledProcessError as e:
-        print(e.output)
+        print("Error: {}".format(e.output))
         raise
 
     finally:
