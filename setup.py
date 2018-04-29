@@ -2,6 +2,7 @@ from setuptools import setup
 from setuptools import find_packages
 import os
 
+
 def read_file(filename):
     filepath = os.path.join(
         os.path.dirname(os.path.dirname(__file__)), filename)
