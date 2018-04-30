@@ -20,7 +20,6 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as f:
     about['__long_description__'] = f.read()
 
 
-
 setup(
     name=about['__title__'],
     version=about['__version__'],
