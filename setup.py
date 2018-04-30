@@ -12,17 +12,27 @@ def read_file(filename):
         return ''
 
 
-__author__ = 'Michiaki Ariga'
+about = {}
+with open(os.path.join(os.path.dirname(__file__), 'tabula', '__version__.py')) as f:
+    exec(f.read(), about)
+
+with open(os.path.join(os.path.dirname(__file__), 'README.md')) as f:
+    about['__long_description__'] = f.read()
+
+
 
 setup(
-    name='tabula-py',
-    version='1.0.0',
-    description='Simple wrapper for tabula, read tables from PDF into DataFrame',
-    long_description=read_file('README.md'),
+    name=about['__title__'],
+    version=about['__version__'],
+    description=about['__description__'],
+    long_description=about['__long_description__'],
     long_description_content_type="text/markdown",
-    author=__author__,
-    author_email='chezou@gmail.com',
-    url='https://github.com/chezou/tabula-py',
+    author=about['__author__'],
+    author_email=about['__author_email__'],
+    maintainer=about['__maintainer__'],
+    maintainer_email=about['__maintainer_email__'],
+    license=about['__license__'],
+    url=about['__url__'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Topic :: Text Processing :: General',
@@ -33,7 +43,6 @@ setup(
     ],
     include_package_data=True,
     packages=find_packages(),
-    license='MIT License',
     keywords=['data frame', 'pdf', 'table'],
     setup_requires=[
         'flake8',
