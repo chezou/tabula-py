@@ -37,5 +37,5 @@ paste your core code
 paste your output
 ```
 
-## What did you intend to be?
+## What did you intend it to be?
 
