@@ -8,6 +8,7 @@ import pandas as pd
 import shutil
 import subprocess
 
+
 class TestReadPdfTable(unittest.TestCase):
     def test_read_pdf(self):
         pdf_path = 'tests/resources/data.pdf'

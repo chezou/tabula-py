@@ -50,5 +50,6 @@ setup(
         'pandas',
         'numpy',
         'requests',
+        'distro',
     ],
 )
