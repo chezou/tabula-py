@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/chezou/tabula-py.svg?branch=master)](https://travis-ci.org/chezou/tabula-py)
 
 `tabula-py` is a simple Python wrapper of [tabula-java](https://github.com/tabulapdf/tabula-java), which can read table of PDF.
-You can read tables from PDF and convert into pandas's DataFrame.
+You can read tables from PDF and convert into pandas's DataFrame. tabula-py also enables you to convert a PDF file into CSV/TSV/JSON file.
 
 ![](http://i.imgur.com/ODM8hst.jpg)
 
@@ -13,10 +13,12 @@ You can read tables from PDF and convert into pandas's DataFrame.
 - Java
   - Confirmed working with Java 7, 8
 - pandas
+- requests
+- distro
 
 ## OS
 
-I confirmed working on macOS and Ubuntu. I can't fully support Windows environment.
+I confirmed working on macOS and Ubuntu. But some people confirm it works on Windows 10. See also following the setting procedure.
 
 # Usage
 
@@ -110,6 +112,8 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 
 There are several possible reasons, but `tabula-py` is just a wrapper of [`tabula-java`](https://github.com/tabulapdf/tabula-java), make sure you've installed Java and you can use `java` command on your terminal. Many issue reporters forget to set PATH for `java` command.
 
+You can check whether tabula-py can call `java` from Python process with `tabula.environment_info()` function.
+
 ### I can't `from tabula import read_pdf`
 
 If you've installed `tabula`, it will be conflict the namespace. You should install `tabula-py` after removing `tabula`.
@@ -186,4 +190,8 @@ Without `-r`(same as `--spreadsheet`) option, it does not work properly.
 
 ### I faced `CParserError`. How can I extract multiple tables?
 
-Use `mutiple_tables` option. Note: This option is experimental.
+Use `mutiple_tables` option.
+
+### I want to prevent tabula-py from stealing focus on every call on my mac 
+
+Set `java_options=["-Djava.awt.headless=true"]`. kudos [@jakekara](https://twitter.com/jakekara/status/979031539697831937)
