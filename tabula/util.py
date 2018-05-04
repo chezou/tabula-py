@@ -36,13 +36,12 @@ def java_version():
 def environment_info():
     import sys
     import distro
-    import textwrap
     from .__version__ import __version__
 
     print("""Python version:
     {}
 Java version:
-{}
+    {}
 tabula-py version: {}
 platform: {}
 uname:
@@ -51,7 +50,7 @@ linux_distribution: {}
 mac_ver: {}
     """.format(
         sys.version,
-        textwrap.indent(java_version().strip(), "    "),
+        java_version().strip(),
         __version__,
         platform.platform(),
         str(platform.uname()),        
