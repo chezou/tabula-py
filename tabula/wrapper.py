@@ -22,6 +22,15 @@ JAR_NAME = "tabula-1.0.1-jar-with-dependencies.jar"
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
+JAVA_NOT_FOUND_ERROR = "`java` command is not found from this Python process. Please ensure Java is installed and PATH is set for `java`"
+
+
+# TODO: Remove this Python 2 compatibility code if possible
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
 
 def read_pdf(input_path,
              output_format='dataframe',
@@ -74,6 +83,11 @@ def read_pdf(input_path,
 
     try:
         output = subprocess.check_output(args)
+
+    except FileNotFoundError as e:
+        print("Error: {}".format(e))
+        print("Error: {}".format(JAVA_NOT_FOUND_ERROR))
+        raise
 
     except subprocess.CalledProcessError as e:
         print("Error: {}".format(e.output.decode(encoding)))
@@ -141,6 +155,11 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     try:
         subprocess.check_output(args)
 
+    except FileNotFoundError as e:
+        print("Error: {}".format(e))
+        print("Error: {}".format(JAVA_NOT_FOUND_ERROR))
+        raise
+
     except subprocess.CalledProcessError as e:
         print("Error: {}".format(e.output))
         raise
@@ -185,7 +204,17 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
 
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options
 
-    subprocess.check_output(args)
+    try:
+        subprocess.check_output(args)
+
+    except FileNotFoundError as e:
+        print("Error: {}".format(e))
+        print("Error: {}".format(JAVA_NOT_FOUND_ERROR))
+        raise
+
+    except subprocess.CalledProcessError as e:
+        print("Error: {}".format(e.output))
+        raise
 
 
 def extract_format_for_conversion(output_format='csv'):
