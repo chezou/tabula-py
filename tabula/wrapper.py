@@ -25,6 +25,13 @@ JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 JAVA_NOT_FOUND_ERROR = "`java` command is not found from this Python process. Please ensure Java is installed and PATH is set for `java`"
 
 
+# TODO: Remove this Python 2 compatibility code if possible
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
+
 def read_pdf(input_path,
              output_format='dataframe',
              encoding='utf-8',
