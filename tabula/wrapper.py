@@ -39,7 +39,7 @@ def read_pdf(input_path,
         output_format (str, optional):
             Output format of this function (dataframe or json)
         encoding (str, optional):
-n            Encoding type for pandas. Default is 'utf-8'
+            Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
             Set java options like `-Xmx256m`.
         pandas_options (dict, optional):
