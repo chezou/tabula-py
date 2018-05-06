@@ -27,8 +27,9 @@ def java_version():
     try:
         res = subprocess.check_output(["java", "-version"], stderr=subprocess.STDOUT)
         res = res.decode()
-    except subprocess.CalledProcessError as e:
-        res = "`java -version` faild. `java` command is not found from this Python process. Please ensure to set PATH for `java`"
+        
+    except FileNotFoundError as e:
+        res = "`java -version` faild. `java` command is not found from this Python process. Please ensure Java is installed and PATH is set for `java`"
 
     return res
 
@@ -53,7 +54,7 @@ mac_ver: {}
         java_version().strip(),
         __version__,
         platform.platform(),
-        str(platform.uname()),        
+        str(platform.uname()),
         distro.linux_distribution(),
         platform.mac_ver(),
     ))
