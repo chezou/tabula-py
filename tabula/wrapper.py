@@ -78,7 +78,11 @@ def read_pdf(input_path,
     elif isinstance(java_options, str):
         java_options = [java_options]
 
-    options = build_options(kwargs)
+    options, conditions = build_options(kwargs)
+    if conditions.get('multiple_areas'):
+        multiple_tables = True
+        kwargs['format'] = 'JSON'
+
     path, is_url = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
@@ -149,7 +153,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     elif isinstance(java_options, str):
         java_options = [java_options]
 
-    options = build_options(kwargs)
+    options, _ = build_options(kwargs)
     path, is_url = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
@@ -201,7 +205,7 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
     # Option for batch
     kwargs['batch'] = input_dir
 
-    options = build_options(kwargs)
+    options, _ = build_options(kwargs)
 
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options
 
@@ -323,9 +327,13 @@ def build_options(kwargs=None):
             Example: '1-2,3', 'all' or [1,2]
         guess (bool, optional):
             Guess the portion of the page to analyze per page. Default `True`
-        area (:obj:`list` of :obj:`float`, optional):
+        area (:obj:`list` of :obj:`float` or :obj:`list` of :obj:`list` of :obj:`float`, optional):
             Portion of the page to analyze(top,left,bottom,right).
-            Example: [269.875,12.75,790.5,561]. Default is entire page
+            Example: [269.875,12.75,790.5,561] or [[12.1,20.5,30.1,50.2],[1.0,3.2,10.5,40.2]].
+            Default is entire page
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by '%', input will be taken as
+            % of actual height or width of the page. Default False.
         lattice (bool, optional):
             Force PDF to be extracted using lattice-mode extraction
             (if there are ruling lines separating each cell, as in a PDF of an
@@ -350,9 +358,11 @@ def build_options(kwargs=None):
             Same as `--outfile` option of tabula-java.
 
     Returns:
-        Built dictionary of options
+        `obj`:list: Built list of options
+        `obj`:dict: Dictionary of exteral conditions
     '''
     __options = []
+    __conditions = {}
     if kwargs is None:
         kwargs = {}
     options = kwargs.get('options', '')
@@ -379,12 +389,20 @@ def build_options(kwargs=None):
         __options.append("--guess")
 
     area = kwargs.get('area')
+    realative_area = kwargs.get('realative_area', False)
     if area:
         __area = area
         if type(area) in [list, tuple]:
-            __area = ",".join(map(str, area))
+            # Check if nested list or tuple for multiple areas
+            if any(isinstance(e, list) or isinstance(e, tuple) for e in area):
+                for e in area:
+                    __area = "{percent}{area_str}".format(percent='%' if realative_area else '', area_str=",".join(map(str, area)))
+                    __options += ["--area", __area]
+                    __conditions['multiple_areas'] = True
 
-        __options += ["--area", __area]
+            else:
+                __area = "{percent}{area_str}".format(percent='%' if realative_area else '', area_str=",".join(map(str, area)))
+                __options += ["--area", __area]
 
     fmt = kwargs.get('format')
     if fmt:
@@ -419,4 +437,4 @@ def build_options(kwargs=None):
     if silent:
         __options.append("--silent")
 
-    return __options
+    return __options, __conditions
