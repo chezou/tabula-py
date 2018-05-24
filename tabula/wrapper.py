@@ -18,7 +18,8 @@ import pandas as pd
 import numpy as np
 from .util import deprecated_option
 
-JAR_NAME = "tabula-1.0.1-jar-with-dependencies.jar"
+TABULA_JAVA_VERSION = "1.0.2"
+JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
