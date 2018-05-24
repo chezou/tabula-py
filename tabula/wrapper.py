@@ -18,7 +18,8 @@ import pandas as pd
 import numpy as np
 from .util import deprecated_option
 
-JAR_NAME = "tabula-1.0.1-jar-with-dependencies.jar"
+TABULA_JAVA_VERSION = "1.0.2"
+JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
 
@@ -78,6 +79,7 @@ def read_pdf(input_path,
         java_options = [java_options]
 
     options = build_options(kwargs)
+
     path, is_url = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
@@ -322,9 +324,13 @@ def build_options(kwargs=None):
             Example: '1-2,3', 'all' or [1,2]
         guess (bool, optional):
             Guess the portion of the page to analyze per page. Default `True`
-        area (:obj:`list` of :obj:`float`, optional):
+        area (:obj:`list` of :obj:`float` or :obj:`list` of :obj:`list` of :obj:`float`, optional):
             Portion of the page to analyze(top,left,bottom,right).
-            Example: [269.875,12.75,790.5,561]. Default is entire page
+            Example: [269.875,12.75,790.5,561] or [[12.1,20.5,30.1,50.2],[1.0,3.2,10.5,40.2]].
+            Default is entire page
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by '%', input will be taken as
+            % of actual height or width of the page. Default False.
         lattice (bool, optional):
             Force PDF to be extracted using lattice-mode extraction
             (if there are ruling lines separating each cell, as in a PDF of an
@@ -349,7 +355,7 @@ def build_options(kwargs=None):
             Same as `--outfile` option of tabula-java.
 
     Returns:
-        Built dictionary of options
+        `obj`:list: Built list of options
     '''
     __options = []
     if kwargs is None:
@@ -373,17 +379,26 @@ def build_options(kwargs=None):
 
         __options += ["--pages", __pages]
 
-    guess = kwargs.get('guess', True)
-    if guess:
-        __options.append("--guess")
-
     area = kwargs.get('area')
+    relative_area = kwargs.get('relative_area')
+    multiple_areas = False
     if area:
         __area = area
         if type(area) in [list, tuple]:
-            __area = ",".join(map(str, area))
+            # Check if nested list or tuple for multiple areas
+            if any(type(e) in [list, tuple] for e in area):
+                for e in area:
+                    __area = "{percent}{area_str}".format(percent='%' if relative_area else '', area_str=",".join(map(str, e)))
+                    __options += ["--area", __area]
+                    multiple_areas = True
 
-        __options += ["--area", __area]
+            else:
+                __area = "{percent}{area_str}".format(percent='%' if relative_area else '', area_str=",".join(map(str, area)))
+                __options += ["--area", __area]
+
+    guess = kwargs.get('guess', True)
+    if guess and not multiple_areas:
+        __options.append("--guess")
 
     fmt = kwargs.get('format')
     if fmt:
