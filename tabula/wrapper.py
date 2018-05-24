@@ -78,10 +78,7 @@ def read_pdf(input_path,
     elif isinstance(java_options, str):
         java_options = [java_options]
 
-    options, conditions = build_options(kwargs)
-    if conditions.get('multiple_areas'):
-        multiple_tables = True
-        kwargs['format'] = 'JSON'
+    options = build_options(kwargs)
 
     path, is_url = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
@@ -153,7 +150,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     elif isinstance(java_options, str):
         java_options = [java_options]
 
-    options, _ = build_options(kwargs)
+    options = build_options(kwargs)
     path, is_url = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
@@ -205,7 +202,7 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
     # Option for batch
     kwargs['batch'] = input_dir
 
-    options, _ = build_options(kwargs)
+    options = build_options(kwargs)
 
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options
 
@@ -359,10 +356,8 @@ def build_options(kwargs=None):
 
     Returns:
         `obj`:list: Built list of options
-        `obj`:dict: Dictionary of exteral conditions
     '''
     __options = []
-    __conditions = {}
     if kwargs is None:
         kwargs = {}
     options = kwargs.get('options', '')
@@ -384,25 +379,26 @@ def build_options(kwargs=None):
 
         __options += ["--pages", __pages]
 
-    guess = kwargs.get('guess', True)
-    if guess:
-        __options.append("--guess")
-
     area = kwargs.get('area')
-    realative_area = kwargs.get('realative_area', False)
+    relative_area = kwargs.get('relative_area')
+    multiple_areas = False
     if area:
         __area = area
         if type(area) in [list, tuple]:
             # Check if nested list or tuple for multiple areas
-            if any(isinstance(e, list) or isinstance(e, tuple) for e in area):
+            if any(type(e) in [list, tuple] for e in area):
                 for e in area:
-                    __area = "{percent}{area_str}".format(percent='%' if realative_area else '', area_str=",".join(map(str, area)))
+                    __area = "{percent}{area_str}".format(percent='%' if relative_area else '', area_str=",".join(map(str, e)))
                     __options += ["--area", __area]
-                    __conditions['multiple_areas'] = True
+                    multiple_areas = True
 
             else:
-                __area = "{percent}{area_str}".format(percent='%' if realative_area else '', area_str=",".join(map(str, area)))
+                __area = "{percent}{area_str}".format(percent='%' if relative_area else '', area_str=",".join(map(str, area)))
                 __options += ["--area", __area]
+
+    guess = kwargs.get('guess', True)
+    if guess and not multiple_areas:
+        __options.append("--guess")
 
     fmt = kwargs.get('format')
     if fmt:
@@ -437,4 +433,4 @@ def build_options(kwargs=None):
     if silent:
         __options.append("--silent")
 
-    return __options, __conditions
+    return __options
