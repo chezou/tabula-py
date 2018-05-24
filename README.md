@@ -78,7 +78,9 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
   - Guess the portion of the page to analyze per page. Default `True`
 - area (`list` of `float`, optional):
   - Portion of the page to analyze(top,left,bottom,right).
-  - Example: [269.875, 12.75, 790.5, 561]. Default is entire page
+  - Example: [269.875, 12.75, 790.5, 561]  or [[12.1,20.5,30.1,50.2],[1.0,3.2,10.5,40.2]]. Default is entire page
+- relative_area (bool, optional):
+  - If all area values are between 0-100 (inclusive) and preceded by '%', input will be taken as % of actual height or width of the page. Default `False`.
 - lattice (bool, optional):
   - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet). 
 - stream (bool, optional):
