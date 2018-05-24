@@ -35,11 +35,12 @@ class TestReadPdfTable(unittest.TestCase):
         pdf_path = 'tests/resources/data.pdf'
         expected_csv1 = 'tests/resources/data_1.csv'
         expected_csv2 = 'tests/resources/data_2-3.csv'
+        expected_df2 = pd.read_csv(expected_csv2)
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1).equals(pd.read_csv(expected_csv1)))
         self.assertTrue(tabula.read_pdf(pdf_path, pages='2-3', nospreadsheet=True,
-                                        guess=False).equals(pd.read_csv(expected_csv2)))
+                                        guess=False).equals(expected_df2))
         self.assertTrue(tabula.read_pdf(pdf_path, pages=(2, 3), nospreadsheet=True,
-                                        guess=False).equals(pd.read_csv(expected_csv2)))
+                                        guess=False).equals(expected_df2))
 
     def test_read_pdf_with_multiple_areas(self):
         # Original files are taken from https://github.com/tabulapdf/tabula-java/pull/213
@@ -47,9 +48,9 @@ class TestReadPdfTable(unittest.TestCase):
         expected_csv = 'tests/resources/MultiColumn.csv'
         expected_df = pd.read_csv(expected_csv)
         self.assertTrue(tabula.read_pdf(
-            pdf_path, pages=1, area=[[0,0,100,50],[0,50,100,100]], relative_area=True).equals(expected_df))
+            pdf_path, pages=1, area=[[0, 0, 100, 50], [0, 50, 100, 100]], relative_area=True).equals(expected_df))
         self.assertTrue(tabula.read_pdf(
-            pdf_path, pages=1, area=[[0,0,451,212],[0,212,451,425]]).equals(expected_df))
+            pdf_path, pages=1, area=[[0, 0, 451, 212], [0, 212, 451, 425]]).equals(expected_df))
 
     def test_read_pdf_with_java_option(self):
         pdf_path = 'tests/resources/data.pdf'
