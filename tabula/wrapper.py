@@ -76,7 +76,7 @@ def read_pdf(input_path,
         java_options = []
 
     elif isinstance(java_options, str):
-        java_options = [java_options]
+        java_options = shlex.split(java_options)
 
     options = build_options(kwargs)
 
@@ -148,7 +148,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         java_options = []
 
     elif isinstance(java_options, str):
-        java_options = [java_options]
+        java_options = shlex.split(java_options)
 
     options = build_options(kwargs)
     path, is_url = localize_file(input_path)
@@ -197,7 +197,7 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
         java_options = []
 
     elif isinstance(java_options, str):
-        java_options = [java_options]
+        java_options = shlex.split(java_options)
 
     # Option for batch
     kwargs['batch'] = input_dir
