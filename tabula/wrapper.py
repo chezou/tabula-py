@@ -14,6 +14,7 @@ import os
 import shlex
 import subprocess
 import requests
+import re
 import pandas as pd
 import numpy as np
 from .util import deprecated_option
@@ -77,6 +78,11 @@ def read_pdf(input_path,
 
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
+
+    if encoding == 'utf-8':
+        r = re.compile('file.encoding')
+        if not any(filter(r.search, java_options)):
+            java_options = java_options + ['-Dfile.encoding=UTF8']
 
     options = build_options(kwargs)
 

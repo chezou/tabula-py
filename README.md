@@ -197,3 +197,24 @@ Use `mutiple_tables` option.
 ### I want to prevent tabula-py from stealing focus on every call on my mac 
 
 Set `java_options=["-Djava.awt.headless=true"]`. kudos [@jakekara](https://twitter.com/jakekara/status/979031539697831937)
+
+### I got `?` character with result on Windows. How can I avoid it?
+
+If the encoding of PDF is UTF-8, you should set `chcp 65001` on your terminal before launching a Python process.
+
+```sh
+chcp 65001
+```
+
+Then you can extract UTF-8 PDF with `java_options="-Dfile.encoding=UTF8"` option. This option will be added with `encoding='utf-8'` option, which is also set by default.
+
+```python
+# This is an example for java_options is set explicitly
+df = read_pdf(file_path, java_options="-Dfile.encoding=UTF8")
+```
+
+Replace `65001` and `UTF-8` appropriately, if the file encoding isn't UTF-8.
+
+### I can't extract file/directory name with space on Windows
+
+You should escape file/directory name yourself.
