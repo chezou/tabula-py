@@ -11,12 +11,14 @@ Todo:
 import io
 import json
 import os
+import platform
 import shlex
 import subprocess
-import requests
-import re
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+import requests
+
 from .util import deprecated_option
 
 TABULA_JAVA_VERSION = "1.0.2"
@@ -79,9 +81,15 @@ def read_pdf(input_path,
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
 
+    # to prevent tabula-py from stealing focus on every call on mac
+    if platform.system() == 'Darwin':
+        r = 'java.awt.headless'
+        if not any(filter(r.find, java_options)):
+            java_options = java_options + ['-Djava.awt.headless=true']
+
     if encoding == 'utf-8':
-        r = re.compile('file.encoding')
-        if not any(filter(r.search, java_options)):
+        r = 'file.encoding'
+        if not any(filter(r.find, java_options)):
             java_options = java_options + ['-Dfile.encoding=UTF8']
 
     options = build_options(kwargs)
