@@ -1,4 +1,4 @@
-requests
+urllib3
 pandas
 pytest
 flake8

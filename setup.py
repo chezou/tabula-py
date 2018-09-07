@@ -49,7 +49,7 @@ setup(
     install_requires=[
         'pandas',
         'numpy',
-        'requests',
+        'urllib3',
         'distro',
     ],
 )

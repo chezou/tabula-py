@@ -17,7 +17,6 @@ import subprocess
 
 import numpy as np
 import pandas as pd
-import requests
 import shutil
 import sys
 
@@ -27,9 +26,11 @@ PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
 
 if PY3:
+    from urllib.request import urlopen
     from urllib.parse import urlparse as parse_url
     from urllib.parse import uses_relative, uses_netloc, uses_params
 else:
+    from urllib2 import urlopen
     from urlparse import urlparse as parse_url
     from urlparse import uses_relative, uses_netloc, uses_params
 
@@ -111,7 +112,7 @@ def read_pdf(input_path,
 
     options = build_options(kwargs)
 
-    path, is_url = localize_file(input_path)
+    path, is_url = _localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
@@ -182,7 +183,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         java_options = shlex.split(java_options)
 
     options = build_options(kwargs)
-    path, is_url = localize_file(input_path)
+    path, is_url = _localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
@@ -315,7 +316,7 @@ def convert_pandas_csv_options(pandas_options, columns):
     return _columns, header_line_number
 
 
-def localize_file(path_or_buffer):
+def _localize_file(path_or_buffer):
     '''Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
@@ -326,25 +327,24 @@ def localize_file(path_or_buffer):
     '''
 
     if _is_url(path_or_buffer):
-        r = requests.get(path_or_buffer)
-        filename = os.path.basename(r.url)
-        print(filename)
+        req = urlopen(path_or_buffer)
+        filename = os.path.basename(req.geturl())
         if os.path.splitext(filename)[-1] is not ".pdf":
             pid = os.getpid()
             filename = "{0}.pdf".format(pid)
 
         with open(filename, 'wb') as f:
-            f.write(r.content)
+            shutil.copyfileobj(req, f)
 
         return filename, True
 
-    elif is_file_like(path_or_buffer):
+    elif _is_file_like(path_or_buffer):
         pid = os.getpid()
         filename = "{0}.pdf".format(pid)
 
         with open(filename, 'wb') as f:
             shutil.copyfileobj(path_or_buffer, f)
-        
+
         return filename, True
 
     # File path case
@@ -361,7 +361,7 @@ def _is_url(url):
         return False
 
 
-def is_file_like(obj):
+def _is_file_like(obj):
     '''Check file like object
 
     Args:
