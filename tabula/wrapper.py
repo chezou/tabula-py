@@ -29,10 +29,12 @@ if PY3:
     from urllib.request import urlopen
     from urllib.parse import urlparse as parse_url
     from urllib.parse import uses_relative, uses_netloc, uses_params
+    text_type = str
 else:
     from urllib2 import urlopen
     from urlparse import urlparse as parse_url
     from urlparse import uses_relative, uses_netloc, uses_params
+    text_type = unicode
 
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
@@ -326,6 +328,8 @@ def _localize_file(path_or_buffer):
             File path or URL of target file.
     '''
 
+    path_or_buffer = _stringify_path(path_or_buffer)
+
     if _is_url(path_or_buffer):
         req = urlopen(path_or_buffer)
         filename = os.path.basename(req.geturl())
@@ -348,9 +352,8 @@ def _localize_file(path_or_buffer):
         return filename, True
 
     # File path case
-    # TODO: Handle pathlib
     else:
-        return path_or_buffer, False
+        return os.path.expanduser(path_or_buffer), False
 
 
 def _is_url(url):
@@ -379,6 +382,31 @@ def _is_file_like(obj):
         return False
 
     return True
+
+
+def _stringify_path(path_or_buffer):
+    '''Convert path like object to string
+
+    Args:
+        path_or_buffer: object to be converted
+
+    Returns:
+        string_path_or_buffer: maybe string version of path_or_buffer
+    '''
+
+    try:
+        import pathlib
+        _PATHLIB_INSTALLED = True
+    except ImportError:
+        _PATHLIB_INSTALLED = False
+
+    if hasattr(path_or_buffer, '__fspath__'):
+        return path_or_buffer.__fspath__()
+
+    if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):
+        return text_type(path_or_buffer)
+
+    return path_or_buffer
 
 
 def build_options(kwargs=None):
