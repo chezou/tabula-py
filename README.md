@@ -13,7 +13,7 @@ You can read tables from PDF and convert into pandas's DataFrame. tabula-py also
 - Java
   - Confirmed working with Java 7, 8
 - pandas
-- requests
+- urllib3
 - distro
 
 ## OS
