@@ -19,8 +19,24 @@ import numpy as np
 import pandas as pd
 import requests
 import shutil
+import sys
 
 from .util import deprecated_option
+
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] >= 3
+
+if PY3:
+    from urllib.parse import urlparse as parse_url
+    from urllib.parse import uses_relative, uses_netloc, uses_params
+else:
+    from urlparse import urlparse as parse_url
+    from urlparse import uses_relative, uses_netloc, uses_params
+
+
+_VALID_URLS = set(uses_relative + uses_netloc + uses_params)
+_VALID_URLS.discard('')
+
 
 TABULA_JAVA_VERSION = "1.0.2"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
@@ -309,10 +325,10 @@ def localize_file(path_or_buffer):
             File path or URL of target file.
     '''
 
-    is_url = False
-    try:
+    if _is_url(path_or_buffer):
         r = requests.get(path_or_buffer)
         filename = os.path.basename(r.url)
+        print(filename)
         if os.path.splitext(filename)[-1] is not ".pdf":
             pid = os.getpid()
             filename = "{0}.pdf".format(pid)
@@ -320,23 +336,29 @@ def localize_file(path_or_buffer):
         with open(filename, 'wb') as f:
             f.write(r.content)
 
-        is_url = True
-        return filename, is_url
+        return filename, True
 
-    except requests.exceptions.RequestException as e:
-        if is_file_like(path_or_buffer):
-            pid = os.getpid()
-            filename = "{0}.pdf".format(pid)
+    elif is_file_like(path_or_buffer):
+        pid = os.getpid()
+        filename = "{0}.pdf".format(pid)
 
-            with open(filename, 'wb') as f:
-                shutil.copyfileobj(path_or_buffer, f)
-            
-            return filename, is_url
+        with open(filename, 'wb') as f:
+            shutil.copyfileobj(path_or_buffer, f)
+        
+        return filename, True
 
-        # File path case
-        # TODO: Handle pathlib
-        else:
-            return path_or_buffer, is_url
+    # File path case
+    # TODO: Handle pathlib
+    else:
+        return path_or_buffer, False
+
+
+def _is_url(url):
+    try:
+        return parse_url(url).scheme in _VALID_URLS
+
+    except Exception:
+        return False
 
 
 def is_file_like(obj):
@@ -347,7 +369,7 @@ def is_file_like(obj):
             file like object.
     
     Returns:
-        boolean: file like object or not
+        bool: file like object or not
     '''
 
     if not (hasattr(obj, 'read') or hasattr(obj, 'write')):
