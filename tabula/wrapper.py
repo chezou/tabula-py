@@ -114,7 +114,7 @@ def read_pdf(input_path,
 
     options = build_options(kwargs)
 
-    path, is_url = _localize_file(input_path)
+    path, temporary = _localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
@@ -130,7 +130,7 @@ def read_pdf(input_path,
         raise
 
     finally:
-        if is_url:
+        if temporary:
             os.unlink(path)
 
     if len(output) == 0:
@@ -185,7 +185,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         java_options = shlex.split(java_options)
 
     options = build_options(kwargs)
-    path, is_url = _localize_file(input_path)
+    path, temporary = _localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     try:
@@ -201,7 +201,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         raise
 
     finally:
-        if is_url:
+        if temporary:
             os.unlink(path)
 
 
@@ -325,7 +325,11 @@ def _localize_file(path_or_buffer):
 
     Args:
         path (str):
-            File path or URL of target file.
+            File path or file like object or URL of target file.
+    
+    Returns:
+        filename (str): file name in local storage
+        temporary_file_flag (bool): temporary file flag
     '''
 
     path_or_buffer = _stringify_path(path_or_buffer)
