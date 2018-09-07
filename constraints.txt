@@ -7,6 +7,7 @@ idna==2.5
 mccabe==0.6.1
 numpy==1.14.3
 pandas==0.22.0
+pathlib==1.0.1
 pkginfo==1.4.2
 py==1.4.34
 pycodestyle==2.3.1
@@ -18,7 +19,7 @@ requests==2.19.1
 requests-toolbelt==0.8.0
 rope==0.11.0
 six==1.11.0
--e git+https://github.com/chezou/tabula-py.git@136cd4e67b80151f88011f59c55abcb8da45a109#egg=tabula_py
+-e git+https://github.com/chezou/tabula-py.git@e2e213af76781d21e49c2289820cb0d1953369f3#egg=tabula_py
 tqdm==4.23.0
 twine==1.11.0
 urllib3==1.22

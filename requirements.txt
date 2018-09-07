@@ -3,3 +3,4 @@ pandas
 pytest
 flake8
 distro
+pathlib
