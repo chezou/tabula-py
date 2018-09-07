@@ -18,6 +18,7 @@ import subprocess
 import numpy as np
 import pandas as pd
 import requests
+import shutil
 
 from .util import deprecated_option
 
@@ -298,7 +299,7 @@ def convert_pandas_csv_options(pandas_options, columns):
     return _columns, header_line_number
 
 
-def localize_file(path):
+def localize_file(path_or_buffer):
     '''Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
@@ -310,7 +311,7 @@ def localize_file(path):
 
     is_url = False
     try:
-        r = requests.get(path)
+        r = requests.get(path_or_buffer)
         filename = os.path.basename(r.url)
         if os.path.splitext(filename)[-1] is not ".pdf":
             pid = os.getpid()
@@ -323,7 +324,39 @@ def localize_file(path):
         return filename, is_url
 
     except requests.exceptions.RequestException as e:
-        return path, is_url
+        if is_file_like(path_or_buffer):
+            pid = os.getpid()
+            filename = "{0}.pdf".format(pid)
+
+            with open(filename, 'wb') as f:
+                shutil.copyfileobj(path_or_buffer, f)
+            
+            return filename, is_url
+
+        # File path case
+        # TODO: Handle pathlib
+        else:
+            return path_or_buffer, is_url
+
+
+def is_file_like(obj):
+    '''Check file like object
+
+    Args:
+        obj:
+            file like object.
+    
+    Returns:
+        boolean: file like object or not
+    '''
+
+    if not (hasattr(obj, 'read') or hasattr(obj, 'write')):
+        return False
+
+    if not hasattr(obj, "__iter__"):
+        return False
+
+    return True
 
 
 def build_options(kwargs=None):

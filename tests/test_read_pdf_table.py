@@ -42,6 +42,14 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(tabula.read_pdf(pdf_path, pages=(2, 3), nospreadsheet=True,
                                         guess=False).equals(expected_df2))
 
+    def test_read_pdf_file_like_obj(self):
+        pdf_path = 'tests/resources/data.pdf'
+        expected_csv1 = 'tests/resources/data_1.csv'
+        with open(pdf_path, 'rb') as f:
+            df = tabula.read_pdf(f)
+            self.assertTrue(isinstance(df, pd.DataFrame))
+            self.assertTrue(df.equals(pd.read_csv(expected_csv1)))        
+
     def test_read_pdf_with_multiple_areas(self):
         # Original files are taken from https://github.com/tabulapdf/tabula-java/pull/213
         pdf_path = 'tests/resources/MultiColumn.pdf'
