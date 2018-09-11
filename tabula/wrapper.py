@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 import shutil
 import sys
+import errno
 
 from .util import deprecated_option
 
@@ -117,16 +118,19 @@ def read_pdf(input_path,
     path, temporary = _localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
+    if not os.path.exists(path):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
+
     try:
         output = subprocess.check_output(args)
 
     except FileNotFoundError as e:
-        print("Error: {}".format(e))
-        print("Error: {}".format(JAVA_NOT_FOUND_ERROR))
+        sys.stderr.write("Error: {}".format(e))
+        sys.stderr.write("Error: {}".format(JAVA_NOT_FOUND_ERROR))
         raise
 
     except subprocess.CalledProcessError as e:
-        print("Error: {}".format(e.output.decode(encoding)))
+        sys.stderr.write("Error: {}".format(e.output.decode(encoding)))
         raise
 
     finally:
@@ -150,7 +154,13 @@ def read_pdf(input_path,
     else:
         pandas_options['encoding'] = pandas_options.get('encoding', encoding)
 
-        return pd.read_csv(io.BytesIO(output), **pandas_options)
+        try:
+            return pd.read_csv(io.BytesIO(output), **pandas_options)
+
+        except pd.errors.ParserError as e:
+            sys.stderr.write("Error: Failed to create DataFrame with different column tables.\n")
+            sys.stderr.write("Error: Try to set `multiple_tables=True`.\n")
+            raise
 
 
 def convert_into(input_path, output_path, output_format='csv', java_options=None, **kwargs):
@@ -188,16 +198,19 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     path, temporary = _localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
+    if not os.path.exists(path):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
+
     try:
         subprocess.check_output(args)
 
     except FileNotFoundError as e:
-        print("Error: {}".format(e))
-        print("Error: {}".format(JAVA_NOT_FOUND_ERROR))
+        sys.stderr.write("Error: {}\n".format(e))
+        sys.stderr.write("Error: {}\n".format(JAVA_NOT_FOUND_ERROR))
         raise
 
     except subprocess.CalledProcessError as e:
-        print("Error: {}".format(e.output))
+        sys.stderr.write("Error: {}\n".format(e.output))
         raise
 
     finally:
