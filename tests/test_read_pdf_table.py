@@ -8,6 +8,12 @@ import pandas as pd
 import shutil
 import subprocess
 
+# TODO: Remove this Python 2 compatibility code if possible
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+ 
 
 class TestReadPdfTable(unittest.TestCase):
     def test_read_pdf(self):
@@ -114,7 +120,7 @@ class TestReadPdfTable(unittest.TestCase):
 
     def test_read_pdf_exception(self):
         invalid_pdf_path = 'notexist.pdf'
-        with self.assertRaises(subprocess.CalledProcessError):
+        with self.assertRaises(FileNotFoundError):
             tabula.read_pdf(invalid_pdf_path)
 
     def test_convert_from(self):
