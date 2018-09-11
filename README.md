@@ -193,9 +193,10 @@ java -jar ./tabula/tabula-1.0.1-jar-with-dependencies.jar -a "337.29,226.49,472.
 
 Without `-r`(same as `--spreadsheet`) option, it does not work properly.
 
-### I faced `CParserError`. How can I extract multiple tables?
+### I faced `ParserError: Error tokenizing data. C error`. How can I extract multiple tables?
 
-Use `multiple_tables` option.
+This error occurs pandas trys to extract multiple tables with different column size at once.
+Use `multiple_tables` option, then you can avoid this error.
 
 ### I want to prevent tabula-py from stealing focus on every call on my mac 
 
