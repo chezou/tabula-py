@@ -148,6 +148,7 @@ def read_pdf(input_path,
 def read_pdf_with_template(
         input_path,
         template_path,
+        pandas_options=None,
         encoding='utf-8',
         java_options=None,
         **kwargs):
@@ -158,6 +159,8 @@ def read_pdf_with_template(
             File like object of tareget PDF file.
         template_path (file_like_obj):
             File like object for Tabula app template.
+        pandas_options (dict, optional):
+            Set pandas options like {'header': None}.
         encoding (str, optional):
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
@@ -175,10 +178,10 @@ def read_pdf_with_template(
     dataframes = []
 
     for option in options:
-        _option = dict(kwargs, **option)
-        _option['encoding'] = encoding
-        _option['java_options'] = java_options
-        _df = read_pdf(input_path, **_option)
+        _df = read_pdf(
+            input_path, pandas_options=pandas_options,
+            encoding=encoding, java_options=java_options,
+            **dict(kwargs, **option))
         if isinstance(_df, list):
             dataframes.extend(_df)
         else:
