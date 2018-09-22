@@ -346,7 +346,7 @@ def _convert_pandas_csv_options(pandas_options, columns):
 
     _columns = pandas_options.pop('names', columns)
     header = pandas_options.pop('header', None)
-    pandas_options.pop('encoding')
+    pandas_options.pop('encoding', None)
 
     if header == 'infer':
         header_line_number = 0 if not bool(_columns) else None
