@@ -115,7 +115,7 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertEqual(len(tabula.read_pdf(pdf_path, pages=2, multiple_tables=True)), 2)
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1, multiple_tables=True)[0].equals(
             pd.read_csv(expected_csv1, header=None)))
-        with self.assertRaises(pd.errors.ParserError):
+        with self.assertRaises(tabula.errors.CSVParseError):
             tabula.read_pdf(pdf_path, pages=2)
 
     def test_read_pdf_exception(self):
