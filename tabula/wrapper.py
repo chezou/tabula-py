@@ -21,6 +21,7 @@ import sys
 import errno
 
 from .util import deprecated_option
+from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
 
@@ -107,12 +108,10 @@ def read_pdf(input_path,
         output = subprocess.check_output(args)
 
     except FileNotFoundError as e:
-        sys.stderr.write("Error: {}".format(e))
-        sys.stderr.write("Error: {}".format(JAVA_NOT_FOUND_ERROR))
-        raise
+        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
 
     except subprocess.CalledProcessError as e:
-        sys.stderr.write("Error: {}".format(e.output.decode(encoding)))
+        sys.stderr.write("Error: {}\n".format(e.output.decode(encoding)))
         raise
 
     finally:
@@ -140,9 +139,10 @@ def read_pdf(input_path,
             return pd.read_csv(io.BytesIO(output), **pandas_options)
 
         except pd.errors.ParserError as e:
-            sys.stderr.write("Error: Failed to create DataFrame with different column tables.\n")
-            sys.stderr.write("Error: Try to set `multiple_tables=True`.\n")
-            raise
+            message = "Error failed to create DataFrame with different column tables.\n"
+            message += "Try to set `multiple_tables=True` or set `names` option for `pandas_options`. \n"
+
+            raise CSVParseError(message, e)
 
 
 def read_pdf_with_template(
@@ -232,9 +232,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         subprocess.check_output(args)
 
     except FileNotFoundError as e:
-        sys.stderr.write("Error: {}\n".format(e))
-        sys.stderr.write("Error: {}\n".format(JAVA_NOT_FOUND_ERROR))
-        raise
+        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
 
     except subprocess.CalledProcessError as e:
         sys.stderr.write("Error: {}\n".format(e.output))
@@ -284,12 +282,10 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
         subprocess.check_output(args)
 
     except FileNotFoundError as e:
-        print("Error: {}".format(e))
-        print("Error: {}".format(JAVA_NOT_FOUND_ERROR))
-        raise
+        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
 
     except subprocess.CalledProcessError as e:
-        print("Error: {}".format(e.output))
+        sys.stderr.write("Error: {}\n".format(e.output))
         raise
 
 
