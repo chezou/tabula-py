@@ -13,7 +13,7 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = IOError
- 
+
 
 class TestReadPdfTable(unittest.TestCase):
     def test_read_pdf(self):
@@ -164,6 +164,18 @@ class TestReadPdfTable(unittest.TestCase):
             tabula.convert_into(pdf_path, None)
         with self.assertRaises(AttributeError):
             tabula.convert_into(pdf_path, '')
+
+    def test_read_pdf_with_template(self):
+        pdf_path = 'tests/resources/data.pdf'
+        template_path = 'tests/resources/data.tabula-template.json'
+        expected_csv1 = 'tests/resources/data_1.csv'
+
+        dfs = tabula.read_pdf_with_template(pdf_path, template_path)
+        self.assertEqual(
+            len(dfs),
+            4)
+        self.assertTrue(dfs[0].equals(
+            pd.read_csv(expected_csv1)))
 
 
 if __name__ == '__main__':

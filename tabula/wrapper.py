@@ -17,30 +17,12 @@ import subprocess
 
 import numpy as np
 import pandas as pd
-import shutil
 import sys
 import errno
 
 from .util import deprecated_option
-
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] >= 3
-
-if PY3:
-    from urllib.request import urlopen
-    from urllib.parse import urlparse as parse_url
-    from urllib.parse import uses_relative, uses_netloc, uses_params
-    text_type = str
-else:
-    from urllib2 import urlopen
-    from urlparse import urlparse as parse_url
-    from urlparse import uses_relative, uses_netloc, uses_params
-    text_type = unicode
-
-
-_VALID_URLS = set(uses_relative + uses_netloc + uses_params)
-_VALID_URLS.discard('')
-
+from .file_util import localize_file
+from .template import load_template
 
 TABULA_JAVA_VERSION = "1.0.2"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
@@ -66,8 +48,8 @@ def read_pdf(input_path,
     '''Read tables in PDF.
 
     Args:
-        input_path (str):
-            File path of tareget PDF file.
+        input_path (file like obj):
+            File like object of tareget PDF file.
         output_format (str, optional):
             Output format of this function (dataframe or json)
         encoding (str, optional):
@@ -115,7 +97,7 @@ def read_pdf(input_path,
 
     options = build_options(kwargs)
 
-    path, temporary = _localize_file(input_path)
+    path, temporary = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     if not os.path.exists(path):
@@ -146,7 +128,7 @@ def read_pdf(input_path,
     fmt = kwargs.get('format')
     if fmt == 'JSON':
         if multiple_tables:
-            return extract_from(json.loads(output.decode(encoding)), pandas_options)
+            return _extract_from(json.loads(output.decode(encoding)), pandas_options)
 
         else:
             return json.loads(output.decode(encoding))
@@ -163,12 +145,57 @@ def read_pdf(input_path,
             raise
 
 
+def read_pdf_with_template(
+        input_path,
+        template_path,
+        pandas_options=None,
+        encoding='utf-8',
+        java_options=None,
+        **kwargs):
+    '''Read tables in PDF.
+
+    Args:
+        input_path (file like obj):
+            File like object of tareget PDF file.
+        template_path (file_like_obj):
+            File like object for Tabula app template.
+        pandas_options (dict, optional):
+            Set pandas options like {'header': None}.
+        encoding (str, optional):
+            Encoding type for pandas. Default is 'utf-8'
+        java_options (list, optional):
+            Set java options like `-Xmx256m`.
+        kwargs (dict):
+            Dictionary of option for tabula-java. Details are shown in `build_options()`
+
+    Returns:
+        Extracted pandas DataFrame or list.
+    '''
+
+    from itertools import chain
+
+    options = load_template(template_path)
+    dataframes = []
+
+    for option in options:
+        _df = read_pdf(
+            input_path, pandas_options=pandas_options,
+            encoding=encoding, java_options=java_options,
+            **dict(kwargs, **option))
+        if isinstance(_df, list):
+            dataframes.extend(_df)
+        else:
+            dataframes.append(_df)
+
+    return dataframes
+
+
 def convert_into(input_path, output_path, output_format='csv', java_options=None, **kwargs):
     '''Convert tables from PDF into a file.
 
     Args:
-        input_path (str):
-            File path of tareget PDF file.
+        input_path (file like obj):
+            File like object of tareget PDF file.
         output_path (str):
             File path of output file.
         output_format (str, optional):
@@ -186,7 +213,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         raise AttributeError("'output_path' shoud not be None or empty")
 
     kwargs['output_path'] = output_path
-    kwargs['format'] = extract_format_for_conversion(output_format)
+    kwargs['format'] = _extract_format_for_conversion(output_format)
 
     if java_options is None:
         java_options = []
@@ -195,7 +222,7 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
         java_options = shlex.split(java_options)
 
     options = build_options(kwargs)
-    path, temporary = _localize_file(input_path)
+    path, temporary = localize_file(input_path)
     args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     if not os.path.exists(path):
@@ -238,7 +265,7 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
     if input_dir is None or not os.path.isdir(input_dir):
         raise AttributeError("'input_dir' shoud be directory path")
 
-    kwargs['format'] = extract_format_for_conversion(output_format)
+    kwargs['format'] = _extract_format_for_conversion(output_format)
 
     if java_options is None:
         java_options = []
@@ -266,7 +293,7 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
         raise
 
 
-def extract_format_for_conversion(output_format='csv'):
+def _extract_format_for_conversion(output_format='csv'):
     if output_format == 'csv':
         return 'CSV'
 
@@ -280,7 +307,7 @@ def extract_format_for_conversion(output_format='csv'):
         raise AttributeError("'output_format' has no attribute 'dataframe'")
 
 
-def extract_from(raw_json, pandas_options=None):
+def _extract_from(raw_json, pandas_options=None):
     '''Extract tables from json.
 
     Args:
@@ -295,7 +322,7 @@ def extract_from(raw_json, pandas_options=None):
         pandas_options = {}
 
     columns = pandas_options.pop('columns', None)
-    columns, header_line_number = convert_pandas_csv_options(pandas_options, columns)
+    columns, header_line_number = _convert_pandas_csv_options(pandas_options, columns)
 
     for table in raw_json:
         list_data = [[np.nan if not e['text'] else e['text'] for e in row] for row in table['data']]
@@ -310,7 +337,7 @@ def extract_from(raw_json, pandas_options=None):
     return data_frames
 
 
-def convert_pandas_csv_options(pandas_options, columns):
+def _convert_pandas_csv_options(pandas_options, columns):
     ''' Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
     Args:
@@ -322,6 +349,7 @@ def convert_pandas_csv_options(pandas_options, columns):
 
     _columns = pandas_options.pop('names', columns)
     header = pandas_options.pop('header', None)
+    pandas_options.pop('encoding', None)
 
     if header == 'infer':
         header_line_number = 0 if not bool(_columns) else None
@@ -329,101 +357,6 @@ def convert_pandas_csv_options(pandas_options, columns):
         header_line_number = header
 
     return _columns, header_line_number
-
-
-def _localize_file(path_or_buffer):
-    '''Ensure localize target file.
-
-    If the target file is remote, this function fetches into local storage.
-
-    Args:
-        path (str):
-            File path or file like object or URL of target file.
-    
-    Returns:
-        filename (str): file name in local storage
-        temporary_file_flag (bool): temporary file flag
-    '''
-
-    path_or_buffer = _stringify_path(path_or_buffer)
-
-    if _is_url(path_or_buffer):
-        req = urlopen(path_or_buffer)
-        filename = os.path.basename(req.geturl())
-        if os.path.splitext(filename)[-1] is not ".pdf":
-            pid = os.getpid()
-            filename = "{0}.pdf".format(pid)
-
-        with open(filename, 'wb') as f:
-            shutil.copyfileobj(req, f)
-
-        return filename, True
-
-    elif _is_file_like(path_or_buffer):
-        pid = os.getpid()
-        filename = "{0}.pdf".format(pid)
-
-        with open(filename, 'wb') as f:
-            shutil.copyfileobj(path_or_buffer, f)
-
-        return filename, True
-
-    # File path case
-    else:
-        return os.path.expanduser(path_or_buffer), False
-
-
-def _is_url(url):
-    try:
-        return parse_url(url).scheme in _VALID_URLS
-
-    except Exception:
-        return False
-
-
-def _is_file_like(obj):
-    '''Check file like object
-
-    Args:
-        obj:
-            file like object.
-    
-    Returns:
-        bool: file like object or not
-    '''
-
-    if not (hasattr(obj, 'read') or hasattr(obj, 'write')):
-        return False
-
-    if not hasattr(obj, "__iter__"):
-        return False
-
-    return True
-
-
-def _stringify_path(path_or_buffer):
-    '''Convert path like object to string
-
-    Args:
-        path_or_buffer: object to be converted
-
-    Returns:
-        string_path_or_buffer: maybe string version of path_or_buffer
-    '''
-
-    try:
-        import pathlib
-        _PATHLIB_INSTALLED = True
-    except ImportError:
-        _PATHLIB_INSTALLED = False
-
-    if hasattr(path_or_buffer, '__fspath__'):
-        return path_or_buffer.__fspath__()
-
-    if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):
-        return text_type(path_or_buffer)
-
-    return path_or_buffer
 
 
 def build_options(kwargs=None):
@@ -471,6 +404,7 @@ def build_options(kwargs=None):
     Returns:
         `obj`:list: Built list of options
     '''
+
     __options = []
     if kwargs is None:
         kwargs = {}
