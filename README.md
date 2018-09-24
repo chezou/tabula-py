@@ -85,7 +85,7 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 - relative_area (bool, optional):
   - If all area values are between 0-100 (inclusive) and preceded by '%', input will be taken as % of actual height or width of the page. Default `False`.
 - lattice (bool, optional):
-  - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet). 
+  - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet).
 - stream (bool, optional):
   - [`nospreadsheet` option is deprecated] Force PDF to be extracted using stream-mode extraction (if there are no ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
 - password (bool, optional):
@@ -96,7 +96,7 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
   - X coordinates of column boundaries.
   - Example: [10.1, 20.2, 30.3]
 - output_format (str, optional):
-  - Format for output file or extracted object. 
+  - Format for output file or extracted object.
   - For `read_pdf()`: `json`, `dataframe`
   - For `convert_into()`: `csv`, `tsv`, `json`
 - output_path (str, optional):
@@ -107,7 +107,7 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 - pandas_options (`dict`, optional):
   - Set pandas options like `{'header': None}`.
 - multiple_tables (bool, optional):
-  - (Experimental) Extract multiple tables. 
+  - (Experimental) Extract multiple tables.
   - This option uses JSON as an intermediate format, so if tabula-java output format will change, this option doesn't work.
 
 
@@ -198,7 +198,7 @@ Without `-r`(same as `--spreadsheet`) option, it does not work properly.
 This error occurs pandas trys to extract multiple tables with different column size at once.
 Use `multiple_tables` option, then you can avoid this error.
 
-### I want to prevent tabula-py from stealing focus on every call on my mac 
+### I want to prevent tabula-py from stealing focus on every call on my mac
 
 Set `java_options=["-Djava.awt.headless=true"]`. kudos [@jakekara](https://twitter.com/jakekara/status/979031539697831937)
 
@@ -222,3 +222,29 @@ Replace `65001` and `UTF-8` appropriately, if the file encoding isn't UTF-8.
 ### I can't extract file/directory name with space on Windows
 
 You should escape file/directory name yourself.
+
+## Contributing
+
+Interested in helping out? I'd love to have your help!
+
+You can help by:
+
+- [Reporting a bug](https://github.com/tabulapdf/tabula-py/issues).
+- Adding or editing documentation.
+- Contributing code via a Pull Request.
+- Write a blog post or spreading the word about `tabula-py` to people who might be able to benefit from using it.
+
+
+### Contributors
+
+- [@lahoffm](https://github.com/lahoffm)
+- [@jakekara](https://github.com/jakekara)
+- [@lcd1232](https://github.com/lcd1232)
+- [@kirkholloway](https://github.com/kirkholloway)
+- [@CurtLH](https://github.com/CurtLH)
+- [@nikhilgk](https://github.com/nikhilgk)
+- [@krassowski](https://github.com/krassowski)
+
+### Another support
+
+You can also support our continued work on `tabula-py` with a donation [on Patreon](https://www.patreon.com/chezou).
