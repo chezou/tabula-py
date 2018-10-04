@@ -11,4 +11,4 @@ DO NOT CREATE A NEW ISSUE TO ASK A QUESTION.
 
 IF YOU ARE HAVING PROBLEMS WITH YOUR TABULA-PY CODE, DO NOT ASK A QUESTION HERE.
 
-Tens of thousands of TypeScript questions have been asked and answered on StackOverflow; see https://stackoverflow.com/search?q=tabula-py . You can ask questions there or on other websites.
+Many tabula-py questions have been asked and answered on StackOverflow; see https://stackoverflow.com/search?q=tabula-py . You can ask questions there or on other websites.
