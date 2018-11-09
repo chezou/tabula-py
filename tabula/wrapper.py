@@ -408,8 +408,8 @@ def build_options(kwargs=None):
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
 
-    DEPRECATED_OPTIONS = ['spreadsheet', 'nospreadsheet']
-    for option in kwargs.keys() and DEPRECATED_OPTIONS:
+    DEPRECATED_OPTIONS = set(['spreadsheet', 'nospreadsheet'])
+    for option in set(kwargs.keys()) & DEPRECATED_OPTIONS:
         deprecated_option(option)
 
     # parse options
