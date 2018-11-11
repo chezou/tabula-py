@@ -15,8 +15,7 @@ script:
 deploy:
   provider: pypi
   user: chezou
-  password:
-    secure: p4CToDZPWU87X1CsCqa9HddVkCGRyJdZJYNN1+/k0ahGxig+EDekayAFZpfHFo/5azOlMEVwWR4jNUhKX+HzRT6lQ8hpLu/QkBmVXejf14TcpUSzFE3dE09ZnaYyi7Ts8xuphL1YUf7+qQBNJ49JD5qIDlGrtyO9+2KKm8noziSaybtww6pNs8hgrUOIPljVhA5AFthDdP8zoaW+Cmw3xlSoVa8sRFrryHvu5nWcDo3bo0KMHRV9DTsLPuai0o7oKAcXFXwl0xUlSK4NPtY9cHKdwqy2/b8/6hQinKOLCyrwx3zDMVLJMSidYkJCqgxB6z+Wd17lO3d612pLzp5dnPM3SsKDd+M6+v5BmVRZNYWyPJUxr28/eVopF7RmabD5uZOjjv/fzu570r0CyaDngK0vOj+zbaxofXgLWJ2JffQokheYCb0stV0Ws7KprcPeagQH3bFBrdRUhNcXf9IPd2FgCVKx4dgzFTR2AACDKeqa0FpgYPgz3pl0lPb0Ouqx1jVjBtM8M4/AuJMuMKpqsX/ncyY7m8KFGzmOMhULq19R3G3k6ANt8TaV6I7oY4K1/uvlU8TKgaPQihjeHKPB+aBOZYg7/Z7bVSmoMAgHAzg8qzkD/mAXFHvfVknSynoG5N3WGxteBeK9KIuLfFFjvhMXF+PeVhmRSR8TpWaC2X4=
+  password: $PYPI_PASSWORD
   distributions: sdist bdist_wheel
   on:
     tags: true
