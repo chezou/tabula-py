@@ -223,6 +223,14 @@ Replace `65001` and `UTF-8` appropriately, if the file encoding isn't UTF-8.
 
 You should escape file/directory name yourself.
 
+
+### I want to use a different tabula .jar  file
+You can specify the jar location via enviroment variable
+```bash
+export TABULA_JAR=".../tabula-x.y.z-jar-with-dependencies.jar"
+```
+
+
 ## Contributing
 
 Interested in helping out? I'd love to have your help!
