@@ -40,6 +40,37 @@ except NameError:
     FileNotFoundError = IOError
 
 
+def _run(java_options, options, path=None, encoding='utf-8'):
+    """Call tabula-java with the given lists of Java options and tabula-py
+    options, as well as an optional path to pass to tabula-java as a regular
+    argument and an optional encoding to use for any required output sent to
+    stderr.
+
+    tabula-py options are translated into tabula-java options, see
+    :func:`build_options` for more information.
+    """
+    # Workaround to enforce the silent option. See:
+    # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
+    if 'silent' in options:
+        java_options.extend((
+            '-Dorg.slf4j.simpleLogger.defaultLogLevel=off',
+            '-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.NoOpLog',
+        ))
+
+    built_options = build_options(options)
+    args = ["java"] + java_options + ["-jar", JAR_PATH] + built_options
+    if path:
+        args.append(path)
+
+    try:
+        return subprocess.check_output(args)
+    except FileNotFoundError as e:
+        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
+    except subprocess.CalledProcessError as e:
+        sys.stderr.write("Error: {}\n".format(e.output.decode(encoding)))
+        raise
+
+
 def read_pdf(input_path,
              output_format='dataframe',
              encoding='utf-8',
@@ -96,24 +127,13 @@ def read_pdf(input_path,
         if not any(filter(r.find, java_options)):
             java_options = java_options + ['-Dfile.encoding=UTF8']
 
-    options = build_options(kwargs)
-
     path, temporary = localize_file(input_path)
-    args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     try:
-        output = subprocess.check_output(args)
-
-    except FileNotFoundError as e:
-        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
-
-    except subprocess.CalledProcessError as e:
-        sys.stderr.write("Error: {}\n".format(e.output.decode(encoding)))
-        raise
-
+        output = _run(java_options, kwargs, path, encoding)
     finally:
         if temporary:
             os.unlink(path)
@@ -221,23 +241,13 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
 
-    options = build_options(kwargs)
     path, temporary = localize_file(input_path)
-    args = ["java"] + java_options + ["-jar", JAR_PATH] + options + [path]
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     try:
-        subprocess.check_output(args)
-
-    except FileNotFoundError as e:
-        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
-
-    except subprocess.CalledProcessError as e:
-        sys.stderr.write("Error: {}\n".format(e.output))
-        raise
-
+        _run(java_options, kwargs, path)
     finally:
         if temporary:
             os.unlink(path)
@@ -274,19 +284,7 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
     # Option for batch
     kwargs['batch'] = input_dir
 
-    options = build_options(kwargs)
-
-    args = ["java"] + java_options + ["-jar", JAR_PATH] + options
-
-    try:
-        subprocess.check_output(args)
-
-    except FileNotFoundError as e:
-        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
-
-    except subprocess.CalledProcessError as e:
-        sys.stderr.write("Error: {}\n".format(e.output))
-        raise
+    _run(java_options, kwargs)
 
 
 def _extract_format_for_conversion(output_format='csv'):
