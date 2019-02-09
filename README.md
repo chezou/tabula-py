@@ -15,9 +15,6 @@ You can read tables from PDF and convert into pandas's DataFrame. tabula-py also
 
 - Java
   - Confirmed working with Java 7, 8
-- pandas
-- urllib3
-- distro
 
 ## OS
 
@@ -57,7 +54,7 @@ tabula.convert_into("test.pdf", "output.csv", output_format="csv")
 tabula.convert_into_by_batch("input_directory", output_format='csv')
 ```
 
-See [example notebook](./examples/tabula_example.ipynb)
+See [example notebook](./examples/tabula_example.ipynb) for more detail. I also recommend to read [the tutorial article](https://aegis4048.github.io/parse-pdf-files-while-retaining-structure-with-tabula-py) written by [@aegis4048](https://github.com/aegis4048).
 
 ## Get tabula-py working (Windows 10)
 
