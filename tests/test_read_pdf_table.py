@@ -43,10 +43,10 @@ class TestReadPdfTable(unittest.TestCase):
         expected_csv2 = 'tests/resources/data_2-3.csv'
         expected_df2 = pd.read_csv(expected_csv2)
         self.assertTrue(tabula.read_pdf(pdf_path, pages=1).equals(pd.read_csv(expected_csv1)))
-        self.assertTrue(tabula.read_pdf(pdf_path, pages='2-3', stream=True,
-                                        guess=False).equals(expected_df2))
+        self.assertTrue(tabula.read_pdf(pdf_path, pages='2-3', stream=True).equals(expected_df2))
+        self.assertTrue(tabula.read_pdf(pdf_path, pages=(2, 3), stream=True).equals(expected_df2))
         self.assertTrue(tabula.read_pdf(pdf_path, pages=(2, 3), stream=True,
-                                        guess=False).equals(expected_df2))
+                                        guess=True).equals(expected_df2))
 
     def test_read_pdf_file_like_obj(self):
         pdf_path = 'tests/resources/data.pdf'
