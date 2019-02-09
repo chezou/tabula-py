@@ -2,10 +2,6 @@
 
 This module extract tables from PDF into pandas DataFrame. Currently, the
 implementation of this module uses subprocess.
-
-Todo:
-  * Use py4j and handle multiple tables in a page
-
 '''
 
 import io
@@ -439,6 +435,17 @@ def build_options(kwargs=None):
                 __options += ["--area", __area]
 
     guess = kwargs.get('guess', True)
+
+    lattice = kwargs.get('lattice') or kwargs.get('spreadsheet')
+    if lattice:
+        guess = False
+        __options.append("--lattice")
+
+    stream = kwargs.get('stream') or kwargs.get('nospreadsheet')
+    if stream:
+        guess = False
+        __options.append("--stream")
+
     if guess and not multiple_areas:
         __options.append("--guess")
 
@@ -449,14 +456,6 @@ def build_options(kwargs=None):
     output_path = kwargs.get('output_path')
     if output_path:
         __options += ["--outfile", output_path]
-
-    lattice = kwargs.get('lattice') or kwargs.get('spreadsheet')
-    if lattice:
-        __options.append("--lattice")
-
-    stream = kwargs.get('stream') or kwargs.get('nospreadsheet')
-    if stream:
-        __options.append("--stream")
 
     columns = kwargs.get('columns')
     if columns:
