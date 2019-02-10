@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import shutil
 import subprocess
+from unittest.mock import MagicMock, patch
 
 # TODO: Remove this Python 2 compatibility code if possible
 try:
@@ -176,6 +177,17 @@ class TestReadPdfTable(unittest.TestCase):
             4)
         self.assertTrue(dfs[0].equals(
             pd.read_csv(expected_csv1)))
+
+    def test_read_pdf_with_jar_path(self):
+        with patch('tabula.wrapper._jar_path', return_value='/tmp/tabula-java.jar'):
+            pdf_path = 'tests/resources/data.pdf'
+
+            mock_fun = MagicMock(return_value=pd.DataFrame())
+            with patch('subprocess.check_output', mock_fun):
+                tabula.read_pdf(pdf_path)
+                mock_fun.assert_called_with(
+                    ['java', '-Dfile.encoding=UTF8', '-jar',
+                     '/tmp/tabula-java.jar', '--pages', '1', '--guess', 'tests/resources/data.pdf'])
 
 
 if __name__ == '__main__':
