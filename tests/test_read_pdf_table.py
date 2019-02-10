@@ -7,13 +7,14 @@ import os
 import pandas as pd
 import shutil
 import subprocess
-from unittest.mock import MagicMock, patch
 
 # TODO: Remove this Python 2 compatibility code if possible
 try:
     FileNotFoundError
+    from unittest.mock import patch
 except NameError:
     FileNotFoundError = IOError
+    from mock import patch
 
 
 class TestReadPdfTable(unittest.TestCase):
