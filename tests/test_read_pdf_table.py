@@ -11,8 +11,10 @@ import subprocess
 # TODO: Remove this Python 2 compatibility code if possible
 try:
     FileNotFoundError
+    from unittest.mock import patch
 except NameError:
     FileNotFoundError = IOError
+    from mock import patch
 
 
 class TestReadPdfTable(unittest.TestCase):
@@ -176,6 +178,17 @@ class TestReadPdfTable(unittest.TestCase):
             4)
         self.assertTrue(dfs[0].equals(
             pd.read_csv(expected_csv1)))
+
+    @patch('subprocess.check_output')
+    @patch('tabula.wrapper._jar_path')
+    def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
+        jar_func.return_value = '/tmp/tabula-java.jar'
+        pdf_path = 'tests/resources/data.pdf'
+
+        tabula.read_pdf(pdf_path)
+        mock_fun.assert_called_with(
+            ['java', '-Dfile.encoding=UTF8', '-jar',
+                '/tmp/tabula-java.jar', '--pages', '1', '--guess', 'tests/resources/data.pdf'])
 
 
 if __name__ == '__main__':

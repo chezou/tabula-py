@@ -24,9 +24,9 @@ from .template import load_template
 TABULA_JAVA_VERSION = "1.0.2"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
-JAR_PATH = os.path.join(JAR_DIR, JAR_NAME)
-
 JAVA_NOT_FOUND_ERROR = "`java` command is not found from this Python process. Please ensure Java is installed and PATH is set for `java`"
+
+DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
 
 
 # TODO: Remove this Python 2 compatibility code if possible
@@ -34,6 +34,10 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = IOError
+
+
+def _jar_path():
+    return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
 
 
 def _run(java_options, options, path=None, encoding='utf-8'):
@@ -54,7 +58,7 @@ def _run(java_options, options, path=None, encoding='utf-8'):
         ))
 
     built_options = build_options(options)
-    args = ["java"] + java_options + ["-jar", JAR_PATH] + built_options
+    args = ["java"] + java_options + ["-jar", _jar_path()] + built_options
     if path:
         args.append(path)
 
