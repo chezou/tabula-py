@@ -52,4 +52,7 @@ setup(
         'urllib3',
         'distro',
     ],
+    test_requires=[
+        'mock'
+    ],
 )
