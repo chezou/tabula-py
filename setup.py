@@ -43,9 +43,6 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     keywords=['data frame', 'pdf', 'table'],
-    setup_requires=[
-        'flake8',
-    ],
     install_requires=[
         'pandas',
         'numpy',
