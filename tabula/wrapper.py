@@ -35,8 +35,10 @@ try:
 except NameError:
     FileNotFoundError = IOError
 
+
 def _jar_path():
     return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
+
 
 def _run(java_options, options, path=None, encoding='utf-8'):
     """Call tabula-java with the given lists of Java options and tabula-py
@@ -67,6 +69,7 @@ def _run(java_options, options, path=None, encoding='utf-8'):
     except subprocess.CalledProcessError as e:
         sys.stderr.write("Error: {}\n".format(e.output.decode(encoding)))
         raise
+
 
 def read_pdf(input_path,
              output_format='dataframe',

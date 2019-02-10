@@ -178,16 +178,16 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(dfs[0].equals(
             pd.read_csv(expected_csv1)))
 
-    def test_read_pdf_with_jar_path(self):
-        with patch('tabula.wrapper._jar_path', return_value='/tmp/tabula-java.jar'):
-            pdf_path = 'tests/resources/data.pdf'
+    @patch('subprocess.check_output')
+    @patch('tabula.wrapper._jar_path')
+    def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
+        jar_func.return_value = '/tmp/tabula-java.jar'
+        pdf_path = 'tests/resources/data.pdf'
 
-            mock_fun = MagicMock(return_value=pd.DataFrame())
-            with patch('subprocess.check_output', mock_fun):
-                tabula.read_pdf(pdf_path)
-                mock_fun.assert_called_with(
-                    ['java', '-Dfile.encoding=UTF8', '-jar',
-                     '/tmp/tabula-java.jar', '--pages', '1', '--guess', 'tests/resources/data.pdf'])
+        tabula.read_pdf(pdf_path)
+        mock_fun.assert_called_with(
+            ['java', '-Dfile.encoding=UTF8', '-jar',
+                '/tmp/tabula-java.jar', '--pages', '1', '--guess', 'tests/resources/data.pdf'])
 
 
 if __name__ == '__main__':
