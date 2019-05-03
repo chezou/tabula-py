@@ -132,6 +132,9 @@ def read_pdf(input_path,
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
+    if os.path.getsize(path) == 0:
+        raise ValueError("{} is empty. Check the file, or download it manually.".format(path))
+
     try:
         output = _run(java_options, kwargs, path, encoding)
     finally:
@@ -245,6 +248,9 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
+
+    if os.path.getsize(path) == 0:
+        raise ValueError("{} is empty. Check the file, or download it manually.".format(path))
 
     try:
         _run(java_options, kwargs, path)
