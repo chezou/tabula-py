@@ -106,6 +106,8 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 - multiple_tables (bool, optional):
   - (Experimental) Extract multiple tables.
   - This option uses JSON as an intermediate format, so if tabula-java output format will change, this option doesn't work.
+- user_agent (str, optional)
+  - Set a custom user-agent when download a pdf from a url. Otherwise it uses the default urllib.request user-agent
 
 
 ## FAQ
