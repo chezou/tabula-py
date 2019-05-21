@@ -39,8 +39,7 @@ def localize_file(path_or_buffer, user_agent=None):
 
     if _is_url(path_or_buffer):
         if user_agent:
-            req_headers = {'User-Agent': user_agent}
-            req = urlopen(Request(path_or_buffer, headers=req_headers))
+            req = urlopen(_create_request(path_or_buffer, user_agent))
         else:
             req = urlopen(path_or_buffer)
         filename = os.path.basename(req.geturl())
@@ -74,6 +73,10 @@ def _is_url(url):
     except Exception:
         return False
 
+
+def _create_request(path_or_buffer, user_agent):
+    req_headers = {'User-Agent': user_agent}
+    return Request(path_or_buffer, headers=req_headers)
 
 def is_file_like(obj):
     '''Check file like object
