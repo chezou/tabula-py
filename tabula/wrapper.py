@@ -127,7 +127,9 @@ def read_pdf(input_path,
         if not any(filter(r.find, java_options)):
             java_options = java_options + ['-Dfile.encoding=UTF8']
 
-    path, temporary = localize_file(input_path)
+    user_agent = kwargs.pop('user_agent', None)
+
+    path, temporary = localize_file(input_path, user_agent)
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)

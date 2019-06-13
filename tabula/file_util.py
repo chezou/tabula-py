@@ -6,12 +6,12 @@ PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] >= 3
 
 if PY3:
-    from urllib.request import urlopen
+    from urllib.request import urlopen, Request
     from urllib.parse import urlparse as parse_url
     from urllib.parse import uses_relative, uses_netloc, uses_params
     text_type = str
 else:
-    from urllib2 import urlopen
+    from urllib2 import urlopen, Request
     from urlparse import urlparse as parse_url
     from urlparse import uses_relative, uses_netloc, uses_params
     text_type = unicode
@@ -21,7 +21,7 @@ _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard('')
 
 
-def localize_file(path_or_buffer):
+def localize_file(path_or_buffer, user_agent=None):
     '''Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
@@ -38,7 +38,10 @@ def localize_file(path_or_buffer):
     path_or_buffer = _stringify_path(path_or_buffer)
 
     if _is_url(path_or_buffer):
-        req = urlopen(path_or_buffer)
+        if user_agent:
+            req = urlopen(_create_request(path_or_buffer, user_agent))
+        else:
+            req = urlopen(path_or_buffer)
         filename = os.path.basename(req.geturl())
         if os.path.splitext(filename)[-1] is not ".pdf":
             pid = os.getpid()
@@ -70,6 +73,10 @@ def _is_url(url):
     except Exception:
         return False
 
+
+def _create_request(path_or_buffer, user_agent):
+    req_headers = {'User-Agent': user_agent}
+    return Request(path_or_buffer, headers=req_headers)
 
 def is_file_like(obj):
     '''Check file like object

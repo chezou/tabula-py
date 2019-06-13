@@ -12,9 +12,11 @@ import subprocess
 try:
     FileNotFoundError
     from unittest.mock import patch
+    from urllib.request import Request
 except NameError:
     FileNotFoundError = IOError
     from mock import patch
+    from urllib2 import Request
 
 
 class TestReadPdfTable(unittest.TestCase):
@@ -28,6 +30,12 @@ class TestReadPdfTable(unittest.TestCase):
     def test_read_remote_pdf(self):
         uri = "https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/12s0324.pdf"
         df = tabula.read_pdf(uri)
+        self.assertTrue(isinstance(df, pd.DataFrame))
+
+    def test_read_remote_pdf_with_custom_user_agent(self):
+        uri = "https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/12s0324.pdf"
+
+        df = tabula.read_pdf(uri, user_agent='Mozilla/5.0')
         self.assertTrue(isinstance(df, pd.DataFrame))
 
     def test_read_pdf_into_json(self):
