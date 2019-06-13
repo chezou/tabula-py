@@ -127,10 +127,7 @@ def read_pdf(input_path,
         if not any(filter(r.find, java_options)):
             java_options = java_options + ['-Dfile.encoding=UTF8']
 
-    user_agent = None
-    if 'user_agent' in kwargs:
-        user_agent = kwargs['user_agent']
-        kwargs.pop('user_agent', None)
+    user_agent = kwargs.pop('user_agent', None)
 
     path, temporary = localize_file(input_path, user_agent)
 
