@@ -8,15 +8,15 @@ import pandas as pd
 import shutil
 import subprocess
 
-from tabula.file_util import _create_request
-
 # TODO: Remove this Python 2 compatibility code if possible
 try:
     FileNotFoundError
     from unittest.mock import patch
+    from urllib.request import Request
 except NameError:
     FileNotFoundError = IOError
     from mock import patch
+    from urllib2 import Request
 
 
 class TestReadPdfTable(unittest.TestCase):
@@ -34,12 +34,9 @@ class TestReadPdfTable(unittest.TestCase):
 
     def test_read_remote_pdf_with_custom_user_agent(self):
         uri = "https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/12s0324.pdf"
-        user_agent='Mozilla/5.0'
 
-        request = _create_request(uri, user_agent)
-        df = tabula.read_pdf(uri, user_agent=user_agent)
+        df = tabula.read_pdf(uri, user_agent='Mozilla/5.0')
         self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(request.headers['User-agent'], 'Mozilla/5.0')
 
     def test_read_pdf_into_json(self):
         pdf_path = 'tests/resources/data.pdf'
