@@ -30,8 +30,6 @@ class TestUtil(unittest.TestCase):
 
         tabula.file_util.localize_file(uri, user_agent=user_agent)
         mock_fun.assert_called_with(uri, user_agent)
-        mock_urlopen.assert_called()
-        mock_copyfileobj.assert_called()
 
 
 if __name__ == '__main__':
