@@ -104,7 +104,7 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 - pandas_options (`dict`, optional):
   - Set pandas options like `{'header': None}`.
 - multiple_tables (bool, optional):
-  - (Experimental) Extract multiple tables.
+  - (Experimental) Extract multiple tables.  If used with multiple pages (e.g. `pages='all'`) will extract separate tables from each page.
   - This option uses JSON as an intermediate format, so if tabula-java output format will change, this option doesn't work.
 - user_agent (str, optional)
   - Set a custom user-agent when download a pdf from a url. Otherwise it uses the default urllib.request user-agent
@@ -228,6 +228,16 @@ You can specify the jar location via enviroment variable
 ```bash
 export TABULA_JAR=".../tabula-x.y.z-jar-with-dependencies.jar"
 ```
+
+### I want to extract multiple tables from a document
+You can use the following example code
+```
+df = read_pdf(file_path, multiple_tables=True)
+```
+The result will be a list of DataFrames.  If you want separate tables across all pages in a document, use the `pages` argument.
+
+### Table cell contents sometimes overflow into the next row.
+You can try using `lattice=True`, which will often work if there are lines separating cells in the table.
 
 
 ## Contributing
