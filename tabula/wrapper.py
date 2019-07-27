@@ -95,8 +95,7 @@ def read_pdf(
         pandas_options (dict, optional):
             Set pandas options like {'header': None}.
         multiple_tables (bool, optional):
-            This is experimental option. It enables to handle multiple tables within a
-            page.
+            It enables to handle multiple tables within a page.
             Note: If `multiple_tables` option is enabled, tabula-py uses not
             :func:`pd.read_csv()`, but `pd.DataFrame()`. Make sure to pass appropriate
             `pandas_options`.

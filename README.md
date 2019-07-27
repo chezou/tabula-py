@@ -26,14 +26,21 @@ I confirmed working on macOS and Ubuntu. But some people confirm it works on Win
 
 ## Install
 
-```
+```bash
 pip install tabula-py
 ```
 
-If you want to become a contributor, you can install dependency for development of tabula-py as follows:
+If you want to become a contributor, you can install dependency after cloning the repo as follows:
 
+```bash
+pip install -e .[dev, test]
+pip install nox
 ```
-pip install -r requirements.txt -c constraints.txt
+
+For running text and liter, run nox command.
+
+```bash
+nox .
 ```
 
 ## Example
@@ -78,22 +85,23 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
   - Example: 1, '1-2,3', 'all' or [1,2]. Default is 1
 - guess (bool, optional):
   - Guess the portion of the page to analyze per page. Default `True`
+  - Note that as of tabula-java 1.0.3, guess option becomes independent from lattice and stream option, you can use guess and lattice/stream option at the same time.
 - area (`list` of `float`, optional):
   - Portion of the page to analyze(top,left,bottom,right).
-  - Example: [269.875, 12.75, 790.5, 561]  or [[12.1,20.5,30.1,50.2],[1.0,3.2,10.5,40.2]]. Default is entire page
+  - Example: `[269.875, 12.75, 790.5, 561]`  or `[[12.1,20.5,30.1,50.2],[1.0,3.2,10.5,40.2]]`. Default is entire page
 - relative_area (bool, optional):
   - If all area values are between 0-100 (inclusive) and preceded by '%', input will be taken as % of actual height or width of the page. Default `False`.
 - lattice (bool, optional):
-  - [`spreadsheet` option is deprecated] Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet).
+  - (`spreadsheet` option is deprecated) Force PDF to be extracted using lattice-mode extraction (if there are ruling lines separating each cell, as in a PDF of an Excel spreadsheet).
 - stream (bool, optional):
-  - [`nospreadsheet` option is deprecated] Force PDF to be extracted using stream-mode extraction (if there are no ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
+  - (`nospreadsheet` option is deprecated) Force PDF to be extracted using stream-mode extraction (if there are no ruling lines separating each cell, as in a PDF of an Excel spreadsheet)
 - password (bool, optional):
   - Password to decrypt document. Default is empty
 - silent (bool, optional):
   - Suppress all stderr output.
 - columns (list, optional):
   - X coordinates of column boundaries.
-  - Example: [10.1, 20.2, 30.3]
+  - Example: `[10.1, 20.2, 30.3]`
 - output_format (str, optional):
   - Format for output file or extracted object.
   - For `read_pdf()`: `json`, `dataframe`
@@ -106,7 +114,7 @@ This instruction is originally written by [@lahoffm](https://github.com/lahoffm)
 - pandas_options (`dict`, optional):
   - Set pandas options like `{'header': None}`.
 - multiple_tables (bool, optional):
-  - (Experimental) Extract multiple tables.  If used with multiple pages (e.g. `pages='all'`) will extract separate tables from each page.
+  - Extract multiple tables.  If used with multiple pages (e.g. `pages='all'`) will extract separate tables from each page.
   - This option uses JSON as an intermediate format, so if tabula-java output format will change, this option doesn't work.
 - user_agent (str, optional)
   - Set a custom user-agent when download a pdf from a url. Otherwise it uses the default urllib.request user-agent
@@ -124,7 +132,7 @@ You can check whether tabula-py can call `java` from Python process with `tabula
 
 If you've installed `tabula`, it will be conflict the namespace. You should install `tabula-py` after removing `tabula`.
 
-```
+```bash
 pip uninstall tabula
 pip install tabula-py
 ```
@@ -137,7 +145,7 @@ pip install tabula-py
 
 Yes. You can use `options` argument as following. The format is same as cli of tabula-java.
 
-```py
+```python
 read_pdf(file_path, options="--columns 10.1,20.2,30.3")
 ```
 
@@ -145,7 +153,7 @@ read_pdf(file_path, options="--columns 10.1,20.2,30.3")
 
 In short, you can extract with `area` and `spreadsheet` option.
 
-```py
+```python
 In [4]: tabula.read_pdf('./table.pdf', spreadsheet=True, area=(337.29, 226.49, 472.85, 384.91))
 Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
 Out[4]:
@@ -161,7 +169,7 @@ Out[4]:
 8          F    E   E4    R    4
 ```
 
-*How to use `area` option*
+#### How to use `area` option
 
 According to tabula-java wiki, there is a explain how to specify the area:
 https://github.com/tabulapdf/tabula-java/wiki/Using-the-command-line-tabula-extractor-tool#grab-coordinates-of-the-table-you-want
@@ -171,14 +179,14 @@ For example, using macOS's preview, I got area information of this [PDF](https:/
 ![image](https://cloud.githubusercontent.com/assets/916653/22047470/b201de24-dd6a-11e6-9cfc-7bc73e33e3b2.png)
 
 
-```
+```bash
 java -jar ./target/tabula-1.0.1-jar-with-dependencies.jar -p all -a $y1,$x1,$y2,$x2 -o $csvfile $filename
 ```
 
 given
 
-```
-Note the left, top, height, and width parameters and calculate the following:
+```python
+# Note the left, top, height, and width parameters and calculate the following:
 
 y1 = top
 x1 = left
@@ -188,7 +196,7 @@ x2 = left + width
 
 I confirmed with tabula-java:
 
-```
+```bash
 java -jar ./tabula/tabula-1.0.1-jar-with-dependencies.jar -a "337.29,226.49,472.85,384.91" table.pdf
 ```
 
@@ -263,6 +271,10 @@ You can help by:
 - [@CurtLH](https://github.com/CurtLH)
 - [@nikhilgk](https://github.com/nikhilgk)
 - [@krassowski](https://github.com/krassowski)
+- [@alexandreio](https://github.com/alexandreio)
+- [@rmnevesLH](https://github.com/rmnevesLH)
+- [@red-bin](https://github.com/red-bin)
+- [@Gallaecio](https://github.com/Gallaecio)
 
 ### Another support
 
