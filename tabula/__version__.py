@@ -1,5 +1,5 @@
 __title__ = "tabula-py"
-__version__ = "1.3.1"
+__version__ = "1.4.0"
 __license__ = "MIT License"
 __description__ = "Simple wrapper for tabula-java, read tables from PDF into DataFrame"
 __author__ = "Aki Ariga"
