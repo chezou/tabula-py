@@ -113,14 +113,12 @@ def read_pdf(input_path,
 
     # to prevent tabula-py from stealing focus on every call on mac
     if platform.system() == 'Darwin':
-        r = 'java.awt.headless'
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ['-Djava.awt.headless=true']
+        if not any('java.awt.headless' in opt for opt in java_options):
+            java_options += ['-Djava.awt.headless=true']
 
     if encoding == 'utf-8':
-        r = 'file.encoding'
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ['-Dfile.encoding=UTF8']
+        if not any('file.encoding' in opt for opt in java_options):
+            java_options += ['-Dfile.encoding=UTF8']
 
     user_agent = kwargs.pop('user_agent', None)
 

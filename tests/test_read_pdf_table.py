@@ -187,12 +187,12 @@ class TestReadPdfTable(unittest.TestCase):
         pdf_path = 'tests/resources/data.pdf'
         tmp_file.return_value.name = '/tmp/output'
 
-        tabula.read_pdf(pdf_path)
+        tabula.read_pdf(pdf_path, encoding="utf-8")
 
         target_args = ["java"]
         if platform.system() == "Darwin":
             target_args += ["-Djava.awt.headless=true"]
-        target_args += ['-jar', '/tmp/tabula-java.jar', '--pages', '1',
+        target_args += ['-Dfile.encoding=UTF8', '-jar', '/tmp/tabula-java.jar', '--pages', '1',
                         '--guess', '--outfile', '/tmp/output', 'tests/resources/data.pdf']
         mock_fun.assert_called_with(target_args)
 
