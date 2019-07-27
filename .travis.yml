@@ -7,11 +7,10 @@ python:
 before_install:
 - pip install --upgrade setuptools
 install:
-- pip install tox
-- pip install tox-travis
-- pip install coverage coveralls
+- pip install nox
+- pip install .
 script:
-- tox -r
+- nox
 deploy:
   provider: pypi
   user: chezou
