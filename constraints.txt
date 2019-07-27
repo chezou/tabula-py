@@ -5,6 +5,7 @@ attrs==19.1.0
 backcall==0.1.0
 black==19.3b0
 Click==7.0
+colorlog==3.2.0
 decorator==4.4.0
 distro==1.4.0
 entrypoints==0.3
@@ -17,6 +18,7 @@ isort==4.3.21
 jedi==0.14.1
 mccabe==0.6.1
 more-itertools==7.2.0
+nox==2019.5.30
 numpy==1.17.0
 packaging==19.0
 pandas==0.25.0
