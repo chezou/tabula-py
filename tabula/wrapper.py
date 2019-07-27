@@ -9,17 +9,19 @@ import os
 import platform
 import shlex
 import subprocess
-
-import numpy as np
-import pandas as pd
-import sys
 import tempfile
 import errno
 
+import numpy as np
+import pandas as pd
+
+from logging import getLogger
 from .util import deprecated_option
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
+
+logger = getLogger(__name__)
 
 TABULA_JAVA_VERSION = "1.0.3"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
@@ -60,7 +62,7 @@ def _run(java_options, options, path=None, encoding='utf-8'):
     except FileNotFoundError as e:
         raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
     except subprocess.CalledProcessError as e:
-        sys.stderr.write("Error: {}\n".format(e.output.decode(encoding)))
+        logger.error("Error: {}\n".format(e.output.decode(encoding)))
         raise
 
 
@@ -140,6 +142,7 @@ def read_pdf(input_path,
             os.unlink(path)
 
     if len(output) == 0:
+        logger.warning("The output file is empty.")
         return
 
     if pandas_options is None:
