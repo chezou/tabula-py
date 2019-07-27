@@ -8,15 +8,7 @@ import pandas as pd
 import shutil
 import platform
 
-# TODO: Remove this Python 2 compatibility code if possible
-try:
-    FileNotFoundError
-    from unittest.mock import patch
-    from urllib.request import Request
-except NameError:
-    FileNotFoundError = IOError
-    from mock import patch
-    from urllib2 import Request
+from unittest.mock import patch
 
 
 class TestReadPdfTable(unittest.TestCase):

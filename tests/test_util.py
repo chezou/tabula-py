@@ -1,14 +1,8 @@
 import unittest
 import tabula
 
-try:
-    FileNotFoundError
-    from unittest.mock import patch, MagicMock
-    from urllib.request import Request
-except NameError:
-    FileNotFoundError = IOError
-    from mock import patch, MagicMock
-    from urllib2 import Request
+from unittest.mock import patch, MagicMock
+from urllib.request import Request
 
 
 class TestUtil(unittest.TestCase):

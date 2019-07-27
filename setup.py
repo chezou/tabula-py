@@ -36,9 +36,9 @@ setup(
         'Development Status :: 4 - Beta',
         'Topic :: Text Processing :: General',
         'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 2.7',
     ],
     include_package_data=True,
     packages=find_packages(),
@@ -46,10 +46,9 @@ setup(
     install_requires=[
         'pandas',
         'numpy',
-        'urllib3',
         'distro',
     ],
-    test_requires=[
-        'mock'
-    ],
+    extras_require={
+        'dev': ['pytest', 'flake8', 'black', 'isort']
+    },
 )

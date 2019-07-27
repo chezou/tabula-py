@@ -24,12 +24,6 @@ def deprecated_option(option):
 def java_version():
     import subprocess
 
-    # TODO: Remove this Python 2 compatibility code if possible
-    try:
-        FileNotFoundError
-    except NameError:
-        FileNotFoundError = IOError
-
     try:
         res = subprocess.check_output(["java", "-version"], stderr=subprocess.STDOUT)
         res = res.decode()

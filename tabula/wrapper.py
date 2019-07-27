@@ -29,13 +29,6 @@ JAVA_NOT_FOUND_ERROR = "`java` command is not found from this Python process. Pl
 DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
 
 
-# TODO: Remove this Python 2 compatibility code if possible
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
-
-
 def _jar_path():
     return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
 

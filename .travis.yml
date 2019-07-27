@@ -1,9 +1,10 @@
+dist: bionic
 sudo: false
 language: python
 python:
-- 2.7
 - 3.5
 - 3.6
+- 3.7
 before_install:
 - pip install --upgrade setuptools
 install:
@@ -19,4 +20,4 @@ deploy:
   distributions: sdist bdist_wheel
   on:
     tags: true
-    python: 3.5
+    python: 3.7
