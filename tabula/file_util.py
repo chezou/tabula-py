@@ -1,21 +1,9 @@
-import sys
 import os
 import shutil
 
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] >= 3
-
-if PY3:
-    from urllib.request import urlopen, Request
-    from urllib.parse import urlparse as parse_url
-    from urllib.parse import uses_relative, uses_netloc, uses_params
-    text_type = str
-else:
-    from urllib2 import urlopen, Request
-    from urlparse import urlparse as parse_url
-    from urlparse import uses_relative, uses_netloc, uses_params
-    text_type = unicode
-
+from urllib.request import urlopen, Request
+from urllib.parse import urlparse as parse_url
+from urllib.parse import uses_relative, uses_netloc, uses_params
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard('')
@@ -118,6 +106,6 @@ def _stringify_path(path_or_buffer):
         return path_or_buffer.__fspath__()
 
     if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):
-        return text_type(path_or_buffer)
+        return str(path_or_buffer)
 
     return path_or_buffer

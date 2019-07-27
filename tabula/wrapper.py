@@ -4,36 +4,31 @@ This module extract tables from PDF into pandas DataFrame. Currently, the
 implementation of this module uses subprocess.
 '''
 
-import io
 import json
 import os
 import platform
 import shlex
 import subprocess
+import tempfile
+import errno
 
 import numpy as np
 import pandas as pd
-import sys
-import errno
 
+from logging import getLogger
 from .util import deprecated_option
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
 
-TABULA_JAVA_VERSION = "1.0.2"
+logger = getLogger(__name__)
+
+TABULA_JAVA_VERSION = "1.0.3"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAVA_NOT_FOUND_ERROR = "`java` command is not found from this Python process. Please ensure Java is installed and PATH is set for `java`"
 
 DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
-
-
-# TODO: Remove this Python 2 compatibility code if possible
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
 
 
 def _jar_path():
@@ -67,7 +62,7 @@ def _run(java_options, options, path=None, encoding='utf-8'):
     except FileNotFoundError as e:
         raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
     except subprocess.CalledProcessError as e:
-        sys.stderr.write("Error: {}\n".format(e.output.decode(encoding)))
+        logger.error("Error: {}\n".format(e.output.decode(encoding)))
         raise
 
 
@@ -118,14 +113,12 @@ def read_pdf(input_path,
 
     # to prevent tabula-py from stealing focus on every call on mac
     if platform.system() == 'Darwin':
-        r = 'java.awt.headless'
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ['-Djava.awt.headless=true']
+        if not any('java.awt.headless' in opt for opt in java_options):
+            java_options += ['-Djava.awt.headless=true']
 
     if encoding == 'utf-8':
-        r = 'file.encoding'
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ['-Dfile.encoding=UTF8']
+        if not any('file.encoding' in opt for opt in java_options):
+            java_options += ['-Dfile.encoding=UTF8']
 
     user_agent = kwargs.pop('user_agent', None)
 
@@ -137,6 +130,9 @@ def read_pdf(input_path,
     if os.path.getsize(path) == 0:
         raise ValueError("{} is empty. Check the file, or download it manually.".format(path))
 
+    out_file = tempfile.NamedTemporaryFile("r", encoding=encoding)
+    kwargs["output_path"] = out_file.name
+
     try:
         output = _run(java_options, kwargs, path, encoding)
     finally:
@@ -144,6 +140,7 @@ def read_pdf(input_path,
             os.unlink(path)
 
     if len(output) == 0:
+        logger.warning("The output file is empty.")
         return
 
     if pandas_options is None:
@@ -152,16 +149,16 @@ def read_pdf(input_path,
     fmt = kwargs.get('format')
     if fmt == 'JSON':
         if multiple_tables:
-            return _extract_from(json.loads(output.decode(encoding)), pandas_options)
+            return _extract_from(json.load(out_file), pandas_options)
 
         else:
-            return json.loads(output.decode(encoding))
+            return json.load(out_file)
 
     else:
         pandas_options['encoding'] = pandas_options.get('encoding', encoding)
 
         try:
-            return pd.read_csv(io.BytesIO(output), **pandas_options)
+            return pd.read_csv(out_file.name, **pandas_options)
 
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
@@ -246,6 +243,12 @@ def convert_into(input_path, output_path, output_format='csv', java_options=None
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
 
+    # to prevent tabula-py from stealing focus on every call on mac
+    if platform.system() == 'Darwin':
+        r = 'java.awt.headless'
+        if not any(filter(r.find, java_options)):
+            java_options = java_options + ['-Djava.awt.headless=true']
+
     path, temporary = localize_file(input_path)
 
     if not os.path.exists(path):
@@ -288,6 +291,12 @@ def convert_into_by_batch(input_dir, output_format='csv', java_options=None, **k
 
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
+
+    # to prevent tabula-py from stealing focus on every call on mac
+    if platform.system() == 'Darwin':
+        r = 'java.awt.headless'
+        if not any(filter(r.find, java_options)):
+            java_options = java_options + ['-Djava.awt.headless=true']
 
     # Option for batch
     kwargs['batch'] = input_dir
@@ -343,7 +352,7 @@ def _convert_pandas_csv_options(pandas_options, columns):
     ''' Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
     Args:
-        pandas_option (dict):
+        pandas_options (dict):
             pandas options like {'header': None}.
         columns (list):
             list of column name.
@@ -373,10 +382,14 @@ def build_options(kwargs=None):
             Example: '1-2,3', 'all' or [1,2]
         guess (bool, optional):
             Guess the portion of the page to analyze per page. Default `True`
+            If you use "area" option, this option becomes `False`.
+
+            Note that as of tabula-java 1.0.3, guess option becomes independent from lattice and stream option,
+            you can use guess and lattice/stream option at the same time.
         area (:obj:`list` of :obj:`float` or :obj:`list` of :obj:`list` of :obj:`float`, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Example: [269.875,12.75,790.5,561] or [[12.1,20.5,30.1,50.2],[1.0,3.2,10.5,40.2]].
-            Default is entire page
+            Default is entire page.
         relative_area (bool, optional):
             If all area values are between 0-100 (inclusive) and preceded by '%', input will be taken as
             % of actual height or width of the page. Default False.
@@ -432,7 +445,11 @@ def build_options(kwargs=None):
     area = kwargs.get('area')
     relative_area = kwargs.get('relative_area')
     multiple_areas = False
+
+    guess = kwargs.get('guess', True)
+
     if area:
+        guess = False
         __area = area
         if type(area) in [list, tuple]:
             # Check if nested list or tuple for multiple areas
@@ -446,16 +463,12 @@ def build_options(kwargs=None):
                 __area = "{percent}{area_str}".format(percent='%' if relative_area else '', area_str=",".join(map(str, area)))
                 __options += ["--area", __area]
 
-    guess = kwargs.get('guess', True)
-
     lattice = kwargs.get('lattice') or kwargs.get('spreadsheet')
     if lattice:
-        guess = False
         __options.append("--lattice")
 
     stream = kwargs.get('stream') or kwargs.get('nospreadsheet')
     if stream:
-        guess = False
         __options.append("--stream")
 
     if guess and not multiple_areas:

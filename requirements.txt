@@ -1,7 +1,1 @@
-urllib3
-pandas
-pytest
-flake8
-distro
-pathlib
-mock
+-e .[dev]
