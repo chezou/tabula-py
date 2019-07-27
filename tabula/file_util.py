@@ -1,16 +1,15 @@
 import os
 import shutil
-
-from urllib.request import urlopen, Request
 from urllib.parse import urlparse as parse_url
-from urllib.parse import uses_relative, uses_netloc, uses_params
+from urllib.parse import uses_netloc, uses_params, uses_relative
+from urllib.request import Request, urlopen
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
-_VALID_URLS.discard('')
+_VALID_URLS.discard("")
 
 
 def localize_file(path_or_buffer, user_agent=None):
-    '''Ensure localize target file.
+    """Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
 
@@ -21,7 +20,7 @@ def localize_file(path_or_buffer, user_agent=None):
     Returns:
         filename (str): file name in local storage
         temporary_file_flag (bool): temporary file flag
-    '''
+    """
 
     path_or_buffer = _stringify_path(path_or_buffer)
 
@@ -31,11 +30,11 @@ def localize_file(path_or_buffer, user_agent=None):
         else:
             req = urlopen(path_or_buffer)
         filename = os.path.basename(req.geturl())
-        if os.path.splitext(filename)[-1] is not ".pdf":
+        if os.path.splitext(filename)[-1] != ".pdf":
             pid = os.getpid()
             filename = "{0}.pdf".format(pid)
 
-        with open(filename, 'wb') as f:
+        with open(filename, "wb") as f:
             shutil.copyfileobj(req, f)
 
         return filename, True
@@ -44,7 +43,7 @@ def localize_file(path_or_buffer, user_agent=None):
         pid = os.getpid()
         filename = "{0}.pdf".format(pid)
 
-        with open(filename, 'wb') as f:
+        with open(filename, "wb") as f:
             shutil.copyfileobj(path_or_buffer, f)
 
         return filename, True
@@ -63,11 +62,12 @@ def _is_url(url):
 
 
 def _create_request(path_or_buffer, user_agent):
-    req_headers = {'User-Agent': user_agent}
+    req_headers = {"User-Agent": user_agent}
     return Request(path_or_buffer, headers=req_headers)
 
+
 def is_file_like(obj):
-    '''Check file like object
+    """Check file like object
 
     Args:
         obj:
@@ -75,9 +75,9 @@ def is_file_like(obj):
 
     Returns:
         bool: file like object or not
-    '''
+    """
 
-    if not (hasattr(obj, 'read') or hasattr(obj, 'write')):
+    if not (hasattr(obj, "read") or hasattr(obj, "write")):
         return False
 
     if not hasattr(obj, "__iter__"):
@@ -87,22 +87,23 @@ def is_file_like(obj):
 
 
 def _stringify_path(path_or_buffer):
-    '''Convert path like object to string
+    """Convert path like object to string
 
     Args:
         path_or_buffer: object to be converted
 
     Returns:
         string_path_or_buffer: maybe string version of path_or_buffer
-    '''
+    """
 
     try:
         import pathlib
+
         _PATHLIB_INSTALLED = True
     except ImportError:
         _PATHLIB_INSTALLED = False
 
-    if hasattr(path_or_buffer, '__fspath__'):
+    if hasattr(path_or_buffer, "__fspath__"):
         return path_or_buffer.__fspath__()
 
     if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):
