@@ -143,11 +143,16 @@ def read_pdf(
             "{} is empty. Check the file, or download it manually.".format(path)
         )
 
-    out_file = tempfile.NamedTemporaryFile("r", encoding=encoding)
-    kwargs["output_path"] = out_file.name
+    if not kwargs.get("output_path"):
+        out_file = tempfile.NamedTemporaryFile("r", encoding=encoding)
+        kwargs["output_path"] = out_file.name
+    else:
+        out_file = None
 
     try:
         output = _run(java_options, kwargs, path, encoding)
+        if not out_file:  # If we passed in an output path, pass it in
+            out_file = open(kwargs.get("output_path"), 'r')
     finally:
         if temporary:
             os.unlink(path)
@@ -160,19 +165,19 @@ def read_pdf(
         pandas_options = {}
 
     fmt = kwargs.get("format")
+    output_path = kwargs.get("output_path")
+
     if fmt == "JSON":
-        if multiple_tables:
-            return _extract_from(json.load(out_file), pandas_options)
-
-        else:
-            return json.load(out_file)
-
+        with open(output_path, "r") as _out_file:
+            if multiple_tables:
+                data = _extract_from(json.load(_out_file), pandas_options)
+            else:
+                data = json.load(_out_file)
     else:
         pandas_options["encoding"] = pandas_options.get("encoding", encoding)
 
         try:
-            return pd.read_csv(out_file.name, **pandas_options)
-
+            data = pd.read_csv(output_path, **pandas_options)
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
             message += (
@@ -181,6 +186,8 @@ def read_pdf(
             )
 
             raise CSVParseError(message, e)
+
+    return data
 
 
 def read_pdf_with_template(
