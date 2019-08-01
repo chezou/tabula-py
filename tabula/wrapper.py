@@ -79,7 +79,7 @@ def read_pdf(
     java_options=None,
     pandas_options=None,
     multiple_tables=False,
-    **kwargs
+    **kwargs,
 ):
     """Read tables in PDF.
 
@@ -152,7 +152,7 @@ def read_pdf(
     try:
         output = _run(java_options, kwargs, path, encoding)
         if not out_file:  # If we passed in an output path, pass it in
-            out_file = open(kwargs.get("output_path"), 'r')
+            out_file = open(kwargs.get("output_path"), "r")
     finally:
         if temporary:
             os.unlink(path)
@@ -196,7 +196,7 @@ def read_pdf_with_template(
     pandas_options=None,
     encoding="utf-8",
     java_options=None,
-    **kwargs
+    **kwargs,
 ):
     """Read tables in PDF.
 
@@ -227,7 +227,7 @@ def read_pdf_with_template(
             pandas_options=pandas_options,
             encoding=encoding,
             java_options=java_options,
-            **dict(kwargs, **option)
+            **dict(kwargs, **option),
         )
         if isinstance(_df, list):
             dataframes.extend(_df)
