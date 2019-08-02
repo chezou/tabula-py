@@ -5,12 +5,12 @@ implementation of this module uses subprocess.
 """
 
 import errno
+import io
 import json
 import os
 import platform
 import shlex
 import subprocess
-import tempfile
 from logging import getLogger
 
 import numpy as np
@@ -143,9 +143,6 @@ def read_pdf(
             "{} is empty. Check the file, or download it manually.".format(path)
         )
 
-    out_file = tempfile.NamedTemporaryFile("r", encoding=encoding)
-    kwargs["output_path"] = out_file.name
-
     try:
         output = _run(java_options, kwargs, path, encoding)
     finally:
@@ -161,17 +158,18 @@ def read_pdf(
 
     fmt = kwargs.get("format")
     if fmt == "JSON":
+        raw_json = json.loads(output.decode(encoding))
         if multiple_tables:
-            return _extract_from(json.load(out_file), pandas_options)
+            return _extract_from(raw_json, pandas_options)
 
         else:
-            return json.load(out_file)
+            return raw_json
 
     else:
         pandas_options["encoding"] = pandas_options.get("encoding", encoding)
 
         try:
-            return pd.read_csv(out_file.name, **pandas_options)
+            return pd.read_csv(io.BytesIO(output), **pandas_options)
 
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
