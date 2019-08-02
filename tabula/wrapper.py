@@ -189,7 +189,7 @@ def read_pdf_with_template(
     java_options=None,
     **kwargs
 ):
-    """Read tables in PDF.
+    """Read tables in PDF with a Tabula App template.
 
     Args:
         input_path (file like obj):
