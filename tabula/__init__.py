@@ -1,4 +1,5 @@
-from .__version__ import __version__
+from pkg_resources import DistributionNotFound, get_distribution
+
 from .util import environment_info
 from .wrapper import (
     convert_into,
@@ -6,3 +7,9 @@ from .wrapper import (
     read_pdf,
     read_pdf_with_template,
 )
+
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass

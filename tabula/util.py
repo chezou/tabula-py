@@ -48,7 +48,7 @@ def java_version():
 def environment_info():
     import sys
     import distro
-    from .__version__ import __version__
+    from setuptools_scm import get_version
 
     print(
         """Python version:
@@ -64,7 +64,7 @@ mac_ver: {}
     """.format(
             sys.version,
             java_version().strip(),
-            __version__,
+            get_version(root="..", relative_to=__file__),
             platform.platform(),
             str(platform.uname()),
             distro.linux_distribution(),

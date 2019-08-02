@@ -11,26 +11,23 @@ def read_file(filename):
         return ""
 
 
-about = {}
-with open(os.path.join(os.path.dirname(__file__), "tabula", "__version__.py")) as f:
-    exec(f.read(), about)
-
 with open(os.path.join(os.path.dirname(__file__), "README.md")) as f:
-    about["__long_description__"] = f.read()
+    long_description = f.read()
 
 
 setup(
-    name=about["__title__"],
-    version=about["__version__"],
-    description=about["__description__"],
-    long_description=about["__long_description__"],
+    name="tabula-py",
+    setup_requires=["setuptools_scm"],
+    use_scm_version=True,
+    description="Simple wrapper for tabula-java, read tables from PDF into DataFrame",
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    author=about["__author__"],
-    author_email=about["__author_email__"],
-    maintainer=about["__maintainer__"],
-    maintainer_email=about["__maintainer_email__"],
-    license=about["__license__"],
-    url=about["__url__"],
+    author="Aki Ariga",
+    author_email="chezou@gmail.com",
+    maintainer="Aki Ariga",
+    maintainer_email="chezou@gmail.com",
+    license="MIT License",
+    url="https://github.com/chezou/tabula-py",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Text Processing :: General",
