@@ -17,7 +17,6 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as f:
 
 setup(
     name="tabula-py",
-    setup_requires=["setuptools_scm"],
     use_scm_version=True,
     description="Simple wrapper for tabula-java, read tables from PDF into DataFrame",
     long_description=long_description,
@@ -39,6 +38,6 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     keywords=["data frame", "pdf", "table"],
-    install_requires=["pandas", "numpy", "distro"],
+    install_requires=["pandas", "numpy", "distro", "setuptools_scm"],
     extras_require={"dev": ["pytest", "flake8", "black", "isort"], "test": ["pytest"]},
 )
