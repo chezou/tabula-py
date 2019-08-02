@@ -219,12 +219,10 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertEqual(len(dfs), 4)
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
-    @patch("tabula.wrapper.tempfile.NamedTemporaryFile")
     @patch("subprocess.check_output")
     @patch("tabula.wrapper._jar_path")
-    def test_read_pdf_with_jar_path(self, jar_func, mock_fun, tmp_file):
+    def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
         jar_func.return_value = "/tmp/tabula-java.jar"
-        tmp_file.return_value.name = "/tmp/output"
 
         tabula.read_pdf(self.pdf_path, encoding="utf-8")
 
@@ -238,8 +236,6 @@ class TestReadPdfTable(unittest.TestCase):
             "--pages",
             "1",
             "--guess",
-            "--outfile",
-            "/tmp/output",
             "tests/resources/data.pdf",
         ]
         mock_fun.assert_called_with(target_args)
