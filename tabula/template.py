@@ -10,7 +10,7 @@ def load_template(path_or_buffer):
         file_like_obj: File like object of Tabula app template
 
     Returns:
-        `obj`:dict: tabula-py options
+        dict: tabula-py options
     """
 
     from itertools import groupby

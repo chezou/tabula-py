@@ -18,8 +18,9 @@ def localize_file(path_or_buffer, user_agent=None):
             File path or file like object or URL of target file.
 
     Returns:
-        filename (str): file name in local storage
-        temporary_file_flag (bool): temporary file flag
+        (str, bool):
+            tuple of str and bool, which represents file name in local storage
+            and temporary file flag.
     """
 
     path_or_buffer = _stringify_path(path_or_buffer)

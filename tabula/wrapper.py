@@ -2,6 +2,19 @@
 
 This module extract tables from PDF into pandas DataFrame. Currently, the
 implementation of this module uses subprocess.
+
+Instead of importing this module, you can import public interfaces sucha as
+:func:`read_pdf()`, :func:`read_pdf_template()`, :func:`convert_into()`,
+:func:`convert_into_by_batch()` from `tabula` module directory.
+
+Note:
+    If you want to use your own tabula-java JAR file, set ``TABULA_JAR`` to
+    environment variable for JAR path.
+
+Example:
+
+>>> import tabula
+>>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
 """
 
 import errno
@@ -84,21 +97,32 @@ def read_pdf(
     """Read tables in PDF.
 
     Args:
-        input_path (file like obj):
+        input_path (file_like_obj):
             File like object of tareget PDF file.
         output_format (str, optional):
-            Output format of this function (dataframe or json)
+            Output format for returned object (``"dataframe" or ``"json"``)
         encoding (str, optional):
-            Encoding type for pandas. Default is 'utf-8'
+            Encoding type for pandas. Default: 'utf-8'
         java_options (list, optional):
-            Set java options like `-Xmx256m`.
+            Set java options.
+
+            Example:
+                `-Xmx256m`
         pandas_options (dict, optional):
-            Set pandas options like {'header': None}.
+            Set pandas options.
+
+            Example:
+                ``{'header': None}``
         multiple_tables (bool, optional):
             It enables to handle multiple tables within a page.
-            Note: If `multiple_tables` option is enabled, tabula-py uses not
-            :func:`pd.read_csv()`, but `pd.DataFrame()`. Make sure to pass appropriate
-            `pandas_options`.
+
+            Note:
+                If `multiple_tables` option is enabled, tabula-py uses not
+                :func:`pd.read_csv()`, but :func:`pd.DataFrame()`. Make
+                sure to pass appropriate `pandas_options`.
+        user_agent (str, optional):
+            Set a custom user-agent when download a pdf from a url. Otherwise
+            it uses the default ``urllib.request`` user-agent.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -192,7 +216,7 @@ def read_pdf_with_template(
     """Read tables in PDF with a Tabula App template.
 
     Args:
-        input_path (file like obj):
+        input_path (file_like_obj):
             File like object of tareget PDF file.
         template_path (file_like_obj):
             File like object for Tabula app template.
@@ -239,9 +263,13 @@ def convert_into(
         output_path (str):
             File path of output file.
         output_format (str, optional):
-            Output format of this function (csv, json or tsv). Default: csv
+            Output format of this function (``csv``, ``json`` or ``tsv``).
+            Default: ``csv``
         java_options (list, optional):
-            Set java options like `-Xmx256m`.
+            Set java options
+
+            Example:
+                ``-Xmx256m``.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in `build_options()`
 
@@ -399,29 +427,32 @@ def build_options(kwargs=None):
     """Build options for tabula-java
 
     Args:
-        options (str, optional):
-            Raw option string for tabula-java.
-        pages (str, int, :obj:`list` of :obj:`int`, optional):
+        pages (str, int, `list` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, :obj:`list` of :obj:`int`.
-            Example: '1-2,3', 'all' or [1,2]
+            `str`,`int`, `list` of :`int`.
+
+            Examples: ``'1-2,3'``, ``'all'``, ``[1,2]``
         guess (bool, optional):
             Guess the portion of the page to analyze per page. Default `True`
             If you use "area" option, this option becomes `False`.
 
-            Note that as of tabula-java 1.0.3, guess option becomes independent from
-            lattice and stream option, you can use guess and lattice/stream option
-            at the same time.
-        area (:obj:`list` of :obj:`float` or
-             :obj:`list` of :obj:`list` of :obj:`float`, optional):
+            Note:
+                As of tabula-java 1.0.3, guess option becomes independent from
+                lattice and stream option, you can use guess and lattice/stream option
+                at the same time.
+
+        area (list of float, list of list of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
-            Example; [269.875,12.75,790.5,561] or
-                     [[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]].
             Default is entire page.
+
+            Examples:
+                ``[269.875,12.75,790.5,561]``,
+                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
+
         relative_area (bool, optional):
-            If all area values are between 0-100 (inclusive) and preceded by '%',
+            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
             input will be taken as % of actual height or width of the page.
-            Default False.
+            Default ``False``.
         lattice (bool, optional):
             Force PDF to be extracted using lattice-mode extraction
             (if there are ruling lines separating each cell, as in a PDF of an
@@ -429,25 +460,31 @@ def build_options(kwargs=None):
         stream (bool, optional):
             Force PDF to be extracted using stream-mode extraction
             (if there are no ruling lines separating each cell, as in a PDF of an
-             Excel spreadsheet)
+            Excel spreadsheet)
         password (str, optional):
-            Password to decrypt document. Default is empty
+            Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
         columns (list, optional):
             X coordinates of column boundaries.
-            Example: [10.1, 20.2, 30.3]
+
+            Example:
+                ``[10.1, 20.2, 30.3]``
         format (str, optional):
-            Format for output file or extracted object. (CSV, TSV, JSON)
+            Format for output file or extracted object.
+            (``"CSV"``, ``"TSV"``, ``"JSON"``)
         batch (str, optional):
             Convert all .pdfs in the provided directory. This argument should be
             directory.
         output_path (str, optional):
-            Output file path. File format of it is depends on `format`.
-            Same as `--outfile` option of tabula-java.
+            Output file path. File format of it is depends on ``format``.
+            Same as ``--outfile`` option of tabula-java.
+        options (str, optional):
+            Raw option string for tabula-java.
 
     Returns:
-        `obj`:list: Built list of options
+        list:
+            Built list of options
     """
 
     __options = []
