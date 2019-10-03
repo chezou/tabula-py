@@ -66,7 +66,7 @@ You can help by:
 
 - [Reporting a bug](https://github.com/tabulapdf/tabula-py/issues).
 - Adding or editing documentation.
-- Contributing code via a Pull Request.
+- Contributing code via a Pull Request. See also [for the contribution](docs/contributing.rst)
 - Write a blog post or spreading the word about `tabula-py` to people who might be able to benefit from using it.
 
 
