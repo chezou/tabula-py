@@ -4,17 +4,15 @@ about: Create a report to help us improve
 
 ---
 
-# Summary of your issue
+# Check list before submit
 
-# Environment
+Write and check the following questionaries.
 
-Write and check your environment. Please paste outputs of specific commands if required.
+- [ ] Did you read [FAQ](https://tabula-py.readthedocs.io/en/latest/faq.html)?
 
-- [ ] Paste the output of `import tabula; tabula.environment_info()` on Python REPL: 
+- [ ] (Optional, but really helpful) Your PDF URL: ?
 
-```py
-# paste output of `tabula.environment_info()`
-```
+- [ ] Paste the output of `import tabula; tabula.environment_info()` on Python REPL: ?
 
 If not possible to execute `tabula.environment_info()`, please answer following questions manually.
 
@@ -22,10 +20,6 @@ If not possible to execute `tabula.environment_info()`, please answer following 
 - [ ] Paste the output of `java -version` command on your terminal: ?
 - [ ] Does `java -h` command work well?; Ensure your java command is included in `PATH`
 - [ ] Write your OS and it's version: ?
-
-Providing PDF would be really helpful to resolve the issue.
-
-- [ ] (Optional, but really helpful) Your PDF URL: ?
 
 
 # What did you do when you faced the problem?

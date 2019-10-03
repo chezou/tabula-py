@@ -1,18 +1,27 @@
 # How to contribute
 
-## Setup
+## Code formatting and testing
 
-```sh
-git clone git@github.com:chezou/tabula-py.git
-cd tabula-py
-# recommend to activate your virtualenv before install dependencies
-pip install -r requirements.txt
-```
+If you want to become a contributor, you can install dependency after cloning the repo as follows:
 
-## Test before sending Pull Request
 
-Run test with tox.
+    git clone git@github.com:chezou/tabula-py.git
+    pip install -e .[dev, test]
+    pip install nox
 
-```sh
-tox
-```
+For running text and liter, run nox command.
+
+
+    nox
+
+
+## Documentation
+
+You can build document on your environment as folows:
+
+
+    pip install -e .[doc]
+    cd docs && make html
+
+The documentation source is under `docs/` directory and the document is published on Read the Docs automatically.
+

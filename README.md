@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/chezou/tabula-py.svg?branch=master)](https://travis-ci.org/chezou/tabula-py)
 [![PyPI version](https://badge.fury.io/py/tabula-py.svg)](https://badge.fury.io/py/tabula-py)
+[![Documentation Status](https://readthedocs.org/projects/tabula-py/badge/?version=latest)](https://tabula-py.readthedocs.io/en/latest/?badge=latest)
 [![Patreon](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/chezou)
 
 
@@ -25,6 +26,7 @@ I confirmed working on macOS and Ubuntu. But some people confirm it works on Win
 # Usage
 
 - [Documentation](https://tabula-py.readthedocs.io/en/latest/)
+  - [FAQ](https://tabula-py.readthedocs.io/en/latest/faq.html) would be helpful if you have issue
 - [Example notebook on Google Colaboratory](https://colab.research.google.com/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb)
 
 ## Install
