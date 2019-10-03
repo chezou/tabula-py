@@ -10,7 +10,7 @@ You can see `the example notebook <https://nbviewer.jupyter.org/github/chezou/ta
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
    getting_started
    faq
