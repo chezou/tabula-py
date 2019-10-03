@@ -20,9 +20,12 @@ You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/ta
 
 ## OS
 
-I confirmed working on macOS and Ubuntu. But some people confirm it works on Windows 10. See also the document for the detailed installation for Windows 10.
+I confirmed working on macOS and Ubuntu. But some people confirm it works on Windows 10. See also [the document for the detailed installation for Windows 10](https://tabula-py.readthedocs.io/en/latest/getting_started.html#get-tabula-py-working-windows-10).
 
 # Usage
+
+- [Documentation](https://tabula-py.readthedocs.io/en/latest/)
+- [Example notebook on Google Colaboratory](https://colab.research.google.com/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb)
 
 ## Install
 
