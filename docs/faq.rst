@@ -140,7 +140,7 @@ I want to extract multiple tables from a document
 
 You can use the following example code
 
-.. code-block::
+.. code-block:: python
 
    df = read_pdf(file_path, multiple_tables=True)
 
