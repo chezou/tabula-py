@@ -20,7 +20,27 @@ If you've installed ``tabula``\ , it will be conflict the namespace. You should 
    pip uninstall tabula
    pip install tabula-py
 
-The result is different from ``tabula-java``. Or, ``stream`` option seems not to work appropreately
+I got a empty DataFrame. How can I resolve it?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Depending on the PDF's complexity, it might be difficult to extract table contents accuracy.
+
+Tuning points of tabula-py are limited:
+
+* Set specific ``area`` for accurate table detection
+* Try ``lattice=True`` option for the table having explicit line. Or try ``stream=True`` option
+
+To know the limitation of tabula-java, I highly recommend to use `tabula app <https://tabula.technology/>`_, the GUI version of `tabula-java <https://github.com/tabulapdf/tabula-java/>`_.
+
+tabula app can:
+
+* specify the area with GUI
+* show preview of the extraction with lattich or stream mode
+* export template that is reusable for tabula-py
+
+Even if you can't extract tabula-py for those table contents which can be extracted tabula app appropriately, file an issue on GitHub.
+
+The result is different from ``tabula-java``. Or, ``stream`` option seems not to work appropriately
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``tabula-py`` set ``guess`` option ``True`` by default, for beginners. It is known to make a conflict between ``stream`` option. If you feel something strange with your result, please set ``guess=False``.
@@ -150,3 +170,10 @@ Table cell contents sometimes overflow into the next row.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can try using ``lattice=True``\ , which will often work if there are lines separating cells in the table.
+
+I got a warning/error message from PDFBox including ``org.apache.pdfbox.pdmodel.``. Is it the cause of empty dataframe?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+No.
+
+Sometimes, you might see message like `` Jul 17, 2019 10:21:25 AM org.apache.pdfbox.pdmodel.font.PDType1Font WARNING: Using fallback font NimbusSanL-Regu for Univers. Nothing was parsed from this one.`` This error message came from Apache PDFBox which is used under tabula-java, and this is caused by the PDF itself. Neither tabula-py nor tabula-java can't handle the warning itself, except for silent option that suppress the warning.
