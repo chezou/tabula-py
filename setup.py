@@ -46,6 +46,6 @@ setup(
     extras_require={
         "dev": ["pytest", "flake8", "black", "isort"],
         "test": ["pytest"],
-        "doc": ["sphinx", "sphinx_rtd_theme", "recommonmark"],
+        "doc": ["sphinx", "sphinx_rtd_theme"],
     },
 )

@@ -88,7 +88,6 @@ author = 'Aki Ariga'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    "recommonmark",
     "sphinx_rtd_theme",
     "sphinx.ext.linkcode",
 ]
