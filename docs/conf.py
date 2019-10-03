@@ -112,3 +112,7 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Work around for contents.rst not found error
+# See also: https://github.com/readthedocs/readthedocs.org/issues/2569
+master_doc = 'index'
