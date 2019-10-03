@@ -43,5 +43,9 @@ setup(
     packages=find_packages(),
     keywords=["data frame", "pdf", "table"],
     install_requires=["pandas", "numpy", "distro"],
-    extras_require={"dev": ["pytest", "flake8", "black", "isort"], "test": ["pytest"]},
+    extras_require={
+        "dev": ["pytest", "flake8", "black", "isort"],
+        "test": ["pytest"],
+        "doc": ["sphinx", "sphinx_rtd_theme", "recommonmark"],
+    },
 )

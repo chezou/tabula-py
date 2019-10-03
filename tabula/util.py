@@ -30,6 +30,11 @@ def deprecated_option(option):
 
 
 def java_version():
+    """Show Java version
+
+    Returns:
+        str: Result of ``java -version``
+    """
     import subprocess
 
     try:
@@ -46,6 +51,14 @@ def java_version():
 
 
 def environment_info():
+    """Show environment information for reporting.
+
+    Returns:
+        str:
+            Detailed information like Python version, Java version,
+            or OS environment, etc.
+    """
+
     import sys
     import distro
     from .__version__ import __version__
