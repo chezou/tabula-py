@@ -1,3 +1,7 @@
+"""
+Utility module providing some convinient functions.
+"""
+
 import platform
 import warnings
 

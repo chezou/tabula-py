@@ -4,7 +4,7 @@ This module extract tables from PDF into pandas DataFrame. Currently, the
 implementation of this module uses subprocess.
 
 Instead of importing this module, you can import public interfaces sucha as
-:func:`read_pdf()`, :func:`read_pdf_template()`, :func:`convert_into()`,
+:func:`read_pdf()`, :func:`read_pdf_with_template()`, :func:`convert_into()`,
 :func:`convert_into_by_batch()` from `tabula` module directory.
 
 Note:
@@ -13,8 +13,8 @@ Note:
 
 Example:
 
->>> import tabula
->>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
+    >>> import tabula
+    >>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
 """
 
 import errno
@@ -128,8 +128,120 @@ def read_pdf(
             :func:`build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list.
-    """
+        Extracted pandas DataFrame or list of DataFrame.
+
+
+    Examples:
+
+        Here is the basic example. Note that ``read_pdf()`` only extract page 1 by default.
+
+        >>> import tabula
+        >>> pdf_path = "https://github.com/chezou/tabula-py/raw/master/tests/resources/data.pdf"
+        >>> tabula.read_pdf(pdf_path, stream=True)
+                    Unnamed: 0   mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb
+        0             Mazda RX4  21.0    6  160.0  110  3.90  2.620  16.46   0   1     4     4
+        1         Mazda RX4 Wag  21.0    6  160.0  110  3.90  2.875  17.02   0   1     4     4
+        2            Datsun 710  22.8    4  108.0   93  3.85  2.320  18.61   1   1     4     1
+        3        Hornet 4 Drive  21.4    6  258.0  110  3.08  3.215  19.44   1   0     3     1
+        4     Hornet Sportabout  18.7    8  360.0  175  3.15  3.440  17.02   0   0     3     2
+        5               Valiant  18.1    6  225.0  105  2.76  3.460  20.22   1   0     3     1
+        6            Duster 360  14.3    8  360.0  245  3.21  3.570  15.84   0   0     3     4
+        7             Merc 240D  24.4    4  146.7   62  3.69  3.190  20.00   1   0     4     2
+        8              Merc 230  22.8    4  140.8   95  3.92  3.150  22.90   1   0     4     2
+        9              Merc 280  19.2    6  167.6  123  3.92  3.440  18.30   1   0     4     4
+        10            Merc 280C  17.8    6  167.6  123  3.92  3.440  18.90   1   0     4     4
+        11           Merc 450SE  16.4    8  275.8  180  3.07  4.070  17.40   0   0     3     3
+        12           Merc 450SL  17.3    8  275.8  180  3.07  3.730  17.60   0   0     3     3
+        13          Merc 450SLC  15.2    8  275.8  180  3.07  3.780  18.00   0   0     3     3
+        14   Cadillac Fleetwood  10.4    8  472.0  205  2.93  5.250  17.98   0   0     3     4
+        15  Lincoln Continental  10.4    8  460.0  215  3.00  5.424  17.82   0   0     3     4
+        16    Chrysler Imperial  14.7    8  440.0  230  3.23  5.345  17.42   0   0     3     4
+        17             Fiat 128  32.4    4   78.7   66  4.08  2.200  19.47   1   1     4     1
+        18          Honda Civic  30.4    4   75.7   52  4.93  1.615  18.52   1   1     4     2
+        19       Toyota Corolla  33.9    4   71.1   65  4.22  1.835  19.90   1   1     4     1
+        20        Toyota Corona  21.5    4  120.1   97  3.70  2.465  20.01   1   0     3     1
+        21     Dodge Challenger  15.5    8  318.0  150  2.76  3.520  16.87   0   0     3     2
+        22          AMC Javelin  15.2    8  304.0  150  3.15  3.435  17.30   0   0     3     2
+        23           Camaro Z28  13.3    8  350.0  245  3.73  3.840  15.41   0   0     3     4
+        24     Pontiac Firebird  19.2    8  400.0  175  3.08  3.845  17.05   0   0     3     2
+        25            Fiat X1-9  27.3    4   79.0   66  4.08  1.935  18.90   1   1     4     1
+        26        Porsche 914-2  26.0    4  120.3   91  4.43  2.140  16.70   0   1     5     2
+        27         Lotus Europa  30.4    4   95.1  113  3.77  1.513  16.90   1   1     5     2
+        28       Ford Pantera L  15.8    8  351.0  264  4.22  3.170  14.50   0   1     5     4
+        29         Ferrari Dino  19.7    6  145.0  175  3.62  2.770  15.50   0   1     5     6
+        30        Maserati Bora  15.0    8  301.0  335  3.54  3.570  14.60   0   1     5     8
+        31           Volvo 142E  21.4    4  121.0  109  4.11  2.780  18.60   1   1     4     2
+
+        If you want to extract all pages, it'd be better to set ``mutiple_tables=True``.
+        ``read_pdf()`` returns list of ``pd.DataFrame``
+
+        >>> dfs = tabula.read_pdf(pdf_path, pages="all", multiple_tables=True)
+        >>> len(dfs)
+        4
+        >>> dfs
+        [       0    1      2    3     4      5      6   7   8     9
+        0    mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear
+        1   21.0    6  160.0  110  3.90  2.620  16.46   0   1     4
+        2   21.0    6  160.0  110  3.90  2.875  17.02   0   1     4
+        3   22.8    4  108.0   93  3.85  2.320  18.61   1   1     4
+        4   21.4    6  258.0  110  3.08  3.215  19.44   1   0     3
+        5   18.7    8  360.0  175  3.15  3.440  17.02   0   0     3
+        6   18.1    6  225.0  105  2.76  3.460  20.22   1   0     3
+        7   14.3    8  360.0  245  3.21  3.570  15.84   0   0     3
+        8   24.4    4  146.7   62  3.69  3.190  20.00   1   0     4
+        9   22.8    4  140.8   95  3.92  3.150  22.90   1   0     4
+        10  19.2    6  167.6  123  3.92  3.440  18.30   1   0     4
+        11  17.8    6  167.6  123  3.92  3.440  18.90   1   0     4
+        12  16.4    8  275.8  180  3.07  4.070  17.40   0   0     3
+        13  17.3    8  275.8  180  3.07  3.730  17.60   0   0     3
+        14  15.2    8  275.8  180  3.07  3.780  18.00   0   0     3
+        15  10.4    8  472.0  205  2.93  5.250  17.98   0   0     3
+        16  10.4    8  460.0  215  3.00  5.424  17.82   0   0     3
+        17  14.7    8  440.0  230  3.23  5.345  17.42   0   0     3
+        18  32.4    4   78.7   66  4.08  2.200  19.47   1   1     4
+        19  30.4    4   75.7   52  4.93  1.615  18.52   1   1     4
+        20  33.9    4   71.1   65  4.22  1.835  19.90   1   1     4
+        21  21.5    4  120.1   97  3.70  2.465  20.01   1   0     3
+        22  15.5    8  318.0  150  2.76  3.520  16.87   0   0     3
+        23  15.2    8  304.0  150  3.15  3.435  17.30   0   0     3
+        24  13.3    8  350.0  245  3.73  3.840  15.41   0   0     3
+        25  19.2    8  400.0  175  3.08  3.845  17.05   0   0     3
+        26  27.3    4   79.0   66  4.08  1.935  18.90   1   1     4
+        27  26.0    4  120.3   91  4.43  2.140  16.70   0   1     5
+        28  30.4    4   95.1  113  3.77  1.513  16.90   1   1     5
+        29  15.8    8  351.0  264  4.22  3.170  14.50   0   1     5
+        30  19.7    6  145.0  175  3.62  2.770  15.50   0   1     5
+        31  15.0    8  301.0  335  3.54  3.570  14.60   0   1     5,               0            1             2            3        4
+        0  Sepal.Length  Sepal.Width  Petal.Length  Petal.Width  Species
+        1           5.1          3.5           1.4          0.2   setosa
+        2           4.9          3.0           1.4          0.2   setosa
+        3           4.7          3.2           1.3          0.2   setosa
+        4           4.6          3.1           1.5          0.2   setosa
+        5           5.0          3.6           1.4          0.2   setosa
+        6           5.4          3.9           1.7          0.4   setosa,      0             1            2             3            4          5
+        0  NaN  Sepal.Length  Sepal.Width  Petal.Length  Petal.Width    Species
+        1  145           6.7          3.3           5.7          2.5  virginica
+        2  146           6.7          3.0           5.2          2.3  virginica
+        3  147           6.3          2.5           5.0          1.9  virginica
+        4  148           6.5          3.0           5.2          2.0  virginica
+        5  149           6.2          3.4           5.4          2.3  virginica
+        6  150           5.9          3.0           5.1          1.8  virginica,        0
+        0   supp
+        1     VC
+        2     VC
+        3     VC
+        4     VC
+        5     VC
+        6     VC
+        7     VC
+        8     VC
+        9     VC
+        10    VC
+        11    VC
+        12    VC
+        13    VC
+        14    VC]
+    """ # noqa
 
     if output_format == "dataframe":
         kwargs.pop("format", None)
@@ -227,11 +339,81 @@ def read_pdf_with_template(
         java_options (list, optional):
             Set java options like `-Xmx256m`.
         kwargs (dict):
-            Dictionary of option for tabula-java. Details are shown in `build_options()`
+            Dictionary of option for tabula-java. Details are shown in
+            :func:`build_options()`
 
     Returns:
         Extracted pandas DataFrame or list.
-    """
+
+
+    Examples:
+
+        >>> import tabula
+        >>> tabula.read_pdf_with_template(pdf_path, "/path/to/data.tabula-template.json")
+        [             Unnamed: 0   mpg  cyl   disp   hp  ...   qsec  vs  am  gear  carb
+        0             Mazda RX4  21.0    6  160.0  110  ...  16.46   0   1     4     4
+        1         Mazda RX4 Wag  21.0    6  160.0  110  ...  17.02   0   1     4     4
+        2            Datsun 710  22.8    4  108.0   93  ...  18.61   1   1     4     1
+        3        Hornet 4 Drive  21.4    6  258.0  110  ...  19.44   1   0     3     1
+        4     Hornet Sportabout  18.7    8  360.0  175  ...  17.02   0   0     3     2
+        5               Valiant  18.1    6  225.0  105  ...  20.22   1   0     3     1
+        6            Duster 360  14.3    8  360.0  245  ...  15.84   0   0     3     4
+        7             Merc 240D  24.4    4  146.7   62  ...  20.00   1   0     4     2
+        8              Merc 230  22.8    4  140.8   95  ...  22.90   1   0     4     2
+        9              Merc 280  19.2    6  167.6  123  ...  18.30   1   0     4     4
+        10            Merc 280C  17.8    6  167.6  123  ...  18.90   1   0     4     4
+        11           Merc 450SE  16.4    8  275.8  180  ...  17.40   0   0     3     3
+        12           Merc 450SL  17.3    8  275.8  180  ...  17.60   0   0     3     3
+        13          Merc 450SLC  15.2    8  275.8  180  ...  18.00   0   0     3     3
+        14   Cadillac Fleetwood  10.4    8  472.0  205  ...  17.98   0   0     3     4
+        15  Lincoln Continental  10.4    8  460.0  215  ...  17.82   0   0     3     4
+        16    Chrysler Imperial  14.7    8  440.0  230  ...  17.42   0   0     3     4
+        17             Fiat 128  32.4    4   78.7   66  ...  19.47   1   1     4     1
+        18          Honda Civic  30.4    4   75.7   52  ...  18.52   1   1     4     2
+        19       Toyota Corolla  33.9    4   71.1   65  ...  19.90   1   1     4     1
+        20        Toyota Corona  21.5    4  120.1   97  ...  20.01   1   0     3     1
+        21     Dodge Challenger  15.5    8  318.0  150  ...  16.87   0   0     3     2
+        22          AMC Javelin  15.2    8  304.0  150  ...  17.30   0   0     3     2
+        23           Camaro Z28  13.3    8  350.0  245  ...  15.41   0   0     3     4
+        24     Pontiac Firebird  19.2    8  400.0  175  ...  17.05   0   0     3     2
+        25            Fiat X1-9  27.3    4   79.0   66  ...  18.90   1   1     4     1
+        26        Porsche 914-2  26.0    4  120.3   91  ...  16.70   0   1     5     2
+        27         Lotus Europa  30.4    4   95.1  113  ...  16.90   1   1     5     2
+        28       Ford Pantera L  15.8    8  351.0  264  ...  14.50   0   1     5     4
+        29         Ferrari Dino  19.7    6  145.0  175  ...  15.50   0   1     5     6
+        30        Maserati Bora  15.0    8  301.0  335  ...  14.60   0   1     5     8
+        31           Volvo 142E  21.4    4  121.0  109  ...  18.60   1   1     4     2
+        [32 rows x 12 columns],
+            0            1             2            3        4
+        0  NaN  Sepal.Width  Petal.Length  Petal.Width  Species
+        1  5.1          3.5           1.4          0.2   setosa
+        2  4.9          3.0           1.4          0.2   setosa
+        3  4.7          3.2           1.3          0.2   setosa
+        4  4.6          3.1           1.5          0.2   setosa
+        5  5.0          3.6           1.4          0.2   setosa,
+            0             1            2             3            4          5
+        0  NaN  Sepal.Length  Sepal.Width  Petal.Length  Petal.Width    Species
+        1  145           6.7          3.3           5.7          2.5  virginica
+        2  146           6.7          3.0           5.2          2.3  virginica
+        3  147           6.3          2.5           5.0          1.9  virginica
+        4  148           6.5          3.0           5.2          2.0  virginica
+        5  149           6.2          3.4           5.4          2.3  virginica,
+            Unnamed: 0 supp  dose
+        0          4.2   VC   0.5
+        1         11.5   VC   0.5
+        2          7.3   VC   0.5
+        3          5.8   VC   0.5
+        4          6.4   VC   0.5
+        5         10.0   VC   0.5
+        6         11.2   VC   0.5
+        7         11.2   VC   0.5
+        8          5.2   VC   0.5
+        9          7.0   VC   0.5
+        10        16.5   VC   1.0
+        11        16.5   VC   1.0
+        12        15.2   VC   1.0
+        13        17.3   VC   1.0]
+    """ # noqa
 
     options = load_template(template_path)
     dataframes = []
@@ -271,7 +453,8 @@ def convert_into(
             Example:
                 ``-Xmx256m``.
         kwargs (dict):
-            Dictionary of option for tabula-java. Details are shown in `build_options()`
+            Dictionary of option for tabula-java. Details are shown in
+            :func:`build_options()`
 
     Returns:
         Nothing. Output file will be saved into `output_path`
@@ -323,7 +506,8 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
         java_options (list, optional):
             Set java options like `-Xmx256m`.
         kwargs (dict):
-            Dictionary of option for tabula-java. Details are shown in `build_options()`
+            Dictionary of option for tabula-java. Details are shown in
+            :func:`build_options()`
 
     Returns:
         Nothing. Outputs are saved into the same directory with `input_dir`
@@ -431,7 +615,8 @@ def build_options(kwargs=None):
             An optional values specifying pages to extract from. It allows
             `str`,`int`, `list` of :`int`.
 
-            Examples: ``'1-2,3'``, ``'all'``, ``[1,2]``
+            Examples:
+                ``'1-2,3'``, ``'all'``, ``[1,2]``
         guess (bool, optional):
             Guess the portion of the page to analyze per page. Default `True`
             If you use "area" option, this option becomes `False`.
