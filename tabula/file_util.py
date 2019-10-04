@@ -30,7 +30,9 @@ def localize_file(path_or_buffer, user_agent=None):
             req = urlopen(_create_request(path_or_buffer, user_agent))
         else:
             req = urlopen(path_or_buffer)
-        filename = os.path.basename(req.geturl())
+
+        parsed_url = parse_url(req.geturl())
+        filename = os.path.basename(parsed_url.path)
         if os.path.splitext(filename)[-1] != ".pdf":
             pid = os.getpid()
             filename = "{0}.pdf".format(pid)

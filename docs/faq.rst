@@ -177,3 +177,11 @@ I got a warning/error message from PDFBox including ``org.apache.pdfbox.pdmodel.
 No.
 
 Sometimes, you might see message like `` Jul 17, 2019 10:21:25 AM org.apache.pdfbox.pdmodel.font.PDType1Font WARNING: Using fallback font NimbusSanL-Regu for Univers. Nothing was parsed from this one.`` This error message came from Apache PDFBox which is used under tabula-java, and this is caused by the PDF itself. Neither tabula-py nor tabula-java can't handle the warning itself, except for silent option that suppress the warning.
+
+I can't figure out accurate extraction with tabula-py. Are there any similar Python libraries?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+I know tabula-py has limitation depending on tabula-java. Sometimes your PDF is too complex to tabula-py. If you want to find plan B, there are similar packages as the following:
+
+* https://github.com/jsvine/pdfplumber
+* https://camelot-py.readthedocs.io/en/master/
