@@ -322,6 +322,7 @@ def read_pdf_with_template(
     pandas_options=None,
     encoding="utf-8",
     java_options=None,
+    user_agent=None,
     **kwargs
 ):
     """Read tables in PDF with a Tabula App template.
@@ -337,6 +338,9 @@ def read_pdf_with_template(
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
             Set java options like `-Xmx256m`.
+        user_agent (str, optional):
+            Set a custom user-agent when download a pdf from a url. Otherwise
+            it uses the default ``urllib.request`` user-agent.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -414,21 +418,29 @@ def read_pdf_with_template(
         13        17.3   VC   1.0]
     """  # noqa
 
-    options = load_template(template_path)
+    path, temporary = localize_file(
+        template_path, user_agent=user_agent, suffix=".json"
+    )
+    options = load_template(path)
     dataframes = []
 
-    for option in options:
-        _df = read_pdf(
-            input_path,
-            pandas_options=pandas_options,
-            encoding=encoding,
-            java_options=java_options,
-            **dict(kwargs, **option)
-        )
-        if isinstance(_df, list):
-            dataframes.extend(_df)
-        else:
-            dataframes.append(_df)
+    try:
+        for option in options:
+            _df = read_pdf(
+                input_path,
+                pandas_options=pandas_options,
+                encoding=encoding,
+                java_options=java_options,
+                **dict(kwargs, **option)
+            )
+
+            if isinstance(_df, list):
+                dataframes.extend(_df)
+            else:
+                dataframes.append(_df)
+    finally:
+        if temporary:
+            os.unlink(path)
 
     return dataframes
 

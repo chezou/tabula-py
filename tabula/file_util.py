@@ -8,7 +8,7 @@ _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard("")
 
 
-def localize_file(path_or_buffer, user_agent=None):
+def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
     """Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
@@ -16,6 +16,11 @@ def localize_file(path_or_buffer, user_agent=None):
     Args:
         path (str):
             File path or file like object or URL of target file.
+        user_agent (str, optional):
+            Set a custom user-agent when download a pdf from a url. Otherwise
+            it uses the default ``urllib.request`` user-agent.
+        suffix (str, optional):
+            File extension to check.
 
     Returns:
         (str, bool):
@@ -33,9 +38,9 @@ def localize_file(path_or_buffer, user_agent=None):
 
         parsed_url = parse_url(req.geturl())
         filename = os.path.basename(parsed_url.path)
-        if os.path.splitext(filename)[-1] != ".pdf":
+        if os.path.splitext(filename)[-1] != suffix:
             pid = os.getpid()
-            filename = "{0}.pdf".format(pid)
+            filename = "{}{}".format(pid, suffix)
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(req, f)
@@ -44,7 +49,7 @@ def localize_file(path_or_buffer, user_agent=None):
 
     elif is_file_like(path_or_buffer):
         pid = os.getpid()
-        filename = "{0}.pdf".format(pid)
+        filename = "{}{}".format(pid, suffix)
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(path_or_buffer, f)

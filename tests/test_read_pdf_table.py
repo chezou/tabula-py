@@ -219,6 +219,16 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertEqual(len(dfs), 4)
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
+    def test_read_pdf_with_remote_template(self):
+        template_path = (
+            "https://github.com/chezou/tabula-py/raw/master/"
+            "tests/resources/data.tabula-template.json"
+        )
+
+        dfs = tabula.read_pdf_with_template(self.pdf_path, template_path)
+        self.assertEqual(len(dfs), 4)
+        self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
+
     @patch("subprocess.check_output")
     @patch("tabula.wrapper._jar_path")
     def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
