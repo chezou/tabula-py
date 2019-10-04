@@ -92,6 +92,7 @@ def read_pdf(
     java_options=None,
     pandas_options=None,
     multiple_tables=False,
+    user_agent=None,
     **kwargs
 ):
     """Read tables in PDF.
@@ -266,8 +267,6 @@ def read_pdf(
     if encoding == "utf-8":
         if not any("file.encoding" in opt for opt in java_options):
             java_options += ["-Dfile.encoding=UTF8"]
-
-    user_agent = kwargs.pop("user_agent", None)
 
     path, temporary = localize_file(input_path, user_agent)
 
