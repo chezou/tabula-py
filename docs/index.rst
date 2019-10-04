@@ -16,6 +16,7 @@ You can see `the example notebook <https://nbviewer.jupyter.org/github/chezou/ta
    faq
    contributing
 
+
 .. toctree::
    :maxdepth: 2
    :caption: API Reference

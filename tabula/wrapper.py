@@ -241,7 +241,7 @@ def read_pdf(
         12    VC
         13    VC
         14    VC]
-    """ # noqa
+    """  # noqa
 
     if output_format == "dataframe":
         kwargs.pop("format", None)
@@ -413,7 +413,7 @@ def read_pdf_with_template(
         11        16.5   VC   1.0
         12        15.2   VC   1.0
         13        17.3   VC   1.0]
-    """ # noqa
+    """  # noqa
 
     options = load_template(template_path)
     dataframes = []
