@@ -92,13 +92,15 @@ def read_pdf(
     java_options=None,
     pandas_options=None,
     multiple_tables=False,
+    user_agent=None,
     **kwargs
 ):
     """Read tables in PDF.
 
     Args:
-        input_path (file_like_obj):
+        input_path (file_like_obj or str):
             File like object of tareget PDF file.
+            It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
             Output format for returned object (``"dataframe" or ``"json"``)
         encoding (str, optional):
@@ -267,8 +269,6 @@ def read_pdf(
         if not any("file.encoding" in opt for opt in java_options):
             java_options += ["-Dfile.encoding=UTF8"]
 
-    user_agent = kwargs.pop("user_agent", None)
-
     path, temporary = localize_file(input_path, user_agent)
 
     if not os.path.exists(path):
@@ -323,21 +323,27 @@ def read_pdf_with_template(
     pandas_options=None,
     encoding="utf-8",
     java_options=None,
+    user_agent=None,
     **kwargs
 ):
     """Read tables in PDF with a Tabula App template.
 
     Args:
-        input_path (file_like_obj):
+        input_path (file_like_obj or str):
             File like object of tareget PDF file.
-        template_path (file_like_obj):
+            It can be URL, which is downloaded by tabula-py automatically.
+        template_path (file_like_obj or str):
             File like object for Tabula app template.
+            It can be URL, which is downloaded by tabula-py automatically.
         pandas_options (dict, optional):
             Set pandas options like {'header': None}.
         encoding (str, optional):
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
             Set java options like `-Xmx256m`.
+        user_agent (str, optional):
+            Set a custom user-agent when download a pdf from a url. Otherwise
+            it uses the default ``urllib.request`` user-agent.
         kwargs (dict):
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -347,6 +353,8 @@ def read_pdf_with_template(
 
 
     Examples:
+
+        You can use template file extracted by tabula app.
 
         >>> import tabula
         >>> tabula.read_pdf_with_template(pdf_path, "/path/to/data.tabula-template.json")
@@ -415,21 +423,29 @@ def read_pdf_with_template(
         13        17.3   VC   1.0]
     """  # noqa
 
-    options = load_template(template_path)
+    path, temporary = localize_file(
+        template_path, user_agent=user_agent, suffix=".json"
+    )
+    options = load_template(path)
     dataframes = []
 
-    for option in options:
-        _df = read_pdf(
-            input_path,
-            pandas_options=pandas_options,
-            encoding=encoding,
-            java_options=java_options,
-            **dict(kwargs, **option)
-        )
-        if isinstance(_df, list):
-            dataframes.extend(_df)
-        else:
-            dataframes.append(_df)
+    try:
+        for option in options:
+            _df = read_pdf(
+                input_path,
+                pandas_options=pandas_options,
+                encoding=encoding,
+                java_options=java_options,
+                **dict(kwargs, **option)
+            )
+
+            if isinstance(_df, list):
+                dataframes.extend(_df)
+            else:
+                dataframes.append(_df)
+    finally:
+        if temporary:
+            os.unlink(path)
 
     return dataframes
 
