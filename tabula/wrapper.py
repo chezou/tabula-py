@@ -98,8 +98,9 @@ def read_pdf(
     """Read tables in PDF.
 
     Args:
-        input_path (file_like_obj):
+        input_path (file_like_obj or str):
             File like object of tareget PDF file.
+            It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
             Output format for returned object (``"dataframe" or ``"json"``)
         encoding (str, optional):
@@ -328,10 +329,12 @@ def read_pdf_with_template(
     """Read tables in PDF with a Tabula App template.
 
     Args:
-        input_path (file_like_obj):
+        input_path (file_like_obj or str):
             File like object of tareget PDF file.
-        template_path (file_like_obj):
+            It can be URL, which is downloaded by tabula-py automatically.
+        template_path (file_like_obj or str):
             File like object for Tabula app template.
+            It can be URL, which is downloaded by tabula-py automatically.
         pandas_options (dict, optional):
             Set pandas options like {'header': None}.
         encoding (str, optional):
@@ -350,6 +353,8 @@ def read_pdf_with_template(
 
 
     Examples:
+
+        You can use template file extracted by tabula app.
 
         >>> import tabula
         >>> tabula.read_pdf_with_template(pdf_path, "/path/to/data.tabula-template.json")
