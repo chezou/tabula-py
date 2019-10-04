@@ -6,7 +6,7 @@ FAQ
 ``tabula-py`` does not work
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are several possible reasons, but ``tabula-py`` is just a wrapper of `tabula-java <https://github.com/tabulapdf/tabula-java>`_ , make sure you've installed Java and you can use ``java`` command on your terminal. Many issue reporters forget to set PATH for ``java`` command.
+There are several possible reasons, but ``tabula-py`` is just a wrapper of `tabula-java <https://github.com/tabulapdf/tabula-java>`__ , make sure you've installed Java and you can use ``java`` command on your terminal. Many issue reporters forget to set PATH for ``java`` command.
 
 You can check whether tabula-py can call ``java`` from Python process with ``tabula.environment_info()`` function.
 
@@ -30,7 +30,7 @@ Tuning points of tabula-py are limited:
 * Set specific ``area`` for accurate table detection
 * Try ``lattice=True`` option for the table having explicit line. Or try ``stream=True`` option
 
-To know the limitation of tabula-java, I highly recommend to use `tabula app <https://tabula.technology/>`_, the GUI version of `tabula-java <https://github.com/tabulapdf/tabula-java/>`_.
+To know the limitation of tabula-java, I highly recommend to use `tabula app <https://tabula.technology/>`_, the GUI version of `tabula-java <https://github.com/tabulapdf/tabula-java/>`__.
 
 tabula app can:
 
