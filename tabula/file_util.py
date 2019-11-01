@@ -14,7 +14,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
     If the target file is remote, this function fetches into local storage.
 
     Args:
-        path (str):
+        path_or_buffer (str):
             File path or file like object or URL of target file.
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
