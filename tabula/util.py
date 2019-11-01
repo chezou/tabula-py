@@ -65,7 +65,7 @@ def environment_info():
 
     import sys
     import distro
-    from .__version__ import __version__
+    from tabula import __version__
 
     print(
         """Python version:
