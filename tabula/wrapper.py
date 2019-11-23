@@ -125,7 +125,7 @@ def read_pdf(
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
-        kwargs (dict):
+        kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
 
@@ -344,7 +344,7 @@ def read_pdf_with_template(
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
-        kwargs (dict):
+        kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
 
@@ -468,7 +468,7 @@ def convert_into(
 
             Example:
                 ``-Xmx256m``.
-        kwargs (dict):
+        kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
 
@@ -521,7 +521,7 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
             Output format of this function (csv, json or tsv)
         java_options (list, optional):
             Set java options like `-Xmx256m`.
-        kwargs (dict):
+        kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
 
