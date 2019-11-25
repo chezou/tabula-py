@@ -77,7 +77,16 @@ def _run(java_options, options, path=None, encoding="utf-8"):
         args.append(path)
 
     try:
-        return subprocess.check_output(args)
+        result = subprocess.run(
+            args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.DEVNULL,
+            check=True,
+        )
+        if result.stderr:
+            logger.warning("Got stderr: {}".format(result.stderr.decode(encoding)))
+        return result.stdout
     except FileNotFoundError:
         raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
     except subprocess.CalledProcessError as e:
