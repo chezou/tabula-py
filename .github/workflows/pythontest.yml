@@ -1,4 +1,4 @@
-name: Python package
+name: Python testing
 
 on: [push]
 
@@ -9,10 +9,15 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v1
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '12'
+        java-package: jdk
+        architecture: x64
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
