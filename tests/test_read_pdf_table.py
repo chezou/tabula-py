@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pandas as pd
 
@@ -249,7 +249,6 @@ class TestReadPdfTable(unittest.TestCase):
             "--guess",
             "tests/resources/data.pdf",
         ]
-        mock_fun.stdout = MagicMock(return_value=b"foo,bar\n1,2")
         subp_args = {
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
