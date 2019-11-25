@@ -3,9 +3,10 @@ import json
 import os
 import platform
 import shutil
+import subprocess
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
@@ -229,7 +230,7 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertEqual(len(dfs), 4)
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
-    @patch("subprocess.check_output")
+    @patch("subprocess.run")
     @patch("tabula.wrapper._jar_path")
     def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
         jar_func.return_value = "/tmp/tabula-java.jar"
@@ -248,7 +249,14 @@ class TestReadPdfTable(unittest.TestCase):
             "--guess",
             "tests/resources/data.pdf",
         ]
-        mock_fun.assert_called_with(target_args)
+        mock_fun.stdout = MagicMock(return_value=b"foo,bar\n1,2")
+        subp_args = {
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.PIPE,
+            "stdin": subprocess.DEVNULL,
+            "check": True,
+        }
+        mock_fun.assert_called_with(target_args, **subp_args)
 
 
 if __name__ == "__main__":
