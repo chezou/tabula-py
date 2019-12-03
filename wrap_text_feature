@@ -1,0 +1,20 @@
+**Is your feature request related to a problem? Please describe.**
+On the PDF files that I have, the data is not always in a super clear format. There are times in which the text on the PDF is "wrapped" onto a second line. Therefore, when the file is exported to CSV, the data is inconsistent
+
+**Describe the solution you'd like**
+Within the function Tabula.Convert_into... there should be a function called "rows" where then user could configure that, for specific columns, you would specify the start point, end point, and number of rows
+Tabula would then convert the CSV into two rows for every instance where the text shows "Line Item" and "Item No" and ignore everything else. 
+In addition, the number of rows would force the conversion to wrap text in a certain number of rows. 
+
+The user would type something like this:
+columns = (1,2,3,4,5)
+start = ('Line Item%', '', '', '', '')
+end = ('Item No%', '%%', '', '', '')
+rows = 3 (or 1, depending on if you want the start row and end row included in the count)
+
+**Describe alternatives you've considered**
+Another option would be to just say "wrap text" Yes/No where, if the text in a column is at the edge, the next row of data would get wrapped 
+Another option would be to specify the dimensions of a "typical" row size and the "maximum" row size, with the option to wrap text in a given way
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
