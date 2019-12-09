@@ -2,8 +2,15 @@
 Utility module providing some convinient functions.
 """
 
+import os
 import platform
 import warnings
+
+DEFAULT_JAVA_CONFIG = {"JAVA_PATH": 'java'}
+
+
+def _java_path():
+    return os.environ.get("JAVA_PATH", DEFAULT_JAVA_CONFIG["JAVA_PATH"])
 
 
 def deprecated(func):
@@ -42,7 +49,7 @@ def java_version():
     import subprocess
 
     try:
-        res = subprocess.check_output(["java", "-version"], stderr=subprocess.STDOUT)
+        res = subprocess.check_output([_java_path(), "-version"], stderr=subprocess.STDOUT)
         res = res.decode()
 
     except FileNotFoundError:

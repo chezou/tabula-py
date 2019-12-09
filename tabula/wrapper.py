@@ -32,7 +32,7 @@ import pandas as pd
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
-from .util import deprecated_option
+from .util import deprecated_option, _java_path
 
 logger = getLogger(__name__)
 
@@ -72,7 +72,7 @@ def _run(java_options, options, path=None, encoding="utf-8"):
         )
 
     built_options = build_options(options)
-    args = ["java"] + java_options + ["-jar", _jar_path()] + built_options
+    args = [_java_path()] + java_options + ["-jar", _jar_path()] + built_options
     if path:
         args.append(path)
 

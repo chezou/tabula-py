@@ -1,6 +1,6 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
-from .util import environment_info
+from .util import environment_info, DEFAULT_JAVA_CONFIG
 from .wrapper import (
     convert_into,
     convert_into_by_batch,
