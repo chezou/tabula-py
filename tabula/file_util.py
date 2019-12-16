@@ -1,11 +1,11 @@
 import os
 import shutil
-from urllib.parse import urlparse as parse_url
-from urllib.parse import uses_netloc, uses_params, uses_relative
+from urllib.parse import quote, urlparse, uses_netloc, uses_params, uses_relative
 from urllib.request import Request, urlopen
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard("")
+MAX_FILE_SIZE = 250
 
 
 def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
@@ -31,14 +31,17 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
     path_or_buffer = _stringify_path(path_or_buffer)
 
     if _is_url(path_or_buffer):
+        path_or_buffer = quote(path_or_buffer, safe="/:")
         if user_agent:
             req = urlopen(_create_request(path_or_buffer, user_agent))
         else:
             req = urlopen(path_or_buffer)
 
-        parsed_url = parse_url(req.geturl())
+        parsed_url = urlparse(req.geturl())
         filename = os.path.basename(parsed_url.path)
-        if os.path.splitext(filename)[-1] != suffix:
+        fname, ext = os.path.splitext(filename)
+        filename = "{}{}".format(fname[:MAX_FILE_SIZE], ext)
+        if ext != suffix:
             pid = os.getpid()
             filename = "{}{}".format(pid, suffix)
 
@@ -63,7 +66,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
 
 def _is_url(url):
     try:
-        return parse_url(url).scheme in _VALID_URLS
+        return urlparse(url).scheme in _VALID_URLS
 
     except Exception:
         return False
