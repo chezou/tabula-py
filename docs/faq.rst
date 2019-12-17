@@ -10,8 +10,8 @@ There are several possible reasons, but ``tabula-py`` is just a wrapper of `tabu
 
 You can check whether tabula-py can call ``java`` from Python process with ``tabula.environment_info()`` function.
 
-I can't ``from tabula import read_pdf``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+I can't run ``from tabula import read_pdf``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you've installed ``tabula``\ , it will be conflict the namespace. You should install ``tabula-py`` after removing ``tabula``.
 
@@ -22,6 +22,10 @@ If you've installed ``tabula``\ , it will be conflict the namespace. You should 
 
 I got a empty DataFrame. How can I resolve it?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Before tuning the tabula-py option, you have to check you set an appropreate `pages` option. By default, tabula-py extracts table from first page of your PDF, with `pages=1` argument.
+If you want to extract from all pages, you need to set pages option like `pages="all"` or `pages=[1, 2, 3]`.
+You might want to extract multiple tables from multiple pages, if so you need to set `multiple_tables=True` together.
 
 Depending on the PDF's complexity, it might be difficult to extract table contents accuracy.
 

@@ -638,7 +638,7 @@ def build_options(kwargs=None):
     Args:
         pages (str, int, `list` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`.
+            `str`,`int`, `list` of :`int`. Default: `1`
 
             Examples:
                 ``'1-2,3'``, ``'all'``, ``[1,2]``
