@@ -262,8 +262,6 @@ class TestReadPdfTable(unittest.TestCase):
             "-Dfile.encoding=UTF8",
             "-jar",
             "/tmp/tabula-java.jar",
-            "--pages",
-            "1",
             "--guess",
             "--format",
             "JSON",

@@ -635,7 +635,7 @@ def _convert_pandas_csv_options(pandas_options, columns):
 
 
 def build_options(
-    pages=1,
+    pages=None,
     guess=True,
     area=None,
     relative_area=False,
@@ -721,13 +721,19 @@ def build_options(
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
 
-    __pages = pages
-    if isinstance(pages, int):
-        __pages = str(pages)
-    elif type(pages) in [list, tuple]:
-        __pages = ",".join(map(str, pages))
+    if pages:
+        __pages = pages
+        if isinstance(pages, int):
+            __pages = str(pages)
+        elif type(pages) in [list, tuple]:
+            __pages = ",".join(map(str, pages))
 
-    __options += ["--pages", __pages]
+        __options += ["--pages", __pages]
+    else:
+        logger.warning(
+            "'pages' argument isn't specified."
+            "Will extract only from page 1 by default."
+        )
 
     multiple_areas = False
 
