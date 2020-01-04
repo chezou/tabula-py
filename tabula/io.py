@@ -32,7 +32,6 @@ import pandas as pd
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
-from .util import deprecated_option
 
 logger = getLogger(__name__)
 
@@ -71,7 +70,7 @@ def _run(java_options, options, path=None, encoding="utf-8"):
             )
         )
 
-    built_options = build_options(options)
+    built_options = build_options(**options)
     args = ["java"] + java_options + ["-jar", _jar_path()] + built_options
     if path:
         args.append(path)
@@ -96,36 +95,36 @@ def _run(java_options, options, path=None, encoding="utf-8"):
 
 def read_pdf(
     input_path,
-    output_format="dataframe",
+    output_format=None,
     encoding="utf-8",
     java_options=None,
     pandas_options=None,
-    multiple_tables=False,
+    multiple_tables=True,
     user_agent=None,
     **kwargs
 ):
     """Read tables in PDF.
 
     Args:
-        input_path (file_like_obj or str):
+        input_path (str, path object or file-like object):
             File like object of tareget PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
-            Output format for returned object (``"dataframe" or ``"json"``)
+            Output format for returned object (``dataframe`` or ``json``)
         encoding (str, optional):
-            Encoding type for pandas. Default: 'utf-8'
+            Encoding type for pandas. Default: ``utf-8``
         java_options (list, optional):
             Set java options.
 
             Example:
-                `-Xmx256m`
+                ``["-Xmx256m"]``
         pandas_options (dict, optional):
             Set pandas options.
 
             Example:
                 ``{'header': None}``
-        multiple_tables (bool, optional):
-            It enables to handle multiple tables within a page.
+        multiple_tables (bool):
+            It enables to handle multiple tables within a page. Default: ``True``
 
             Note:
                 If `multiple_tables` option is enabled, tabula-py uses not
@@ -139,17 +138,39 @@ def read_pdf(
             :func:`build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list of DataFrame.
+        list of DataFrames or dict.
+
+    Raises:
+        FileNotFoundError:
+            If downloaded remote file doesn't exist.
+
+        ValueError:
+            If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.CSVParseError:
+            If pandas CSV parsing failed.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
 
 
     Examples:
 
-        Here is the basic example. Note that ``read_pdf()`` only extract page 1 by default.
+        Here is a simple example.
+        Note that :func:`read_pdf()` only extract page 1 by default.
+
+        Notes:
+            As of tabula-py 2.0.0, :func:`read_pdf()` sets `multiple_tables=True` by
+            default. If you want to get consistent output with previous version, set
+            `multiple_tables=False`.
 
         >>> import tabula
         >>> pdf_path = "https://github.com/chezou/tabula-py/raw/master/tests/resources/data.pdf"
         >>> tabula.read_pdf(pdf_path, stream=True)
-                    Unnamed: 0   mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb
+        [             Unnamed: 0   mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb
         0             Mazda RX4  21.0    6  160.0  110  3.90  2.620  16.46   0   1     4     4
         1         Mazda RX4 Wag  21.0    6  160.0  110  3.90  2.875  17.02   0   1     4     4
         2            Datsun 710  22.8    4  108.0   93  3.85  2.320  18.61   1   1     4     1
@@ -181,12 +202,11 @@ def read_pdf(
         28       Ford Pantera L  15.8    8  351.0  264  4.22  3.170  14.50   0   1     5     4
         29         Ferrari Dino  19.7    6  145.0  175  3.62  2.770  15.50   0   1     5     6
         30        Maserati Bora  15.0    8  301.0  335  3.54  3.570  14.60   0   1     5     8
-        31           Volvo 142E  21.4    4  121.0  109  4.11  2.780  18.60   1   1     4     2
+        31           Volvo 142E  21.4    4  121.0  109  4.11  2.780  18.60   1   1     4     2]
 
-        If you want to extract all pages, it'd be better to set ``mutiple_tables=True``.
-        ``read_pdf()`` returns list of ``pd.DataFrame``
+        If you want to extract all pages, set ``pages="all"``.
 
-        >>> dfs = tabula.read_pdf(pdf_path, pages="all", multiple_tables=True)
+        >>> dfs = tabula.read_pdf(pdf_path, pages="all")
         >>> len(dfs)
         4
         >>> dfs
@@ -254,18 +274,22 @@ def read_pdf(
         14    VC]
     """  # noqa
 
-    if output_format == "dataframe":
-        kwargs.pop("format", None)
+    if output_format:
+        # Respects explicit output_format
+        multiple_tables = False
 
-    elif output_format == "json":
-        kwargs["format"] = "JSON"
+        if output_format.lower() == "dataframe":
+            kwargs.pop("format", None)
+        elif output_format.lower() == "json":
+            kwargs["format"] = "JSON"
+        else:
+            raise ValueError("Unknown output_format {}".format(output_format))
 
     if multiple_tables:
         kwargs["format"] = "JSON"
 
     if java_options is None:
         java_options = []
-
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
 
@@ -296,7 +320,7 @@ def read_pdf(
 
     if len(output) == 0:
         logger.warning("The output file is empty.")
-        return
+        return []
 
     if pandas_options is None:
         pandas_options = {}
@@ -306,7 +330,6 @@ def read_pdf(
         raw_json = json.loads(output.decode(encoding))
         if multiple_tables:
             return _extract_from(raw_json, pandas_options)
-
         else:
             return raw_json
 
@@ -314,8 +337,7 @@ def read_pdf(
         pandas_options["encoding"] = pandas_options.get("encoding", encoding)
 
         try:
-            return pd.read_csv(io.BytesIO(output), **pandas_options)
-
+            return [pd.read_csv(io.BytesIO(output), **pandas_options)]
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
             message += (
@@ -338,10 +360,10 @@ def read_pdf_with_template(
     """Read tables in PDF with a Tabula App template.
 
     Args:
-        input_path (file_like_obj or str):
-            File like object of tareget PDF file.
+        input_path (str, path object or file-like object):
+            File like object of target PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
-        template_path (file_like_obj or str):
+        template_path (str, path object or file-like object):
             File like object for Tabula app template.
             It can be URL, which is downloaded by tabula-py automatically.
         pandas_options (dict, optional):
@@ -349,7 +371,7 @@ def read_pdf_with_template(
         encoding (str, optional):
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
-            Set java options like `-Xmx256m`.
+            Set java options like ``["-Xmx256m"]``.
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
@@ -358,7 +380,23 @@ def read_pdf_with_template(
             :func:`build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list.
+        list of DataFrame.
+
+    Raises:
+        FileNotFoundError:
+            If downloaded remote file doesn't exist.
+
+        ValueError:
+            If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.CSVParseError:
+            If pandas CSV parsing failed.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
 
 
     Examples:
@@ -463,6 +501,7 @@ def convert_into(
     input_path, output_path, output_format="csv", java_options=None, **kwargs
 ):
     """Convert tables from PDF into a file.
+    Output file will be saved into `output_path`.
 
     Args:
         input_path (file like obj):
@@ -476,32 +515,32 @@ def convert_into(
             Set java options
 
             Example:
-                ``-Xmx256m``.
+                ``"-Xmx256m"``.
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
 
-    Returns:
-        Nothing. Output file will be saved into `output_path`
+    Raises:
+        FileNotFoundError:
+            If downloaded remote file doesn't exist.
+
+        ValueError:
+            If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
     """
 
     if output_path is None or len(output_path) == 0:
-        raise AttributeError("'output_path' shoud not be None or empty")
+        raise ValueError("'output_path' shoud not be None or empty")
 
     kwargs["output_path"] = output_path
     kwargs["format"] = _extract_format_for_conversion(output_format)
 
-    if java_options is None:
-        java_options = []
-
-    elif isinstance(java_options, str):
-        java_options = shlex.split(java_options)
-
-    # to prevent tabula-py from stealing focus on every call on mac
-    if platform.system() == "Darwin":
-        r = "java.awt.headless"
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ["-Djava.awt.headless=true"]
+    java_options = _build_java_options(java_options)
 
     path, temporary = localize_file(input_path)
 
@@ -536,24 +575,24 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
 
     Returns:
         Nothing. Outputs are saved into the same directory with `input_dir`
+
+    Raises:
+        ValueError:
+            If input_dir doesn't exist.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
     """
 
     if input_dir is None or not os.path.isdir(input_dir):
-        raise AttributeError("'input_dir' shoud be directory path")
+        raise ValueError("'input_dir' should be an existing directory path")
 
     kwargs["format"] = _extract_format_for_conversion(output_format)
 
-    if java_options is None:
-        java_options = []
-
-    elif isinstance(java_options, str):
-        java_options = shlex.split(java_options)
-
-    # to prevent tabula-py from stealing focus on every call on mac
-    if platform.system() == "Darwin":
-        r = "java.awt.headless"
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ["-Djava.awt.headless=true"]
+    java_options = _build_java_options(java_options)
 
     # Option for batch
     kwargs["batch"] = input_dir
@@ -561,18 +600,30 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
     _run(java_options, kwargs)
 
 
+def _build_java_options(_java_options=None):
+    if _java_options is None:
+        _java_options = []
+    elif isinstance(_java_options, str):
+        _java_options = shlex.split(_java_options)
+
+    # to prevent tabula-py from stealing focus on every call on mac
+    if platform.system() == "Darwin":
+        r = "java.awt.headless"
+        if not any(filter(r.find, _java_options)):
+            _java_options = _java_options + ["-Djava.awt.headless=true"]
+
+    return _java_options
+
+
 def _extract_format_for_conversion(output_format="csv"):
-    if output_format == "csv":
+    if output_format.lower() == "csv":
         return "CSV"
-
-    if output_format == "json":
+    elif output_format.lower() == "json":
         return "JSON"
-
-    if output_format == "tsv":
+    elif output_format.lower() == "tsv":
         return "TSV"
-
-    if output_format == "dataframe":
-        raise AttributeError("'output_format' has no attribute 'dataframe'")
+    else:
+        raise ValueError("Unknown 'output_format': '{}'".format(output_format))
 
 
 def _extract_from(raw_json, pandas_options=None):
@@ -601,11 +652,17 @@ def _extract_from(raw_json, pandas_options=None):
 
         if isinstance(header_line_number, int) and not columns:
             _columns = list_data.pop(header_line_number)
-            _columns = ["" if e is np.nan else e for e in _columns]
+            _unname_idx = 0
+            for idx, e in enumerate(_columns):
+                if e is np.nan:
+                    _columns[idx] = "Unnamed: {}".format(_unname_idx)
+                    _unname_idx += 1
 
-        data_frames.append(
-            pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
-        )
+        df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
+
+        for c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="ignore")
+        data_frames.append(df)
 
     return data_frames
 
@@ -621,7 +678,7 @@ def _convert_pandas_csv_options(pandas_options, columns):
     """
 
     _columns = pandas_options.pop("names", columns)
-    header = pandas_options.pop("header", None)
+    header = pandas_options.pop("header", "infer")
     pandas_options.pop("encoding", None)
 
     if header == "infer":
@@ -632,7 +689,21 @@ def _convert_pandas_csv_options(pandas_options, columns):
     return _columns, header_line_number
 
 
-def build_options(kwargs=None):
+def build_options(
+    pages=None,
+    guess=True,
+    area=None,
+    relative_area=False,
+    lattice=False,
+    stream=False,
+    password=None,
+    silent=None,
+    columns=None,
+    format=None,
+    batch=None,
+    output_path=None,
+    options="",
+):
     """Build options for tabula-java
 
     Args:
@@ -654,6 +725,10 @@ def build_options(kwargs=None):
         area (list of float, list of list of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
 
             Examples:
                 ``[269.875,12.75,790.5,561]``,
@@ -684,8 +759,8 @@ def build_options(kwargs=None):
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
         batch (str, optional):
-            Convert all .pdfs in the provided directory. This argument should be
-            directory.
+            Convert all PDF files in the provided directory. This argument should be
+            directory path.
         output_path (str, optional):
             Output file path. File format of it is depends on ``format``.
             Same as ``--outfile`` option of tabula-java.
@@ -698,18 +773,9 @@ def build_options(kwargs=None):
     """
 
     __options = []
-    if kwargs is None:
-        kwargs = {}
-    options = kwargs.get("options", "")
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
 
-    DEPRECATED_OPTIONS = set(["spreadsheet", "nospreadsheet"])
-    for option in set(kwargs.keys()) & DEPRECATED_OPTIONS:
-        deprecated_option(option)
-
-    # parse options
-    pages = kwargs.get("pages", 1)
     if pages:
         __pages = pages
         if isinstance(pages, int):
@@ -718,12 +784,13 @@ def build_options(kwargs=None):
             __pages = ",".join(map(str, pages))
 
         __options += ["--pages", __pages]
+    else:
+        logger.warning(
+            "'pages' argument isn't specified."
+            "Will extract only from page 1 by default."
+        )
 
-    area = kwargs.get("area")
-    relative_area = kwargs.get("relative_area")
     multiple_areas = False
-
-    guess = kwargs.get("guess", True)
 
     if area:
         guess = False
@@ -746,39 +813,31 @@ def build_options(kwargs=None):
                 )
                 __options += ["--area", __area]
 
-    lattice = kwargs.get("lattice") or kwargs.get("spreadsheet")
     if lattice:
         __options.append("--lattice")
 
-    stream = kwargs.get("stream") or kwargs.get("nospreadsheet")
     if stream:
         __options.append("--stream")
 
     if guess and not multiple_areas:
         __options.append("--guess")
 
-    fmt = kwargs.get("format")
-    if fmt:
-        __options += ["--format", fmt]
+    if format:
+        __options += ["--format", format]
 
-    output_path = kwargs.get("output_path")
     if output_path:
         __options += ["--outfile", output_path]
 
-    columns = kwargs.get("columns")
     if columns:
         __columns = ",".join(map(str, columns))
         __options += ["--columns", __columns]
 
-    password = kwargs.get("password")
     if password:
         __options += ["--password", password]
 
-    batch = kwargs.get("batch")
     if batch:
         __options += ["--batch", batch]
 
-    silent = kwargs.get("silent")
     if silent:
         __options.append("--silent")
 
