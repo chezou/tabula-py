@@ -140,6 +140,22 @@ def read_pdf(
     Returns:
         list of DataFrames or dict.
 
+    Raises:
+        FileNotFoundError:
+            If downloaded remote file doesn't exist.
+
+        ValueError:
+            If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.CSVParseError:
+            If pandas CSV parsing failed.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
+
 
     Examples:
 
@@ -366,6 +382,22 @@ def read_pdf_with_template(
     Returns:
         list of DataFrame.
 
+    Raises:
+        FileNotFoundError:
+            If downloaded remote file doesn't exist.
+
+        ValueError:
+            If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.CSVParseError:
+            If pandas CSV parsing failed.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
+
 
     Examples:
 
@@ -487,6 +519,19 @@ def convert_into(
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
+
+    Raises:
+        FileNotFoundError:
+            If downloaded remote file doesn't exist.
+
+        ValueError:
+            If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
     """
 
     if output_path is None or len(output_path) == 0:
@@ -530,6 +575,16 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
 
     Returns:
         Nothing. Outputs are saved into the same directory with `input_dir`
+
+    Raises:
+        ValueError:
+            If input_dir doesn't exist.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
     """
 
     if input_dir is None or not os.path.isdir(input_dir):
