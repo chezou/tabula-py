@@ -44,13 +44,13 @@ tabula-py enables you to extract table from PDF into DataFrame and JSON. It also
 ```py
 import tabula
 
-# Read pdf into DataFrame
+# Read pdf into list of DataFrame
 df = tabula.read_pdf("test.pdf", pages='all')
 
-# Read remote pdf into DataFrame
+# Read remote pdf into list of DataFrame
 df2 = tabula.read_pdf("https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/arabic.pdf")
 
-# convert PDF into CSV
+# convert PDF into CSV file
 tabula.convert_into("test.pdf", "output.csv", output_format="csv", pages='all')
 
 # convert all PDFs in a directory
