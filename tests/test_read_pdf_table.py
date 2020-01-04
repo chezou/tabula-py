@@ -194,6 +194,8 @@ class TestReadPdfTable(unittest.TestCase):
             tabula.read_pdf(invalid_pdf_path)
         with self.assertRaises(TypeError):
             tabula.read_pdf(self.pdf_path, unknown_option="foo")
+        with self.assertRaises(ValueError):
+            tabula.read_pdf(self.pdf_path, output_format="unknown")
 
     def test_convert_from(self):
         expected_tsv = "tests/resources/data_1.tsv"
@@ -217,6 +219,9 @@ class TestReadPdfTable(unittest.TestCase):
             self.assertTrue(filecmp.cmp(converted_csv, self.expected_csv1))
         finally:
             shutil.rmtree(temp_dir)
+
+        with self.assertRaises(ValueError):
+            tabula.convert_into_by_batch(None, output_format="csv")
 
     def test_convert_remote_file(self):
         temp = tempfile.NamedTemporaryFile()
