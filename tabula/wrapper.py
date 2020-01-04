@@ -110,14 +110,14 @@ def read_pdf(
             File like object of tareget PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
-            Output format for returned object (``"dataframe" or ``"json"``)
+            Output format for returned object (``dataframe`` or ``json``)
         encoding (str, optional):
-            Encoding type for pandas. Default: 'utf-8'
+            Encoding type for pandas. Default: ``utf-8``
         java_options (list, optional):
             Set java options.
 
             Example:
-                `-Xmx256m`
+                ``["-Xmx256m"]``
         pandas_options (dict, optional):
             Set pandas options.
 
@@ -143,7 +143,8 @@ def read_pdf(
 
     Examples:
 
-        Here is the basic example. Note that ``read_pdf()`` only extract page 1 by default.
+        Here is a basic example.
+        Note that ``read_pdf()`` only extract page 1 by default.
 
         >>> import tabula
         >>> pdf_path = "https://github.com/chezou/tabula-py/raw/master/tests/resources/data.pdf"
@@ -336,7 +337,7 @@ def read_pdf_with_template(
 
     Args:
         input_path (file_like_obj or str):
-            File like object of tareget PDF file.
+            File like object of target PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
         template_path (file_like_obj or str):
             File like object for Tabula app template.
@@ -346,7 +347,7 @@ def read_pdf_with_template(
         encoding (str, optional):
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
-            Set java options like `-Xmx256m`.
+            Set java options like ``["-Xmx256m"]``.
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
@@ -460,6 +461,7 @@ def convert_into(
     input_path, output_path, output_format="csv", java_options=None, **kwargs
 ):
     """Convert tables from PDF into a file.
+    Output file will be saved into `output_path`.
 
     Args:
         input_path (file like obj):
@@ -473,13 +475,10 @@ def convert_into(
             Set java options
 
             Example:
-                ``-Xmx256m``.
+                ``"-Xmx256m"``.
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
-
-    Returns:
-        Nothing. Output file will be saved into `output_path`
     """
 
     if output_path is None or len(output_path) == 0:
@@ -687,8 +686,8 @@ def build_options(
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
         batch (str, optional):
-            Convert all .pdfs in the provided directory. This argument should be
-            directory.
+            Convert all PDF files in the provided directory. This argument should be
+            directory path.
         output_path (str, optional):
             Output file path. File format of it is depends on ``format``.
             Same as ``--outfile`` option of tabula-java.

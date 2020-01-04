@@ -7,7 +7,7 @@ def load_template(path_or_buffer):
     """Build tabula-py option from template file
 
     Args:
-        file_like_obj: File like object of Tabula app template
+        path_or_buffer (file_like_obj): File like object of Tabula app template
 
     Returns:
         dict: tabula-py options
