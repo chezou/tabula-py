@@ -106,7 +106,7 @@ def read_pdf(
     """Read tables in PDF.
 
     Args:
-        input_path (file_like_obj or str):
+        input_path (str, path object or file-like object):
             File like object of tareget PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
@@ -344,10 +344,10 @@ def read_pdf_with_template(
     """Read tables in PDF with a Tabula App template.
 
     Args:
-        input_path (file_like_obj or str):
+        input_path (str, path object or file-like object):
             File like object of target PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
-        template_path (file_like_obj or str):
+        template_path (str, path object or file-like object):
             File like object for Tabula app template.
             It can be URL, which is downloaded by tabula-py automatically.
         pandas_options (dict, optional):
