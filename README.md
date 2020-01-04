@@ -85,6 +85,9 @@ You can help by:
 - [@rmnevesLH](https://github.com/rmnevesLH)
 - [@red-bin](https://github.com/red-bin)
 - [@Gallaecio](https://github.com/Gallaecio)
+- [@red-bin](https://github.com/red-bin)
+- [@alexandreio](https://github.com/alexandreio)
+- [@bpben](https://github.com/bpben)
 
 ### Another support
 
