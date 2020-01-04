@@ -95,11 +95,11 @@ def _run(java_options, options, path=None, encoding="utf-8"):
 
 def read_pdf(
     input_path,
-    output_format="dataframe",
+    output_format=None,
     encoding="utf-8",
     java_options=None,
     pandas_options=None,
-    multiple_tables=False,
+    multiple_tables=True,
     user_agent=None,
     **kwargs
 ):
@@ -123,8 +123,8 @@ def read_pdf(
 
             Example:
                 ``{'header': None}``
-        multiple_tables (bool, optional):
-            It enables to handle multiple tables within a page.
+        multiple_tables (bool):
+            It enables to handle multiple tables within a page. Default: ``True``
 
             Note:
                 If `multiple_tables` option is enabled, tabula-py uses not
@@ -143,13 +143,18 @@ def read_pdf(
 
     Examples:
 
-        Here is a basic example.
-        Note that ``read_pdf()`` only extract page 1 by default.
+        Here is a simple example.
+        Note that :func:`read_pdf()` only extract page 1 by default.
+
+        Notes:
+            As of tabula-py 2.0.0, :func:`read_pdf()` sets `multiple_tables=True` by
+            default. If you want to get consistent output with previous version, set
+            `multiple_tables=False`.
 
         >>> import tabula
         >>> pdf_path = "https://github.com/chezou/tabula-py/raw/master/tests/resources/data.pdf"
         >>> tabula.read_pdf(pdf_path, stream=True)
-                    Unnamed: 0   mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb
+        [             Unnamed: 0   mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb
         0             Mazda RX4  21.0    6  160.0  110  3.90  2.620  16.46   0   1     4     4
         1         Mazda RX4 Wag  21.0    6  160.0  110  3.90  2.875  17.02   0   1     4     4
         2            Datsun 710  22.8    4  108.0   93  3.85  2.320  18.61   1   1     4     1
@@ -181,12 +186,11 @@ def read_pdf(
         28       Ford Pantera L  15.8    8  351.0  264  4.22  3.170  14.50   0   1     5     4
         29         Ferrari Dino  19.7    6  145.0  175  3.62  2.770  15.50   0   1     5     6
         30        Maserati Bora  15.0    8  301.0  335  3.54  3.570  14.60   0   1     5     8
-        31           Volvo 142E  21.4    4  121.0  109  4.11  2.780  18.60   1   1     4     2
+        31           Volvo 142E  21.4    4  121.0  109  4.11  2.780  18.60   1   1     4     2]
 
-        If you want to extract all pages, it'd be better to set ``mutiple_tables=True``.
-        ``read_pdf()`` returns list of ``pd.DataFrame``
+        If you want to extract all pages, set ``pages="all"``.
 
-        >>> dfs = tabula.read_pdf(pdf_path, pages="all", multiple_tables=True)
+        >>> dfs = tabula.read_pdf(pdf_path, pages="all")
         >>> len(dfs)
         4
         >>> dfs
@@ -254,12 +258,16 @@ def read_pdf(
         14    VC]
     """  # noqa
 
-    if output_format.lower() == "dataframe":
-        kwargs.pop("format", None)
-    elif output_format.lower() == "json":
-        kwargs["format"] = "JSON"
-    else:
-        raise ValueError("Unknown output_format {}".format(output_format))
+    if output_format:
+        # Respects explicit output_format
+        multiple_tables = False
+
+        if output_format.lower() == "dataframe":
+            kwargs.pop("format", None)
+        elif output_format.lower() == "json":
+            kwargs["format"] = "JSON"
+        else:
+            raise ValueError("Unknown output_format {}".format(output_format))
 
     if multiple_tables:
         kwargs["format"] = "JSON"
@@ -589,11 +597,17 @@ def _extract_from(raw_json, pandas_options=None):
 
         if isinstance(header_line_number, int) and not columns:
             _columns = list_data.pop(header_line_number)
-            _columns = ["" if e is np.nan else e for e in _columns]
+            _unname_idx = 0
+            for idx, e in enumerate(_columns):
+                if e is np.nan:
+                    _columns[idx] = "Unnamed: {}".format(_unname_idx)
+                    _unname_idx += 1
 
-        data_frames.append(
-            pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
-        )
+        df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
+
+        for c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="ignore")
+        data_frames.append(df)
 
     return data_frames
 
@@ -609,7 +623,7 @@ def _convert_pandas_csv_options(pandas_options, columns):
     """
 
     _columns = pandas_options.pop("names", columns)
-    header = pandas_options.pop("header", None)
+    header = pandas_options.pop("header", "infer")
     pandas_options.pop("encoding", None)
 
     if header == "infer":
@@ -656,6 +670,10 @@ def build_options(
         area (list of float, list of list of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
 
             Examples:
                 ``[269.875,12.75,790.5,561]``,

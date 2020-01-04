@@ -40,7 +40,9 @@ class TestReadPdfTable(unittest.TestCase):
 
     def test_read_pdf_into_json(self):
         expected_json = "tests/resources/data_1.json"
-        json_data = tabula.read_pdf(self.pdf_path, output_format="json", stream=True)
+        json_data = tabula.read_pdf(
+            self.pdf_path, output_format="json", stream=True, multiple_tables=False
+        )
         self.assertTrue(isinstance(json_data, list))
         with open(expected_json) as json_file:
             data = json.load(json_file)
@@ -55,19 +57,22 @@ class TestReadPdfTable(unittest.TestCase):
             )
         )
         self.assertTrue(
-            tabula.read_pdf(self.pdf_path, pages="2-3", stream=True, guess=False)[
-                0
-            ].equals(expected_df2)
+            tabula.read_pdf(
+                self.pdf_path,
+                pages="2-3",
+                stream=True,
+                guess=False,
+                multiple_tables=False,
+            )[0].equals(expected_df2)
         )
         self.assertTrue(
-            tabula.read_pdf(self.pdf_path, pages=(2, 3), stream=True, guess=False)[
-                0
-            ].equals(expected_df2)
-        )
-        self.assertTrue(
-            tabula.read_pdf(self.pdf_path, pages=(2, 3), stream=True, guess=False)[
-                0
-            ].equals(expected_df2)
+            tabula.read_pdf(
+                self.pdf_path,
+                pages=(2, 3),
+                stream=True,
+                guess=False,
+                multiple_tables=False,
+            )[0].equals(expected_df2)
         )
 
     def test_read_pdf_file_like_obj(self):
@@ -97,11 +102,15 @@ class TestReadPdfTable(unittest.TestCase):
                 pages=1,
                 area=[[0, 0, 100, 50], [0, 50, 100, 100]],
                 relative_area=True,
+                multiple_tables=False,
             )[0].equals(expected_df)
         )
         self.assertTrue(
             tabula.read_pdf(
-                pdf_path, pages=1, area=[[0, 0, 451, 212], [0, 212, 451, 425]]
+                pdf_path,
+                pages=1,
+                area=[[0, 0, 451, 212], [0, 212, 451, 425]],
+                multiple_tables=False,
             )[0].equals(expected_df)
         )
 
@@ -174,10 +183,10 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(
             tabula.read_pdf(self.pdf_path, pages=1, multiple_tables=True, stream=True)[
                 0
-            ].equals(pd.read_csv(self.expected_csv1, header=None))
+            ].equals(pd.read_csv(self.expected_csv1))
         )
         with self.assertRaises(tabula.errors.CSVParseError):
-            tabula.read_pdf(self.pdf_path, pages=2)
+            tabula.read_pdf(self.pdf_path, pages=2, multiple_tables=False)
 
     def test_read_pdf_exception(self):
         invalid_pdf_path = "notexist.pdf"
@@ -256,6 +265,8 @@ class TestReadPdfTable(unittest.TestCase):
             "--pages",
             "1",
             "--guess",
+            "--format",
+            "JSON",
             "tests/resources/data.pdf",
         ]
         subp_args = {
