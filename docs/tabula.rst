@@ -2,13 +2,15 @@ tabula
 ======
 
 
+.. _high-level-interface:
+
 High level interfaces
 ----------------------
 
-tabula.wrapper
+tabula.io
 ^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: tabula.wrapper
+.. automodule:: tabula.io
    :members:
    :undoc-members:
    :show-inheritance:
