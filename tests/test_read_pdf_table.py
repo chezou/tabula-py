@@ -75,6 +75,15 @@ class TestReadPdfTable(unittest.TestCase):
             )[0].equals(expected_df2)
         )
 
+    def test_read_pdf_with_columns(self):
+        pdf_path = "tests/resources/campaign_donors.pdf"
+        expected_csv = "tests/resources/campaign_donors.csv"
+        self.assertTrue(
+            tabula.read_pdf(
+                pdf_path, columns=[47, 147, 256, 310, 375, 431, 504], guess=False
+            )[0].equals(pd.read_csv(expected_csv))
+        )
+
     def test_read_pdf_file_like_obj(self):
         with open(self.pdf_path, "rb") as f:
             df = tabula.read_pdf(f, stream=True)
