@@ -488,17 +488,7 @@ def convert_into(
     kwargs["output_path"] = output_path
     kwargs["format"] = _extract_format_for_conversion(output_format)
 
-    if java_options is None:
-        java_options = []
-
-    elif isinstance(java_options, str):
-        java_options = shlex.split(java_options)
-
-    # to prevent tabula-py from stealing focus on every call on mac
-    if platform.system() == "Darwin":
-        r = "java.awt.headless"
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ["-Djava.awt.headless=true"]
+    java_options = _build_java_options(java_options)
 
     path, temporary = localize_file(input_path)
 
