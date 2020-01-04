@@ -249,7 +249,7 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
     @patch("subprocess.run")
-    @patch("tabula.wrapper._jar_path")
+    @patch("tabula.io._jar_path")
     def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
         jar_func.return_value = "/tmp/tabula-java.jar"
 
