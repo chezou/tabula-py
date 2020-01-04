@@ -70,7 +70,7 @@ def _run(java_options, options, path=None, encoding="utf-8"):
             )
         )
 
-    built_options = build_options(options)
+    built_options = build_options(**options)
     args = ["java"] + java_options + ["-jar", _jar_path()] + built_options
     if path:
         args.append(path)
@@ -138,7 +138,7 @@ def read_pdf(
             :func:`build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list of DataFrame.
+        list of DataFrames or dict.
 
 
     Examples:
@@ -295,7 +295,7 @@ def read_pdf(
 
     if len(output) == 0:
         logger.warning("The output file is empty.")
-        return
+        return []
 
     if pandas_options is None:
         pandas_options = {}
@@ -305,7 +305,6 @@ def read_pdf(
         raw_json = json.loads(output.decode(encoding))
         if multiple_tables:
             return _extract_from(raw_json, pandas_options)
-
         else:
             return raw_json
 
@@ -313,8 +312,7 @@ def read_pdf(
         pandas_options["encoding"] = pandas_options.get("encoding", encoding)
 
         try:
-            return pd.read_csv(io.BytesIO(output), **pandas_options)
-
+            return [pd.read_csv(io.BytesIO(output), **pandas_options)]
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
             message += (
@@ -357,7 +355,7 @@ def read_pdf_with_template(
             :func:`build_options()`
 
     Returns:
-        Extracted pandas DataFrame or list.
+        list of DataFrame.
 
 
     Examples:

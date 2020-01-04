@@ -24,16 +24,19 @@ class TestReadPdfTable(unittest.TestCase):
 
     def test_read_pdf(self):
         df = tabula.read_pdf(self.pdf_path, stream=True)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(df.equals(pd.read_csv(self.expected_csv1)))
+        self.assertTrue(len(df), 1)
+        self.assertTrue(isinstance(df[0], pd.DataFrame))
+        self.assertTrue(df[0].equals(pd.read_csv(self.expected_csv1)))
 
     def test_read_remote_pdf(self):
         df = tabula.read_pdf(self.uri)
-        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(len(df), 1)
+        self.assertTrue(isinstance(df[0], pd.DataFrame))
 
     def test_read_remote_pdf_with_custom_user_agent(self):
         df = tabula.read_pdf(self.uri, user_agent="Mozilla/5.0", stream=True)
-        self.assertTrue(isinstance(df, pd.DataFrame))
+        self.assertTrue(len(df), 1)
+        self.assertTrue(isinstance(df[0], pd.DataFrame))
 
     def test_read_pdf_into_json(self):
         expected_json = "tests/resources/data_1.json"
@@ -47,38 +50,40 @@ class TestReadPdfTable(unittest.TestCase):
         expected_csv2 = "tests/resources/data_2-3.csv"
         expected_df2 = pd.read_csv(expected_csv2)
         self.assertTrue(
-            tabula.read_pdf(self.pdf_path, pages=1, stream=True).equals(
+            tabula.read_pdf(self.pdf_path, pages=1, stream=True)[0].equals(
                 pd.read_csv(self.expected_csv1)
             )
         )
         self.assertTrue(
-            tabula.read_pdf(
-                self.pdf_path, pages="2-3", stream=True, guess=False
-            ).equals(expected_df2)
+            tabula.read_pdf(self.pdf_path, pages="2-3", stream=True, guess=False)[
+                0
+            ].equals(expected_df2)
         )
         self.assertTrue(
-            tabula.read_pdf(
-                self.pdf_path, pages=(2, 3), stream=True, guess=False
-            ).equals(expected_df2)
+            tabula.read_pdf(self.pdf_path, pages=(2, 3), stream=True, guess=False)[
+                0
+            ].equals(expected_df2)
         )
         self.assertTrue(
-            tabula.read_pdf(
-                self.pdf_path, pages=(2, 3), stream=True, guess=False
-            ).equals(expected_df2)
+            tabula.read_pdf(self.pdf_path, pages=(2, 3), stream=True, guess=False)[
+                0
+            ].equals(expected_df2)
         )
 
     def test_read_pdf_file_like_obj(self):
         with open(self.pdf_path, "rb") as f:
             df = tabula.read_pdf(f, stream=True)
-            self.assertTrue(isinstance(df, pd.DataFrame))
-            self.assertTrue(df.equals(pd.read_csv(self.expected_csv1)))
+            self.assertTrue(len(df), 1)
+            self.assertTrue(isinstance(df[0], pd.DataFrame))
+            self.assertTrue(df[0].equals(pd.read_csv(self.expected_csv1)))
 
     def test_read_pdf_pathlib(self):
         from pathlib import Path
 
         df = tabula.read_pdf(Path(self.pdf_path), stream=True)
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        self.assertTrue(df.equals(pd.read_csv(self.expected_csv1)))
+        self.assertTrue(len(df), 1)
+        self.assertTrue(isinstance(df[0], pd.DataFrame))
+        self.assertTrue(df[0].equals(pd.read_csv(self.expected_csv1)))
 
     def test_read_pdf_with_multiple_areas(self):
         # Original files are taken from
@@ -92,19 +97,19 @@ class TestReadPdfTable(unittest.TestCase):
                 pages=1,
                 area=[[0, 0, 100, 50], [0, 50, 100, 100]],
                 relative_area=True,
-            ).equals(expected_df)
+            )[0].equals(expected_df)
         )
         self.assertTrue(
             tabula.read_pdf(
                 pdf_path, pages=1, area=[[0, 0, 451, 212], [0, 212, 451, 425]]
-            ).equals(expected_df)
+            )[0].equals(expected_df)
         )
 
     def test_read_pdf_with_java_option(self):
         self.assertTrue(
             tabula.read_pdf(
                 self.pdf_path, pages=1, stream=True, java_options=["-Xmx256m"]
-            ).equals(pd.read_csv(self.expected_csv1))
+            )[0].equals(pd.read_csv(self.expected_csv1))
         )
 
     def test_read_pdf_with_pandas_option(self):
@@ -112,17 +117,17 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(
             tabula.read_pdf(
                 self.pdf_path, pages=1, stream=True, pandas_options={"header": None}
-            ).equals(pd.read_csv(self.expected_csv1, header=None))
+            )[0].equals(pd.read_csv(self.expected_csv1, header=None))
         )
         self.assertTrue(
             tabula.read_pdf(
                 self.pdf_path, pages=1, stream=True, pandas_options={"header": 0}
-            ).equals(pd.read_csv(self.expected_csv1, header=0))
+            )[0].equals(pd.read_csv(self.expected_csv1, header=0))
         )
         self.assertTrue(
             tabula.read_pdf(
                 self.pdf_path, pages=1, stream=True, pandas_options={"header": "infer"}
-            ).equals(pd.read_csv(self.expected_csv1, header="infer"))
+            )[0].equals(pd.read_csv(self.expected_csv1, header="infer"))
         )
         self.assertTrue(
             tabula.read_pdf(
@@ -130,7 +135,9 @@ class TestReadPdfTable(unittest.TestCase):
                 pages=1,
                 stream=True,
                 pandas_options={"header": "infer", "names": column_name},
-            ).equals(pd.read_csv(self.expected_csv1, header="infer", names=column_name))
+            )[0].equals(
+                pd.read_csv(self.expected_csv1, header="infer", names=column_name)
+            )
         )
         self.assertTrue(
             tabula.read_pdf(
