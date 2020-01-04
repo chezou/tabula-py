@@ -621,7 +621,21 @@ def _convert_pandas_csv_options(pandas_options, columns):
     return _columns, header_line_number
 
 
-def build_options(kwargs=None):
+def build_options(
+    pages=1,
+    guess=True,
+    area=None,
+    relative_area=False,
+    lattice=False,
+    stream=False,
+    password=None,
+    silent=None,
+    columns=None,
+    format=None,
+    batch=None,
+    output_path=None,
+    options="",
+):
     """Build options for tabula-java
 
     Args:
@@ -687,28 +701,18 @@ def build_options(kwargs=None):
     """
 
     __options = []
-    if kwargs is None:
-        kwargs = {}
-    options = kwargs.get("options", "")
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
 
-    # parse options
-    pages = kwargs.get("pages", 1)
-    if pages:
-        __pages = pages
-        if isinstance(pages, int):
-            __pages = str(pages)
-        elif type(pages) in [list, tuple]:
-            __pages = ",".join(map(str, pages))
+    __pages = pages
+    if isinstance(pages, int):
+        __pages = str(pages)
+    elif type(pages) in [list, tuple]:
+        __pages = ",".join(map(str, pages))
 
-        __options += ["--pages", __pages]
+    __options += ["--pages", __pages]
 
-    area = kwargs.get("area")
-    relative_area = kwargs.get("relative_area")
     multiple_areas = False
-
-    guess = kwargs.get("guess", True)
 
     if area:
         guess = False
@@ -731,39 +735,31 @@ def build_options(kwargs=None):
                 )
                 __options += ["--area", __area]
 
-    lattice = kwargs.get("lattice") or kwargs.get("spreadsheet")
     if lattice:
         __options.append("--lattice")
 
-    stream = kwargs.get("stream") or kwargs.get("nospreadsheet")
     if stream:
         __options.append("--stream")
 
     if guess and not multiple_areas:
         __options.append("--guess")
 
-    fmt = kwargs.get("format")
-    if fmt:
-        __options += ["--format", fmt]
+    if format:
+        __options += ["--format", format]
 
-    output_path = kwargs.get("output_path")
     if output_path:
         __options += ["--outfile", output_path]
 
-    columns = kwargs.get("columns")
     if columns:
         __columns = ",".join(map(str, columns))
         __options += ["--columns", __columns]
 
-    password = kwargs.get("password")
     if password:
         __options += ["--password", password]
 
-    batch = kwargs.get("batch")
     if batch:
         __options += ["--batch", batch]
 
-    silent = kwargs.get("silent")
     if silent:
         __options.append("--silent")
 

@@ -183,6 +183,8 @@ class TestReadPdfTable(unittest.TestCase):
         invalid_pdf_path = "notexist.pdf"
         with self.assertRaises(FileNotFoundError):
             tabula.read_pdf(invalid_pdf_path)
+        with self.assertRaises(TypeError):
+            tabula.read_pdf(self.pdf_path, unknown_option="foo")
 
     def test_convert_from(self):
         expected_tsv = "tests/resources/data_1.tsv"
