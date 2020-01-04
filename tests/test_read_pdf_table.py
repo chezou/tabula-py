@@ -206,11 +206,11 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(os.path.exists(temp.name))
 
     def test_convert_into_exception(self):
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(ValueError):
             tabula.convert_into(self.pdf_path, "test.csv", output_format="dataframe")
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(ValueError):
             tabula.convert_into(self.pdf_path, None)
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(ValueError):
             tabula.convert_into(self.pdf_path, "")
 
     def test_read_pdf_with_template(self):

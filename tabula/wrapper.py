@@ -253,18 +253,18 @@ def read_pdf(
         14    VC]
     """  # noqa
 
-    if output_format == "dataframe":
+    if output_format.lower() == "dataframe":
         kwargs.pop("format", None)
-
-    elif output_format == "json":
+    elif output_format.lower() == "json":
         kwargs["format"] = "JSON"
+    else:
+        raise ValueError("Unknown output_format {}".format(output_format))
 
     if multiple_tables:
         kwargs["format"] = "JSON"
 
     if java_options is None:
         java_options = []
-
     elif isinstance(java_options, str):
         java_options = shlex.split(java_options)
 
@@ -485,7 +485,7 @@ def convert_into(
     """
 
     if output_path is None or len(output_path) == 0:
-        raise AttributeError("'output_path' shoud not be None or empty")
+        raise ValueError("'output_path' shoud not be None or empty")
 
     kwargs["output_path"] = output_path
     kwargs["format"] = _extract_format_for_conversion(output_format)
@@ -538,21 +538,11 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
     """
 
     if input_dir is None or not os.path.isdir(input_dir):
-        raise AttributeError("'input_dir' shoud be directory path")
+        raise ValueError("'input_dir' should be an existing directory path")
 
     kwargs["format"] = _extract_format_for_conversion(output_format)
 
-    if java_options is None:
-        java_options = []
-
-    elif isinstance(java_options, str):
-        java_options = shlex.split(java_options)
-
-    # to prevent tabula-py from stealing focus on every call on mac
-    if platform.system() == "Darwin":
-        r = "java.awt.headless"
-        if not any(filter(r.find, java_options)):
-            java_options = java_options + ["-Djava.awt.headless=true"]
+    java_options = _build_java_options(java_options)
 
     # Option for batch
     kwargs["batch"] = input_dir
@@ -560,18 +550,30 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
     _run(java_options, kwargs)
 
 
+def _build_java_options(_java_options=None):
+    if _java_options is None:
+        _java_options = []
+    elif isinstance(_java_options, str):
+        _java_options = shlex.split(_java_options)
+
+    # to prevent tabula-py from stealing focus on every call on mac
+    if platform.system() == "Darwin":
+        r = "java.awt.headless"
+        if not any(filter(r.find, _java_options)):
+            _java_options = _java_options + ["-Djava.awt.headless=true"]
+
+    return _java_options
+
+
 def _extract_format_for_conversion(output_format="csv"):
-    if output_format == "csv":
+    if output_format.lower() == "csv":
         return "CSV"
-
-    if output_format == "json":
+    elif output_format.lower() == "json":
         return "JSON"
-
-    if output_format == "tsv":
+    elif output_format.lower() == "tsv":
         return "TSV"
-
-    if output_format == "dataframe":
-        raise AttributeError("'output_format' has no attribute 'dataframe'")
+    else:
+        raise ValueError("Unknown 'output_format': '{}'".format(output_format))
 
 
 def _extract_from(raw_json, pandas_options=None):
