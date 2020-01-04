@@ -32,7 +32,6 @@ import pandas as pd
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
-from .util import deprecated_option
 
 logger = getLogger(__name__)
 
@@ -703,10 +702,6 @@ def build_options(kwargs=None):
     options = kwargs.get("options", "")
     # handle options described in string for backward compatibility
     __options += shlex.split(options)
-
-    DEPRECATED_OPTIONS = set(["spreadsheet", "nospreadsheet"])
-    for option in set(kwargs.keys()) & DEPRECATED_OPTIONS:
-        deprecated_option(option)
 
     # parse options
     pages = kwargs.get("pages", 1)
