@@ -24,6 +24,7 @@ import os
 import platform
 import shlex
 import subprocess
+from collections import defaultdict
 from logging import getLogger
 
 import numpy as np
@@ -653,10 +654,24 @@ def _extract_from(raw_json, pandas_options=None):
         if isinstance(header_line_number, int) and not columns:
             _columns = list_data.pop(header_line_number)
             _unname_idx = 0
-            for idx, e in enumerate(_columns):
-                if e is np.nan:
+            for idx, col in enumerate(_columns):
+                if col is np.nan:
                     _columns[idx] = "Unnamed: {}".format(_unname_idx)
                     _unname_idx += 1
+
+            counts = defaultdict(int)
+
+            # Avoid duplicate column name adding ".\d" as a suffix
+            for idx, col in enumerate(_columns):
+                cur_count = counts[col]
+
+                while cur_count > 0:
+                    counts[col] = cur_count + 1
+                    col = "{}.{}".format(col, cur_count)
+                    cur_count = counts[col]
+
+                _columns[idx] = col
+                counts[col] = cur_count + 1
 
         df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
 
