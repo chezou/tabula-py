@@ -1,5 +1,6 @@
 import os
 import shutil
+import uuid
 from urllib.parse import quote, urlparse, uses_netloc, uses_params, uses_relative
 from urllib.request import Request, urlopen
 
@@ -51,8 +52,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         return filename, True
 
     elif is_file_like(path_or_buffer):
-        pid = os.getpid()
-        filename = "{}{}".format(pid, suffix)
+        filename = "{}{}".format(uuid.uuid4(), suffix)
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(path_or_buffer, f)
