@@ -88,6 +88,7 @@ You can help by:
 - [@red-bin](https://github.com/red-bin)
 - [@alexandreio](https://github.com/alexandreio)
 - [@bpben](https://github.com/bpben)
+- [@Bueddl](https://github.com/Bueddl)
 
 ### Another support
 
