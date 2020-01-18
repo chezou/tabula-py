@@ -645,6 +645,9 @@ def _extract_from(raw_json, pandas_options=None):
     columns, header_line_number = _convert_pandas_csv_options(pandas_options, columns)
 
     for table in raw_json:
+        if len(table["data"]) == 0:
+            continue
+
         list_data = [
             [np.nan if not e["text"] else e["text"] for e in row]
             for row in table["data"]
