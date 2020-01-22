@@ -102,6 +102,7 @@ def read_pdf(
     pandas_options=None,
     multiple_tables=True,
     user_agent=None,
+    temp_directory="",
     **kwargs
 ):
     """Read tables in PDF.
@@ -134,6 +135,8 @@ def read_pdf(
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
+        temp_directory (str, optional):
+            Directory to use for temporary files.
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -303,7 +306,9 @@ def read_pdf(
         if not any("file.encoding" in opt for opt in java_options):
             java_options += ["-Dfile.encoding=UTF8"]
 
-    path, temporary = localize_file(input_path, user_agent)
+    path, temporary = localize_file(
+        input_path, user_agent, temp_directory=temp_directory
+    )
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
@@ -356,6 +361,7 @@ def read_pdf_with_template(
     encoding="utf-8",
     java_options=None,
     user_agent=None,
+    temp_directory="",
     **kwargs
 ):
     """Read tables in PDF with a Tabula App template.
@@ -376,6 +382,8 @@ def read_pdf_with_template(
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
+        temp_directory (str, optional):
+            Directory to use for temporary files.
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -472,7 +480,10 @@ def read_pdf_with_template(
     """  # noqa
 
     path, temporary = localize_file(
-        template_path, user_agent=user_agent, suffix=".json"
+        template_path,
+        user_agent=user_agent,
+        suffix=".json",
+        temp_directory=temp_directory,
     )
     options = load_template(path)
     dataframes = []
@@ -499,7 +510,12 @@ def read_pdf_with_template(
 
 
 def convert_into(
-    input_path, output_path, output_format="csv", java_options=None, **kwargs
+    input_path,
+    output_path,
+    output_format="csv",
+    java_options=None,
+    temp_directory="",
+    **kwargs
 ):
     """Convert tables from PDF into a file.
     Output file will be saved into `output_path`.
@@ -517,6 +533,8 @@ def convert_into(
 
             Example:
                 ``"-Xmx256m"``.
+        temp_directory (str, optional):
+            Directory to use for temporary files.
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -543,7 +561,7 @@ def convert_into(
 
     java_options = _build_java_options(java_options)
 
-    path, temporary = localize_file(input_path)
+    path, temporary = localize_file(input_path, temp_directory=temp_directory)
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)

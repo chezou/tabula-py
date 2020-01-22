@@ -9,7 +9,7 @@ _VALID_URLS.discard("")
 MAX_FILE_SIZE = 250
 
 
-def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
+def localize_file(path_or_buffer, user_agent=None, suffix=".pdf", temp_directory=""):
     """Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
@@ -22,6 +22,8 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
             it uses the default ``urllib.request`` user-agent.
         suffix (str, optional):
             File extension to check.
+        temp_directory (str, optional):
+            Directory to use for temporary files.
 
     Returns:
         (str, bool):
@@ -45,6 +47,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         if ext != suffix:
             pid = os.getpid()
             filename = "{}{}".format(pid, suffix)
+        filename = os.path.join(temp_directory, filename)
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(req, f)
@@ -52,7 +55,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         return filename, True
 
     elif is_file_like(path_or_buffer):
-        filename = "{}{}".format(uuid.uuid4(), suffix)
+        filename = os.path.join(temp_directory, "{}{}".format(uuid.uuid4(), suffix))
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(path_or_buffer, f)
