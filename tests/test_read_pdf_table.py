@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import uuid
 from unittest.mock import patch
 
 import pandas as pd
@@ -209,13 +210,14 @@ class TestReadPdfTable(unittest.TestCase):
     def test_convert_from(self):
         expected_tsv = "tests/resources/data_1.tsv"
         expected_json = "tests/resources/data_1.json"
-        temp = tempfile.NamedTemporaryFile()
-        tabula.convert_into(self.pdf_path, temp.name, output_format="csv", stream=True)
-        self.assertTrue(filecmp.cmp(temp.name, self.expected_csv1))
-        tabula.convert_into(self.pdf_path, temp.name, output_format="tsv", stream=True)
-        self.assertTrue(filecmp.cmp(temp.name, expected_tsv))
-        tabula.convert_into(self.pdf_path, temp.name, output_format="json", stream=True)
-        self.assertTrue(filecmp.cmp(temp.name, expected_json))
+        with tempfile.TemporaryDirectory() as tempdir:
+            temp = os.path.join(tempdir, str(uuid.uuid4()))
+            tabula.convert_into(self.pdf_path, temp, output_format="csv", stream=True)
+            self.assertTrue(filecmp.cmp(temp, self.expected_csv1))
+            tabula.convert_into(self.pdf_path, temp, output_format="tsv", stream=True)
+            self.assertTrue(filecmp.cmp(temp, expected_tsv))
+            tabula.convert_into(self.pdf_path, temp, output_format="json", stream=True)
+            self.assertTrue(filecmp.cmp(temp, expected_json))
 
     def test_convert_into_by_batch(self):
         temp_dir = tempfile.mkdtemp()
@@ -233,9 +235,10 @@ class TestReadPdfTable(unittest.TestCase):
             tabula.convert_into_by_batch(None, output_format="csv")
 
     def test_convert_remote_file(self):
-        temp = tempfile.NamedTemporaryFile()
-        tabula.convert_into(self.uri, temp.name, output_format="csv")
-        self.assertTrue(os.path.exists(temp.name))
+        with tempfile.TemporaryDirectory() as tempdir:
+            temp = os.path.join(tempdir, str(uuid.uuid4()))
+            tabula.convert_into(self.uri, temp, output_format="csv")
+            self.assertTrue(os.path.exists(temp))
 
     def test_convert_into_exception(self):
         with self.assertRaises(ValueError):
