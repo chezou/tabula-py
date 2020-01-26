@@ -1,12 +1,13 @@
 import os
 import shutil
 import uuid
+from tempfile import gettempdir
 from urllib.parse import quote, urlparse, uses_netloc, uses_params, uses_relative
 from urllib.request import Request, urlopen
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard("")
-MAX_FILE_SIZE = 250
+MAX_FILE_SIZE = 200
 
 
 def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
@@ -43,8 +44,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         fname, ext = os.path.splitext(filename)
         filename = "{}{}".format(fname[:MAX_FILE_SIZE], ext)
         if ext != suffix:
-            pid = os.getpid()
-            filename = "{}{}".format(pid, suffix)
+            filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(req, f)
@@ -52,7 +52,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         return filename, True
 
     elif is_file_like(path_or_buffer):
-        filename = "{}{}".format(uuid.uuid4(), suffix)
+        filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(path_or_buffer, f)
