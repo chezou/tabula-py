@@ -678,14 +678,7 @@ def _extract_from(raw_json, pandas_options=None):
 
         df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
 
-        if pandas_options.get('dtype', None) == int:
-            for c in df.columns:
-                df[c] = pd.to_numeric(df[c], errors="ignore", downcast='integer')       
-        elif pandas_options.get('dtype', None) == str:
-            mask = df.applymap(lambda x: x == 'None')
-            for col in df.columns[(mask).any()]:
-                df.loc[mask[col], col] = None
-        else:
+        if not pandas_options.get('dtype'):
             for c in df.columns:
                 df[c] = pd.to_numeric(df[c], errors="ignore")
         data_frames.append(df)
