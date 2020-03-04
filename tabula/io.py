@@ -124,6 +124,11 @@ def read_pdf(
 
             Example:
                 ``{'header': None}``
+
+            Note:
+                With ``multiple_tables=True`` (default), pandas_options is passed
+                to pandas.read_csv, otherwise it is passed to pandas.DataFrame.
+                Those two functions are different for accept options like ``dtype``.
         multiple_tables (bool):
             It enables to handle multiple tables within a page. Default: ``True``
 
@@ -678,7 +683,7 @@ def _extract_from(raw_json, pandas_options=None):
 
         df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
 
-        if not pandas_options.get('dtype'):
+        if not pandas_options.get("dtype"):
             for c in df.columns:
                 df[c] = pd.to_numeric(df[c], errors="ignore")
         data_frames.append(df)
