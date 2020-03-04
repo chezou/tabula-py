@@ -295,22 +295,53 @@ class TestReadPdfTable(unittest.TestCase):
     def test_read_pdf_with_dtype_string(self):
         pdf_path = "tests/resources/data_dtype.pdf"
         expected_csv = "tests/resources/data_dtype_expected.csv"
+        expected_csv2 = "tests/resources/data_2-3.csv"
         template_path = "tests/resources/data_dtype.tabula-template.json"
         template_expected_csv = "tests/resources/data_dtype_template_expected.csv"
 
         pandas_options = {'dtype': str}
-        df = tabula.read_pdf(self.pdf_path, stream=True, pages=0, pandas_options=pandas_options.copy())
-        self.assertTrue(df.equals(pd.read_csv(self.expected_csv1, **pandas_options.copy())))
-        
+        self.assertTrue(
+            tabula.read_pdf(
+                self.pdf_path, 
+                stream=True, 
+                pages=1,
+                multiple_tables=False,
+                pandas_options=pandas_options.copy()
+            ).equals(pd.read_csv(self.expected_csv1, **pandas_options))
+        )
+        self.assertTrue(
+            tabula.read_pdf(
+                self.pdf_path,
+                pages="2-3",
+                stream=True,
+                guess=False,
+                multiple_tables=False,
+                pandas_options=pandas_options.copy()
+            ).equals(pd.read_csv(expected_csv2, **pandas_options))
+        )
+
         pandas_options = {'header': None, 'dtype': str}
-        dfs = tabula.read_pdf(pdf_path, multiple_tables=True, pandas_options=pandas_options.copy())
-        self.assertTrue(dfs[0].equals(pd.read_csv(expected_csv, **pandas_options.copy())))
+        dfs = tabula.read_pdf(
+            pdf_path, 
+            multiple_tables=True, 
+            pandas_options=pandas_options.copy()
+        )
         self.assertEqual(len(dfs), 4)
+        self.assertTrue(
+            dfs[0].equals(pd.read_csv(expected_csv, **pandas_options))
+        )
 
         dfs_template = tabula.read_pdf_with_template(
-            pdf_path, template_path, stream=True, pages='all', pandas_options=pandas_options.copy())
+            pdf_path, 
+            template_path, 
+            stream=True, 
+            pages='all', 
+            pandas_options=pandas_options.copy()
+        )
         self.assertEqual(len(dfs_template), 5)
-        self.assertTrue(dfs_template[0].equals(pd.read_csv(template_expected_csv, **pandas_options.copy())))
+        self.assertTrue(
+            dfs_template[0].equals(pd.read_csv(template_expected_csv, **pandas_options))
+        )
         
 if __name__ == "__main__":
     unittest.main()
