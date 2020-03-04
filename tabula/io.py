@@ -678,8 +678,9 @@ def _extract_from(raw_json, pandas_options=None):
 
         df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
 
-        for c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="ignore")
+        if not pandas_options.get('dtype'):
+            for c in df.columns:
+                df[c] = pd.to_numeric(df[c], errors="ignore")
         data_frames.append(df)
 
     return data_frames
