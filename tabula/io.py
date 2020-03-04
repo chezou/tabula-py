@@ -683,7 +683,6 @@ def _extract_from(raw_json, pandas_options=None):
                 df[c] = pd.to_numeric(df[c], errors="ignore")
         data_frames.append(df)
 
-
     return data_frames
 
 
