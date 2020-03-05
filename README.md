@@ -89,6 +89,7 @@ You can help by:
 - [@alexandreio](https://github.com/alexandreio)
 - [@bpben](https://github.com/bpben)
 - [@Bueddl](https://github.com/Bueddl)
+- [@cjotade](https://github.com/cjotade)
 
 ### Another support
 
