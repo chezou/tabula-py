@@ -2,7 +2,14 @@ import os
 import shutil
 import uuid
 from tempfile import gettempdir
-from urllib.parse import quote, urlparse, uses_netloc, uses_params, uses_relative
+from urllib.parse import (
+    quote,
+    unquote,
+    urlparse,
+    uses_netloc,
+    uses_params,
+    uses_relative,
+)
 from urllib.request import Request, urlopen
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
@@ -31,9 +38,10 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
     """
 
     path_or_buffer = _stringify_path(path_or_buffer)
+    safe_with_percent = "!#$%&'()*+,/:;=?@[]~"
 
     if _is_url(path_or_buffer):
-        path_or_buffer = quote(path_or_buffer, safe="/:")
+        path_or_buffer = quote(unquote(path_or_buffer), safe=safe_with_percent)
         if user_agent:
             req = urlopen(_create_request(path_or_buffer, user_agent))
         else:
