@@ -55,11 +55,11 @@ tabula-py enables you to extract table from PDF into DataFrame and JSON. It also
 
    import tabula
 
-   # Read pdf into DataFrame
-   df = tabula.read_pdf("test.pdf", pages='all')
+   # Read pdf into a list of DataFrame
+   dfs = tabula.read_pdf("test.pdf", pages='all')
 
-   # Read remote pdf into DataFrame
-   df2 = tabula.read_pdf("https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/arabic.pdf")
+   # Read remote pdf into a list of DataFrame
+   dfs2 = tabula.read_pdf("https://github.com/tabulapdf/tabula-java/raw/master/src/test/resources/technology/tabula/arabic.pdf")
 
    # convert PDF into CSV
    tabula.convert_into("test.pdf", "output.csv", output_format="csv", pages='all')
@@ -67,7 +67,7 @@ tabula-py enables you to extract table from PDF into DataFrame and JSON. It also
    # convert all PDFs in a directory
    tabula.convert_into_by_batch("input_directory", output_format='csv', pages='all)
 
-See `example notebook <./examples/tabula_example.ipynb>`_ for more detail. I also recommend to read `the tutorial article <https://aegis4048.github.io/parse-pdf-files-while-retaining-structure-with-tabula-py>`_ written by `@aegis4048 <https://github.com/aegis4048>`_.
+See `example notebook <https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb>`_ for more detail. I also recommend to read `the tutorial article <https://aegis4048.github.io/parse-pdf-files-while-retaining-structure-with-tabula-py>`_ written by `@aegis4048 <https://github.com/aegis4048>`_.
 
 
 .. Note::
