@@ -8,7 +8,7 @@ def lint(session):
     session.install(*lint_tools)
     session.run("flake8", *targets)
     session.run("black", "--diff", "--check", *targets)
-    session.run("isort", "--check-only")
+    session.run("isort", "--check-only", *targets)
 
 
 @nox.session
