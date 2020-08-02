@@ -62,7 +62,7 @@ def _run(java_options, options, path=None, encoding="utf-8"):
     """
     # Workaround to enforce the silent option. See:
     # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
-    if "silent" in options:
+    if options.get("silent"):
         java_options.extend(
             (
                 "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
