@@ -90,6 +90,7 @@ You can help by:
 - [@bpben](https://github.com/bpben)
 - [@Bueddl](https://github.com/Bueddl)
 - [@cjotade](https://github.com/cjotade)
+- [@codeboy5](https://github.com/codeboy5)
 
 ### Another support
 
