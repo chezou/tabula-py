@@ -36,7 +36,9 @@ def environment_info():
     """
 
     import sys
+
     import distro
+
     from tabula import __version__
 
     print(
