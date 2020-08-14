@@ -127,7 +127,7 @@ def read_pdf(
 
             Note:
                 With ``multiple_tables=True`` (default), pandas_options is passed
-                to pandas.read_csv, otherwise it is passed to pandas.DataFrame.
+                to pandas.DataFrame, otherwise it is passed to pandas.read_csv.
                 Those two functions are different for accept options like ``dtype``.
         multiple_tables (bool):
             It enables to handle multiple tables within a page. Default: ``True``
