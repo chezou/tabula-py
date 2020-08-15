@@ -7,7 +7,7 @@
 
 
 `tabula-py` is a simple Python wrapper of [tabula-java](https://github.com/tabulapdf/tabula-java), which can read tables in a PDF.
-You can read tables from a PDF and convert them into a pandas' DataFrame. tabula-py also enables you to convert a PDF file into a CSV, a TSV or a JSON file.
+You can read tables from a PDF and convert them into a pandas DataFrame. tabula-py also enables you to convert a PDF file into a CSV, a TSV or a JSON file.
 
 You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb) and try it on Google Colab, or we highly recommend to read [our document](https://tabula-py.readthedocs.io/en/latest/) especially the FAQ section.
 
