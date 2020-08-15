@@ -49,7 +49,7 @@ This instruction is originally written by `@lahoffm <https://github.com/lahoffm>
 Example
 -------
 
-tabula-py enables you to extract table from PDF into DataFrame and JSON. It also can extract tables from PDF and save file as CSV, TSV or JSON.
+tabula-py enables you to extract table from PDF into DataFrame and JSON. It can also extract tables from PDF and save file as CSV, TSV or JSON.
 
 .. code-block:: py
 
