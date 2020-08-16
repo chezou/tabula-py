@@ -1,20 +1,21 @@
-"""This module is a wrapper of tabula, which enables the extraction of tables from a PDF.
+"""
+This module is a wrapper of tabula, which enables table extraction from a PDF.
 
 This module extracts tables from a PDF into a pandas DataFrame. Currently, the
 implementation of this module uses subprocess.
 
-Instead of importing this module, you can import public interfaces sucha as
+Instead of importing this module, you can import public interfaces such as
 :func:`read_pdf()`, :func:`read_pdf_with_template()`, :func:`convert_into()`,
 :func:`convert_into_by_batch()` from `tabula` module directory.
 
 Note:
-    If you want to use your own tabula-java JAR file, set ``TABULA_JAR`` to
-    environment variable for JAR path.
+If you want to use your own tabula-java JAR file, set ``TABULA_JAR`` to
+environment variable for JAR path.
 
 Example:
 
-    >>> import tabula
-    >>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
+>>> import tabula
+>>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
 """
 
 import errno
