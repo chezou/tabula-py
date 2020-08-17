@@ -13,8 +13,8 @@ Note:
 
 Example:
 
->>> import tabula
->>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
+    >>> import tabula
+    >>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
 """
 
 import errno
