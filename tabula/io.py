@@ -1,9 +1,9 @@
-"""This module is a wrapper of tabula, which enables extract tables from PDF.
+"""This module is a wrapper of tabula, which enables table extraction from a PDF.
 
-This module extract tables from PDF into pandas DataFrame. Currently, the
+This module extracts tables from a PDF into a pandas DataFrame. Currently, the
 implementation of this module uses subprocess.
 
-Instead of importing this module, you can import public interfaces sucha as
+Instead of importing this module, you can import public interfaces such as
 :func:`read_pdf()`, :func:`read_pdf_with_template()`, :func:`convert_into()`,
 :func:`convert_into_by_batch()` from `tabula` module directory.
 
