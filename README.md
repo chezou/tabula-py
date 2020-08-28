@@ -91,6 +91,8 @@ You can help by:
 - [@Bueddl](https://github.com/Bueddl)
 - [@cjotade](https://github.com/cjotade)
 - [@codeboy5](https://github.com/codeboy5)
+- [@manohar-voggu](https://github.com/manohar-voggu)
+- [@deveshSingh06](https://github.com/deveshSingh06)
 
 ### Another support
 
