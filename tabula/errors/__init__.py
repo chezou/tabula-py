@@ -2,8 +2,7 @@ from pandas.errors import ParserError
 
 
 class CSVParseError(ParserError):
-    """Error represents CSV parse error, which mainly caused by pandas.
-    """
+    """Error represents CSV parse error, which mainly caused by pandas."""
 
     def __init__(self, message, cause):
         super(CSVParseError, self).__init__(message + ", caused by " + repr(cause))
@@ -11,7 +10,6 @@ class CSVParseError(ParserError):
 
 
 class JavaNotFoundError(Exception):
-    """Error represents Java doesn't exist.
-    """
+    """Error represents Java doesn't exist."""
 
     pass

@@ -324,7 +324,7 @@ class TestReadPdfTable(unittest.TestCase):
         dfs = tabula.read_pdf(
             pdf_path, multiple_tables=True, pandas_options=pandas_options.copy()
         )
-        self.assertEqual(len(dfs), 4)
+        self.assertEqual(len(dfs), 5)
         self.assertTrue(dfs[0].equals(pd.read_csv(expected_csv, **pandas_options)))
 
         dfs_template = tabula.read_pdf_with_template(
