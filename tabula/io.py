@@ -36,7 +36,7 @@ from .template import load_template
 
 logger = getLogger(__name__)
 
-TABULA_JAVA_VERSION = "1.0.3"
+TABULA_JAVA_VERSION = "1.0.4"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAVA_NOT_FOUND_ERROR = (
@@ -692,7 +692,7 @@ def _extract_from(raw_json, pandas_options=None):
 
 
 def _convert_pandas_csv_options(pandas_options, columns):
-    """ Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
+    """Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
     Args:
         pandas_options (dict):
