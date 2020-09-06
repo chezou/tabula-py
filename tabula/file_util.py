@@ -52,8 +52,9 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         fname, ext = os.path.splitext(filename)
         filename = "{}{}".format(fname[:MAX_FILE_SIZE], ext)
         if ext != suffix:
-            filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
+            filename = "{}{}".format(uuid.uuid4(), suffix)
 
+        filename = os.path.join(gettempdir(), filename)
         with open(filename, "wb") as f:
             shutil.copyfileobj(req, f)
 

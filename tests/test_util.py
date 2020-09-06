@@ -73,7 +73,7 @@ class TestUtil(unittest.TestCase):
 
         fname, _ = tabula.file_util.localize_file(uri)
         mock_urlopen.assert_called_with(uri)
-        self.assertEqual(fname, "123456789012345678901234567890.pdf")
+        self.assertTrue(fname.endswith("123456789012345678901234567890.pdf"))
         self.addCleanup(os.remove, fname)
 
 
