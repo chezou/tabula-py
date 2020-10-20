@@ -65,7 +65,7 @@ tabula-py enables you to extract tables from a PDF into a DataFrame, or a JSON. 
    tabula.convert_into("test.pdf", "output.csv", output_format="csv", pages='all')
 
    # convert all PDFs in a directory
-   tabula.convert_into_by_batch("input_directory", output_format='csv', pages='all)
+   tabula.convert_into_by_batch("input_directory", output_format='csv', pages='all')
 
 See `example notebook <https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb>`_ for more detail. I also recommend to read `the tutorial article <https://aegis4048.github.io/parse-pdf-files-while-retaining-structure-with-tabula-py>`_ written by `@aegis4048 <https://github.com/aegis4048>`_.
 
