@@ -9,7 +9,7 @@
 `tabula-py` is a simple Python wrapper of [tabula-java](https://github.com/tabulapdf/tabula-java), which can read tables in a PDF.
 You can read tables from a PDF and convert them into a pandas DataFrame. tabula-py also enables you to convert a PDF file into a CSV, a TSV or a JSON file.
 
-You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb) and try it on Google Colab, or we highly recommend to read [our document](https://tabula-py.readthedocs.io/en/latest/) especially the FAQ section.
+You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb) and try it on Google Colab, or we highly recommend to read [our documentation](https://tabula-py.readthedocs.io/en/latest/) especially the FAQ section.
 
 ![](./example.png)
 
@@ -21,7 +21,7 @@ You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/ta
 
 ## OS
 
-I confirmed working on macOS and Ubuntu. But some people confirm it works on Windows 10. See also [the document for the detailed installation for Windows 10](https://tabula-py.readthedocs.io/en/latest/getting_started.html#get-tabula-py-working-windows-10).
+I confirmed working on macOS and Ubuntu. But some people confirm it works on Windows 10. See also [the documentation for the detailed installation for Windows 10](https://tabula-py.readthedocs.io/en/latest/getting_started.html#get-tabula-py-working-windows-10).
 
 # Usage
 
