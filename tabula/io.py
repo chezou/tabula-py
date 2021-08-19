@@ -36,7 +36,7 @@ from .template import load_template
 
 logger = getLogger(__name__)
 
-TABULA_JAVA_VERSION = "1.0.4"
+TABULA_JAVA_VERSION = "1.0.5"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAVA_NOT_FOUND_ERROR = (
