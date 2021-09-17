@@ -9,7 +9,7 @@ If you want to become a contributor, you can install dependency after cloning th
     pip install -e .[dev, test]
     pip install nox
 
-For running text and liter, run nox command.
+For running tests and linter, run nox command.
 
 
     nox
