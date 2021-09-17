@@ -32,7 +32,7 @@ For running tests and linter, run nox command.
 Documentation
 -------------
 
-You can build document on your environment as folows:
+You can build document on your environment as follows:
 
 .. code-block:: bash
 
