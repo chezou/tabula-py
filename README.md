@@ -5,31 +5,29 @@
 [![Documentation Status](https://readthedocs.org/projects/tabula-py/badge/?version=latest)](https://tabula-py.readthedocs.io/en/latest/?badge=latest)
 [![Patreon](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/chezou)
 
-
 `tabula-py` is a simple Python wrapper of [tabula-java](https://github.com/tabulapdf/tabula-java), which can read tables in a PDF.
 You can read tables from a PDF and convert them into a pandas DataFrame. tabula-py also enables you to convert a PDF file into a CSV, a TSV or a JSON file.
 
 You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb) and try it on Google Colab, or we highly recommend to read [our documentation](https://tabula-py.readthedocs.io/en/latest/) especially the FAQ section.
 
-![](./example.png)
+![tabula-py example](./example.png)
 
-
-# Requirements
+## Requirements
 
 - Java 8+
-- Python 3.6+
+- Python 3.7+
 
-## OS
+### OS
 
 I confirmed working on macOS and Ubuntu. But some people confirm it works on Windows 10. See also [the documentation for the detailed installation for Windows 10](https://tabula-py.readthedocs.io/en/latest/getting_started.html#get-tabula-py-working-windows-10).
 
-# Usage
+## Usage
 
 - [Documentation](https://tabula-py.readthedocs.io/en/latest/)
   - [FAQ](https://tabula-py.readthedocs.io/en/latest/faq.html) would be helpful if you have an issue
 - [Example notebook on Google Colaboratory](https://colab.research.google.com/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb)
 
-## Install
+### Install
 
 Ensure you have a Java runtime and set the PATH for it.
 
@@ -37,7 +35,7 @@ Ensure you have a Java runtime and set the PATH for it.
 pip install tabula-py
 ```
 
-## Example
+### Example
 
 tabula-py enables you to extract tables from a PDF into a DataFrame, or a JSON. It can also extract tables from a PDF and save the file as a CSV, a TSV, or a JSON.  
 
@@ -59,8 +57,7 @@ tabula.convert_into_by_batch("input_directory", output_format='csv', pages='all'
 
 See [example notebook](https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb) for more details. I also recommend to read [the tutorial article](https://aegis4048.github.io/parse-pdf-files-while-retaining-structure-with-tabula-py) written by [@aegis4048](https://github.com/aegis4048).
 
-
-## Contributing
+### Contributing
 
 Interested in helping out? I'd love to have your help!
 
@@ -71,8 +68,7 @@ You can help by:
 - Contributing code via a Pull Request. See also [for the contribution](docs/contributing.rst)
 - Write a blog post or spreading the word about `tabula-py` to people who might be able to benefit from using it.
 
-
-### Contributors
+#### Contributors
 
 - [@lahoffm](https://github.com/lahoffm)
 - [@jakekara](https://github.com/jakekara)
@@ -94,6 +90,6 @@ You can help by:
 - [@manohar-voggu](https://github.com/manohar-voggu)
 - [@deveshSingh06](https://github.com/deveshSingh06)
 
-### Another support
+#### Another support
 
-You can also support our continued work on `tabula-py` with a donation [on Patreon](https://www.patreon.com/chezou).
+You can also support our continued work on `tabula-py` with a donation on GitHub Sponsors or [Patreon](https://www.patreon.com/chezou).
