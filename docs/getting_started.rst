@@ -11,7 +11,7 @@ Requirements
 
 * Python
 
-  * 3.6+
+  * 3.7+
 
 
 Installation
