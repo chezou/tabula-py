@@ -42,23 +42,14 @@ def environment_info():
     from tabula import __version__
 
     print(
-        """Python version:
-    {}
+        f"""Python version:
+    {sys.version}
 Java version:
-    {}
-tabula-py version: {}
-platform: {}
+    {java_version().strip()}
+tabula-py version: {__version__}
+platform: {platform.platform()}
 uname:
-    {}
-linux_distribution: {}
-mac_ver: {}
-    """.format(
-            sys.version,
-            java_version().strip(),
-            __version__,
-            platform.platform(),
-            str(platform.uname()),
-            distro.linux_distribution(),
-            platform.mac_ver(),
-        )
+    {str(platform.uname())}
+linux_distribution: ('{distro.name()}', '{distro.version()}', '{distro.codename()}')
+mac_ver: {platform.mac_ver()}"""
     )

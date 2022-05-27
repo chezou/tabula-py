@@ -265,6 +265,15 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertEqual(len(dfs), 4)
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
+    def test_read_pdf_with_binary_template(self):
+        template_path = "tests/resources/data.tabula-template.json"
+
+        with open(self.pdf_path, "rb") as pdf:
+            with open(template_path, "rb") as template:
+                dfs = tabula.read_pdf_with_template(pdf, template)
+        self.assertEqual(len(dfs), 4)
+        self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
+
     @patch("subprocess.run")
     @patch("tabula.io._jar_path")
     def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
