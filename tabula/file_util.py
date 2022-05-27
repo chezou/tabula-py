@@ -62,6 +62,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
 
     elif is_file_like(path_or_buffer):
         filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
+        path_or_buffer.seek(0)
 
         with open(filename, "wb") as f:
             shutil.copyfileobj(path_or_buffer, f)
