@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid
 from tempfile import gettempdir
+from typing import IO, Optional, Tuple, cast
 from urllib.parse import (
     quote,
     unquote,
@@ -12,12 +13,16 @@ from urllib.parse import (
 )
 from urllib.request import Request, urlopen
 
+from .util import FileLikeObj
+
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard("")
 MAX_FILE_SIZE = 200
 
 
-def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
+def localize_file(
+    path_or_buffer: FileLikeObj, user_agent: Optional[str] = None, suffix: str = ".pdf"
+) -> Tuple[str, bool]:
     """Ensure localize target file.
 
     If the target file is remote, this function fetches into local storage.
@@ -62,6 +67,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
 
     elif is_file_like(path_or_buffer):
         filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
+        path_or_buffer = cast(IO, path_or_buffer)
         path_or_buffer.seek(0)
 
         with open(filename, "wb") as f:
@@ -74,7 +80,7 @@ def localize_file(path_or_buffer, user_agent=None, suffix=".pdf"):
         return os.path.expanduser(path_or_buffer), False
 
 
-def _is_url(url):
+def _is_url(url: str) -> bool:
     try:
         return urlparse(url).scheme in _VALID_URLS
 
@@ -82,12 +88,12 @@ def _is_url(url):
         return False
 
 
-def _create_request(path_or_buffer, user_agent):
+def _create_request(path_or_buffer: str, user_agent: str) -> Request:
     req_headers = {"User-Agent": user_agent}
     return Request(path_or_buffer, headers=req_headers)
 
 
-def is_file_like(obj):
+def is_file_like(obj: FileLikeObj) -> bool:
     """Check file like object
 
     Args:
@@ -107,7 +113,7 @@ def is_file_like(obj):
     return True
 
 
-def _stringify_path(path_or_buffer):
+def _stringify_path(path_or_buffer: FileLikeObj) -> str:
     """Convert path like object to string
 
     Args:
@@ -125,9 +131,11 @@ def _stringify_path(path_or_buffer):
         _PATHLIB_INSTALLED = False
 
     if hasattr(path_or_buffer, "__fspath__"):
+        path_or_buffer = cast(os.PathLike, path_or_buffer)
         return path_or_buffer.__fspath__()
 
     if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):
         return str(path_or_buffer)
 
+    path_or_buffer = cast(str, path_or_buffer)
     return path_or_buffer
