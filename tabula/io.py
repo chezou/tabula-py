@@ -26,6 +26,7 @@ import shlex
 import subprocess
 from collections import defaultdict
 from logging import getLogger
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -33,6 +34,7 @@ import pandas as pd
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
+from .util import FileLikeObj
 
 logger = getLogger(__name__)
 
@@ -47,11 +49,16 @@ JAVA_NOT_FOUND_ERROR = (
 DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
 
 
-def _jar_path():
+def _jar_path() -> str:
     return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
 
 
-def _run(java_options, options, path=None, encoding="utf-8"):
+def _run(
+    java_options: List[str],
+    options: Dict[str, Any],
+    path: Optional[str] = None,
+    encoding: str = "utf-8",
+) -> bytes:
     """Call tabula-java with the given lists of Java options and tabula-py
     options, as well as an optional path to pass to tabula-java as a regular
     argument and an optional encoding to use for any required output sent to
@@ -95,15 +102,15 @@ def _run(java_options, options, path=None, encoding="utf-8"):
 
 
 def read_pdf(
-    input_path,
-    output_format=None,
-    encoding="utf-8",
-    java_options=None,
-    pandas_options=None,
-    multiple_tables=True,
-    user_agent=None,
-    **kwargs
-):
+    input_path: FileLikeObj,
+    output_format: Optional[str] = None,
+    encoding: str = "utf-8",
+    java_options: Optional[List[str]] = None,
+    pandas_options: Optional[Dict[str, Any]] = None,
+    multiple_tables: bool = True,
+    user_agent: Optional[str] = None,
+    **kwargs: str,
+) -> Union[List[pd.DataFrame], Dict[str, Any]]:
     """Read tables in PDF.
 
     Args:
@@ -333,7 +340,7 @@ def read_pdf(
 
     fmt = kwargs.get("format")
     if fmt == "JSON":
-        raw_json = json.loads(output.decode(encoding))
+        raw_json: List[Any] = json.loads(output.decode(encoding))
         if multiple_tables:
             return _extract_from(raw_json, pandas_options)
         else:
@@ -355,14 +362,14 @@ def read_pdf(
 
 
 def read_pdf_with_template(
-    input_path,
-    template_path,
-    pandas_options=None,
-    encoding="utf-8",
-    java_options=None,
-    user_agent=None,
-    **kwargs
-):
+    input_path: FileLikeObj,
+    template_path: FileLikeObj,
+    pandas_options: Optional[Dict[str, Any]] = None,
+    encoding: str = "utf-8",
+    java_options: Optional[List[str]] = None,
+    user_agent: Optional[str] = None,
+    **kwargs: str,
+) -> List[pd.DataFrame]:
     """Read tables in PDF with a Tabula App template.
 
     Args:
@@ -489,7 +496,7 @@ def read_pdf_with_template(
                 pandas_options=pandas_options,
                 encoding=encoding,
                 java_options=java_options,
-                **dict(kwargs, **option)
+                **dict(kwargs, **option),
             )
 
             if isinstance(_df, list):
@@ -504,8 +511,12 @@ def read_pdf_with_template(
 
 
 def convert_into(
-    input_path, output_path, output_format="csv", java_options=None, **kwargs
-):
+    input_path: FileLikeObj,
+    output_path: str,
+    output_format: str = "csv",
+    java_options: Optional[List[str]] = None,
+    **kwargs: str,
+) -> None:
     """Convert tables from PDF into a file.
     Output file will be saved into `output_path`.
 
@@ -565,7 +576,12 @@ def convert_into(
             os.unlink(path)
 
 
-def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **kwargs):
+def convert_into_by_batch(
+    input_dir: str,
+    output_format: str = "csv",
+    java_options: Optional[List[str]] = None,
+    **kwargs: str,
+) -> None:
     """Convert tables from PDFs in a directory.
 
     Args:
@@ -606,7 +622,7 @@ def convert_into_by_batch(input_dir, output_format="csv", java_options=None, **k
     _run(java_options, kwargs)
 
 
-def _build_java_options(_java_options=None):
+def _build_java_options(_java_options: Optional[List[str]] = None) -> List[str]:
     if _java_options is None:
         _java_options = []
     elif isinstance(_java_options, str):
@@ -615,13 +631,13 @@ def _build_java_options(_java_options=None):
     # to prevent tabula-py from stealing focus on every call on mac
     if platform.system() == "Darwin":
         r = "java.awt.headless"
-        if not any(filter(r.find, _java_options)):
+        if not any(filter(r.find, _java_options)):  # type: ignore
             _java_options = _java_options + ["-Djava.awt.headless=true"]
 
     return _java_options
 
 
-def _extract_format_for_conversion(output_format="csv"):
+def _extract_format_for_conversion(output_format: str = "csv") -> str:
     if output_format.lower() == "csv":
         return "CSV"
     elif output_format.lower() == "json":
@@ -632,7 +648,9 @@ def _extract_format_for_conversion(output_format="csv"):
         raise ValueError("Unknown 'output_format': '{}'".format(output_format))
 
 
-def _extract_from(raw_json, pandas_options=None):
+def _extract_from(
+    raw_json: List[Any], pandas_options: Optional[Dict[str, Any]] = None
+) -> List[pd.DataFrame]:
     """Extract tables from json.
 
     Args:
@@ -667,7 +685,7 @@ def _extract_from(raw_json, pandas_options=None):
                     _columns[idx] = "Unnamed: {}".format(_unname_idx)
                     _unname_idx += 1
 
-            counts = defaultdict(int)
+            counts: Dict[str, int] = defaultdict(int)
 
             # Avoid duplicate column name adding ".\d" as a suffix
             for idx, col in enumerate(_columns):
@@ -691,7 +709,9 @@ def _extract_from(raw_json, pandas_options=None):
     return data_frames
 
 
-def _convert_pandas_csv_options(pandas_options, columns):
+def _convert_pandas_csv_options(
+    pandas_options: Dict[str, Any], columns: List[str]
+) -> Tuple[str, Optional[int]]:
     """Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
     Args:
@@ -714,20 +734,20 @@ def _convert_pandas_csv_options(pandas_options, columns):
 
 
 def build_options(
-    pages=None,
-    guess=True,
-    area=None,
-    relative_area=False,
-    lattice=False,
-    stream=False,
-    password=None,
-    silent=None,
-    columns=None,
-    format=None,
-    batch=None,
-    output_path=None,
-    options="",
-):
+    pages: Optional[Union[str, int, List[int]]] = None,
+    guess: bool = True,
+    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
+    relative_area: bool = False,
+    lattice: bool = False,
+    stream: bool = False,
+    password: Optional[str] = None,
+    silent: Optional[bool] = None,
+    columns: Optional[List[float]] = None,
+    format: Optional[str] = None,
+    batch: Optional[str] = None,
+    output_path: Optional[str] = None,
+    options: str = "",
+) -> List[str]:
     """Build options for tabula-java
 
     Args:
@@ -807,6 +827,7 @@ def build_options(
         elif type(pages) in [list, tuple]:
             __pages = ",".join(map(str, pages))
 
+        __pages = cast(str, __pages)
         __options += ["--pages", __pages]
     else:
         logger.warning(
@@ -818,23 +839,18 @@ def build_options(
 
     if area:
         guess = False
-        __area = area
         if type(area) in [list, tuple]:
             # Check if nested list or tuple for multiple areas
             if any(type(e) in [list, tuple] for e in area):
                 for e in area:
-                    __area = "{percent}{area_str}".format(
-                        percent="%" if relative_area else "",
-                        area_str=",".join(map(str, e)),
-                    )
+                    e = cast(Iterable[float], e)
+                    __area = _format_area(e, relative_area)
                     __options += ["--area", __area]
                     multiple_areas = True
 
             else:
-                __area = "{percent}{area_str}".format(
-                    percent="%" if relative_area else "",
-                    area_str=",".join(map(str, area)),
-                )
+                area = cast(Iterable[float], area)
+                __area = _format_area(area, relative_area)
                 __options += ["--area", __area]
 
     if lattice:
@@ -866,3 +882,10 @@ def build_options(
         __options.append("--silent")
 
     return __options
+
+
+def _format_area(area: Iterable[float], relative_area: bool) -> str:
+    percent = "%" if relative_area else ""
+    area_str = ",".join(map(str, area))
+
+    return f"{percent}{area_str}"

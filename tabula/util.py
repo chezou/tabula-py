@@ -2,10 +2,14 @@
 Utility module providing some convenient functions.
 """
 
+import os
 import platform
+from typing import IO, Union
+
+FileLikeObj = Union[IO, str, os.PathLike]
 
 
-def java_version():
+def java_version() -> str:
     """Show Java version
 
     Returns:
@@ -14,8 +18,9 @@ def java_version():
     import subprocess
 
     try:
-        res = subprocess.check_output(["java", "-version"], stderr=subprocess.STDOUT)
-        res = res.decode()
+        res = subprocess.check_output(
+            ["java", "-version"], stderr=subprocess.STDOUT
+        ).decode()
 
     except FileNotFoundError:
         res = (
@@ -26,7 +31,7 @@ def java_version():
     return res
 
 
-def environment_info():
+def environment_info() -> None:
     """Show environment information for reporting.
 
     Returns:

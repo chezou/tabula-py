@@ -9,7 +9,7 @@ import unittest
 import uuid
 from unittest.mock import patch
 
-import pandas as pd
+import pandas as pd  # type: ignore
 
 import tabula
 
