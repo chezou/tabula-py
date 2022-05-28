@@ -131,7 +131,7 @@ def _stringify_path(path_or_buffer: FileLikeObj) -> str:
         _PATHLIB_INSTALLED = False
 
     if hasattr(path_or_buffer, "__fspath__"):
-        path_or_buffer = cast(os.PathLike[str], path_or_buffer)
+        path_or_buffer = cast(os.PathLike, path_or_buffer)
         return path_or_buffer.__fspath__()
 
     if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):
