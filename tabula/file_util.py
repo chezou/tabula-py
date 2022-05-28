@@ -2,7 +2,7 @@ import os
 import shutil
 import uuid
 from tempfile import gettempdir
-from typing import IO, Optional, Tuple, cast
+from typing import BinaryIO, Optional, Tuple, cast
 from urllib.parse import (
     quote,
     unquote,
@@ -67,7 +67,7 @@ def localize_file(
 
     elif is_file_like(path_or_buffer):
         filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
-        path_or_buffer = cast(IO, path_or_buffer)
+        path_or_buffer = cast(BinaryIO, path_or_buffer)
         path_or_buffer.seek(0)
 
         with open(filename, "wb") as f:
@@ -131,7 +131,7 @@ def _stringify_path(path_or_buffer: FileLikeObj) -> str:
         _PATHLIB_INSTALLED = False
 
     if hasattr(path_or_buffer, "__fspath__"):
-        path_or_buffer = cast(os.PathLike, path_or_buffer)
+        path_or_buffer = cast(os.PathLike[str], path_or_buffer)
         return path_or_buffer.__fspath__()
 
     if _PATHLIB_INSTALLED and isinstance(path_or_buffer, pathlib.Path):

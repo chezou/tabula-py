@@ -29,7 +29,7 @@ from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 import numpy as np
-import pandas as pd  # type: ignore
+import pandas as pd
 
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
