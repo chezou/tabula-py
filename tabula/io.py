@@ -109,6 +109,7 @@ def read_pdf(
     pandas_options: Optional[Dict[str, Any]] = None,
     multiple_tables: bool = True,
     user_agent: Optional[str] = None,
+    use_raw_url: bool = False,
     **kwargs: str,
 ) -> Union[List[pd.DataFrame], Dict[str, Any]]:
     """Read tables in PDF.
@@ -119,6 +120,7 @@ def read_pdf(
             It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
             Output format for returned object (``dataframe`` or ``json``)
+            Giving this option enforces to ignore `multiple_tables` option.
         encoding (str, optional):
             Encoding type for pandas. Default: ``utf-8``
         java_options (list, optional):
@@ -146,6 +148,9 @@ def read_pdf(
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
+        use_raw_url (bool):
+            It enforces to use `input_path` string for url without quoting/dequoting.
+            Default: False
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -315,7 +320,7 @@ def read_pdf(
         if not any("file.encoding" in opt for opt in java_options):
             java_options += ["-Dfile.encoding=UTF8"]
 
-    path, temporary = localize_file(input_path, user_agent)
+    path, temporary = localize_file(input_path, user_agent, use_raw_url=use_raw_url)
 
     if not os.path.exists(path):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
@@ -368,6 +373,7 @@ def read_pdf_with_template(
     encoding: str = "utf-8",
     java_options: Optional[List[str]] = None,
     user_agent: Optional[str] = None,
+    use_raw_url: bool = False,
     **kwargs: str,
 ) -> List[pd.DataFrame]:
     """Read tables in PDF with a Tabula App template.
@@ -388,6 +394,9 @@ def read_pdf_with_template(
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
+        use_raw_url (bool):
+            It enforces to use `input_path` string for url without quoting/dequoting.
+            Default: False
         kwargs:
             Dictionary of option for tabula-java. Details are shown in
             :func:`build_options()`
@@ -484,7 +493,7 @@ def read_pdf_with_template(
     """  # noqa
 
     path, temporary = localize_file(
-        template_path, user_agent=user_agent, suffix=".json"
+        template_path, user_agent=user_agent, suffix=".json", use_raw_url=use_raw_url
     )
     options = load_template(path)
     dataframes = []

@@ -21,7 +21,10 @@ MAX_FILE_SIZE = 200
 
 
 def localize_file(
-    path_or_buffer: FileLikeObj, user_agent: Optional[str] = None, suffix: str = ".pdf"
+    path_or_buffer: FileLikeObj,
+    user_agent: Optional[str] = None,
+    suffix: str = ".pdf",
+    use_raw_url=False,
 ) -> Tuple[str, bool]:
     """Ensure localize target file.
 
@@ -35,6 +38,8 @@ def localize_file(
             it uses the default ``urllib.request`` user-agent.
         suffix (str, optional):
             File extension to check.
+        use_raw_url (bool):
+            Use `path_or_buffer` without quoting/dequoting.
 
     Returns:
         (str, bool):
@@ -46,7 +51,8 @@ def localize_file(
     safe_with_percent = "!#$%&'()*+,/:;=?@[]~"
 
     if _is_url(path_or_buffer):
-        path_or_buffer = quote(unquote(path_or_buffer), safe=safe_with_percent)
+        if not use_raw_url:
+            path_or_buffer = quote(unquote(path_or_buffer), safe=safe_with_percent)
         if user_agent:
             req = urlopen(_create_request(path_or_buffer, user_agent))
         else:
