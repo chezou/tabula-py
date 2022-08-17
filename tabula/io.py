@@ -110,7 +110,7 @@ def read_pdf(
     multiple_tables: bool = True,
     user_agent: Optional[str] = None,
     use_raw_url: bool = False,
-    **kwargs: str,
+    **kwargs,
 ) -> Union[List[pd.DataFrame], Dict[str, Any]]:
     """Read tables in PDF.
 
@@ -374,7 +374,7 @@ def read_pdf_with_template(
     java_options: Optional[List[str]] = None,
     user_agent: Optional[str] = None,
     use_raw_url: bool = False,
-    **kwargs: str,
+    **kwargs,
 ) -> List[pd.DataFrame]:
     """Read tables in PDF with a Tabula App template.
 
@@ -524,7 +524,7 @@ def convert_into(
     output_path: str,
     output_format: str = "csv",
     java_options: Optional[List[str]] = None,
-    **kwargs: str,
+    **kwargs,
 ) -> None:
     """Convert tables from PDF into a file.
     Output file will be saved into `output_path`.
@@ -589,7 +589,7 @@ def convert_into_by_batch(
     input_dir: str,
     output_format: str = "csv",
     java_options: Optional[List[str]] = None,
-    **kwargs: str,
+    **kwargs,
 ) -> None:
     """Convert tables from PDFs in a directory.
 
