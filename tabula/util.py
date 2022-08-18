@@ -2,9 +2,16 @@
 Utility module providing some convenient functions.
 """
 
+from __future__ import annotations
+
 import os
 import platform
-from typing import IO, Union
+import shlex
+from dataclasses import asdict, dataclass
+from logging import getLogger
+from typing import IO, Any, Dict, Iterable, List, Optional, Union, cast
+
+logger = getLogger(__name__)
 
 FileLikeObj = Union[IO, str, os.PathLike]
 
@@ -58,3 +65,188 @@ uname:
 linux_distribution: ('{distro.name()}', '{distro.version()}', '{distro.codename()}')
 mac_ver: {platform.mac_ver()}"""
     )
+
+
+@dataclass
+class TabulaOption:
+    """Build options for tabula-java
+
+    Args:
+        pages (str, int, `list` of `int`, optional):
+            An optional values specifying pages to extract from. It allows
+            `str`,`int`, `list` of :`int`. Default: `1`
+
+            Examples:
+                ``'1-2,3'``, ``'all'``, ``[1,2]``
+        guess (bool, optional):
+            Guess the portion of the page to analyze per page. Default `True`
+            If you use "area" option, this option becomes `False`.
+
+            Note:
+                As of tabula-java 1.0.3, guess option becomes independent from
+                lattice and stream option, you can use guess and lattice/stream option
+                at the same time.
+
+        area (list of float, list of list of float, optional):
+            Portion of the page to analyze(top,left,bottom,right).
+            Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
+
+            Examples:
+                ``[269.875,12.75,790.5,561]``,
+                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
+
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
+            input will be taken as % of actual height or width of the page.
+            Default ``False``.
+        lattice (bool, optional):
+            Force PDF to be extracted using lattice-mode extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        stream (bool, optional):
+            Force PDF to be extracted using stream-mode extraction
+            (if there are no ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        password (str, optional):
+            Password to decrypt document. Default: empty
+        silent (bool, optional):
+            Suppress all stderr output.
+        columns (list, optional):
+            X coordinates of column boundaries.
+
+            Example:
+                ``[10.1, 20.2, 30.3]``
+        format (str, optional):
+            Format for output file or extracted object.
+            (``"CSV"``, ``"TSV"``, ``"JSON"``)
+        batch (str, optional):
+            Convert all PDF files in the provided directory. This argument should be
+            directory path.
+        output_path (str, optional):
+            Output file path. File format of it is depends on ``format``.
+            Same as ``--outfile`` option of tabula-java.
+        options (str, optional):
+            Raw option string for tabula-java.
+        multiple_tables (bool, optional):
+            Extract multiple tables into a dataframe. Default: True
+    """
+
+    pages: Optional[Union[str, int, List[int]]] = None
+    guess: bool = True
+    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None
+    relative_area: bool = False
+    lattice: bool = False
+    stream: bool = False
+    password: Optional[str] = None
+    silent: Optional[bool] = None
+    columns: Optional[List[float]] = None
+    format: Optional[str] = None
+    batch: Optional[str] = None
+    output_path: Optional[str] = None
+    options: Optional[str] = ""
+    multiple_tables: bool = True
+
+    def merge(self, other: TabulaOption) -> TabulaOption:
+        """Merge two TabulaOption.
+        self will overwrite other fields' values.
+        """
+        return TabulaOption(
+            pages=self.pages or other.pages,
+            guess=self.guess or other.guess,
+            area=self.area or other.area,
+            relative_area=self.relative_area or other.relative_area,
+            lattice=self.lattice or other.lattice,
+            stream=self.stream or other.stream,
+            password=self.password or other.password,
+            silent=self.silent or other.silent,
+            columns=self.columns or other.columns,
+            format=self.format or other.format,
+            batch=self.batch or other.batch,
+            output_path=self.output_path or other.output_path,
+            options=self.options or other.options,
+            multiple_tables=self.multiple_tables or other.multiple_tables,
+        )
+
+    def to_list(self) -> List[str]:
+        """Convert to list"""
+        __options = []
+        # handle options described in string for backward compatibility
+        if self.options:
+            __options += shlex.split(self.options)
+
+        if self.pages:
+            __pages = self.pages
+            if isinstance(self.pages, int):
+                __pages = str(self.pages)
+            elif type(self.pages) in [list, tuple]:
+                __pages = ",".join(map(str, self.pages))
+
+            __pages = cast(str, __pages)
+            __options += ["--pages", __pages]
+        else:
+            logger.warning(
+                "'pages' argument isn't specified."
+                "Will extract only from page 1 by default."
+            )
+
+        multiple_areas = False
+
+        if self.area:
+            self.guess = False
+            if type(self.area) in [list, tuple]:
+                # Check if nested list or tuple for multiple areas
+                if any(type(e) in [list, tuple] for e in self.area):
+                    for e in self.area:
+                        e = cast(Iterable[float], e)
+                        __area = _format_area(e, self.relative_area)
+                        __options += ["--area", __area]
+                        multiple_areas = True
+
+                else:
+                    area = cast(Iterable[float], self.area)
+                    __area = _format_area(area, self.relative_area)
+                    __options += ["--area", __area]
+
+        if self.lattice:
+            __options.append("--lattice")
+
+        if self.stream:
+            __options.append("--stream")
+
+        if self.guess and not multiple_areas:
+            __options.append("--guess")
+
+        if self.format:
+            __options += ["--format", self.format]
+
+        if self.output_path:
+            __options += ["--outfile", self.output_path]
+
+        if self.columns:
+            __columns = ",".join(map(str, self.columns))
+            __options += ["--columns", __columns]
+
+        if self.password:
+            __options += ["--password", self.password]
+
+        if self.batch:
+            __options += ["--batch", self.batch]
+
+        if self.silent:
+            __options.append("--silent")
+
+        return __options
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+def _format_area(area: Iterable[float], relative_area: bool) -> str:
+    percent = "%" if relative_area else ""
+    area_str = ",".join(map(str, area))
+
+    return f"{percent}{area_str}"
