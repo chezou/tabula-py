@@ -25,6 +25,7 @@ import platform
 import shlex
 import subprocess
 from collections import defaultdict
+from dataclasses import asdict
 from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
@@ -78,7 +79,7 @@ def _run(
             )
         )
 
-    args = ["java"] + java_options + ["-jar", _jar_path()] + options.to_list()
+    args = ["java"] + java_options + ["-jar", _jar_path()] + options.build_option_list()
     if path:
         args.append(path)
 
@@ -674,7 +675,7 @@ def read_pdf_with_template(
                 pandas_options=pandas_options,
                 encoding=encoding,
                 java_options=java_options,
-                **_force_option.merge(option).to_dict(),
+                **asdict(_force_option.merge(option)),
             )
 
             if isinstance(_df, list):
