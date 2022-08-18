@@ -7,9 +7,9 @@ from __future__ import annotations
 import os
 import platform
 import shlex
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from logging import getLogger
-from typing import IO, Any, Dict, Iterable, List, Optional, Union, cast
+from typing import IO, Iterable, List, Optional, Union, cast
 
 logger = getLogger(__name__)
 
@@ -171,8 +171,8 @@ class TabulaOption:
             multiple_tables=self.multiple_tables or other.multiple_tables,
         )
 
-    def to_list(self) -> List[str]:
-        """Convert to list"""
+    def build_option_list(self) -> List[str]:
+        """Convert to tabula-java option list"""
         __options = []
         # handle options described in string for backward compatibility
         if self.options:
@@ -240,9 +240,6 @@ class TabulaOption:
             __options.append("--silent")
 
         return __options
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
 
 
 def _format_area(area: Iterable[float], relative_area: bool) -> str:
