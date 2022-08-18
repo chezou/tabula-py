@@ -1,6 +1,6 @@
 # tabula-py
 
-[![Build Status](https://travis-ci.org/chezou/tabula-py.svg?branch=master)](https://travis-ci.org/chezou/tabula-py)
+[![Build Status](https://github.com/chezou/tabula-py/actions/workflows/pythontest.yml/badge.svg)](https://github.com/chezou/tabula-py/actions/workflows/pythontest.yml)
 [![PyPI version](https://badge.fury.io/py/tabula-py.svg)](https://badge.fury.io/py/tabula-py)
 [![Documentation Status](https://readthedocs.org/projects/tabula-py/badge/?version=latest)](https://tabula-py.readthedocs.io/en/latest/?badge=latest)
 [![Patreon](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/chezou)
