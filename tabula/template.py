@@ -1,11 +1,11 @@
 import json
-from typing import Any, Dict, List, TextIO, Union, cast
+from typing import Dict, Iterable, List, TextIO, Union, cast
 
 from .file_util import _stringify_path, is_file_like
-from .util import FileLikeObj
+from .util import FileLikeObj, TabulaOption
 
 
-def load_template(path_or_buffer: FileLikeObj) -> List[Dict[str, Any]]:
+def load_template(path_or_buffer: FileLikeObj) -> List[TabulaOption]:
     """Build tabula-py option from template file
 
     Args:
@@ -40,9 +40,9 @@ def load_template(path_or_buffer: FileLikeObj) -> List[Dict[str, Any]]:
             continue
 
         option = tmp_options[0]
-        areas = [e.get("area") for e in tmp_options]
-        option["area"] = areas
-        option["multiple_tables"] = True
+        _areas = [cast(Iterable[float], e.area) for e in tmp_options]
+        option.area = _areas
+        option.multiple_tables = True
         options.append(option)
 
     return options
@@ -50,7 +50,7 @@ def load_template(path_or_buffer: FileLikeObj) -> List[Dict[str, Any]]:
 
 def _convert_template_option(
     template: Dict[str, Union[bool, float, int, str]]
-) -> Dict[str, Any]:
+) -> TabulaOption:
     """Convert Tabula app template to tabula-py option
 
     Args:
@@ -60,21 +60,26 @@ def _convert_template_option(
         `obj`:dict: tabula-py option
     """
 
-    option: Dict[str, Union[bool, str, int, List[float]]] = {}
     extraction_method = template.get("extraction_method")
+    guess = False
+    lattice = False
+    stream = False
     if extraction_method == "guess":
-        option["guess"] = True
+        guess = True
     elif extraction_method == "lattice":
-        option["lattice"] = True
+        lattice = True
     elif extraction_method == "stream":
-        option["stream"] = True
+        stream = True
 
-    option["pages"] = cast(int, template.get("page"))
-    option["area"] = [
+    pages = cast(int, template.get("page"))
+    area = [
         round(cast(float, template["y1"]), 3),
         round(cast(float, template["x1"]), 3),
         round(cast(float, template["y2"]), 3),
         round(cast(float, template["x2"]), 3),
     ]
+    option = TabulaOption(
+        guess=guess, lattice=lattice, stream=stream, pages=pages, area=area
+    )
 
     return option

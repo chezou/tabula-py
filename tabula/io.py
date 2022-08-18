@@ -26,7 +26,7 @@ import shlex
 import subprocess
 from collections import defaultdict
 from logging import getLogger
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ import pandas as pd
 from .errors import CSVParseError, JavaNotFoundError
 from .file_util import localize_file
 from .template import load_template
-from .util import FileLikeObj
+from .util import FileLikeObj, TabulaOption
 
 logger = getLogger(__name__)
 
@@ -55,7 +55,7 @@ def _jar_path() -> str:
 
 def _run(
     java_options: List[str],
-    options: Dict[str, Any],
+    options: TabulaOption,
     path: Optional[str] = None,
     encoding: str = "utf-8",
 ) -> bytes:
@@ -69,7 +69,7 @@ def _run(
     """
     # Workaround to enforce the silent option. See:
     # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
-    if options.get("silent"):
+    if options.silent:
         java_options.extend(
             (
                 "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
@@ -78,8 +78,7 @@ def _run(
             )
         )
 
-    built_options = build_options(**options)
-    args = ["java"] + java_options + ["-jar", _jar_path()] + built_options
+    args = ["java"] + java_options + ["-jar", _jar_path()] + options.to_list()
     if path:
         args.append(path)
 
@@ -110,13 +109,25 @@ def read_pdf(
     multiple_tables: bool = True,
     user_agent: Optional[str] = None,
     use_raw_url: bool = False,
-    **kwargs,
+    pages: Optional[Union[str, int, List[int]]] = None,
+    guess: bool = True,
+    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
+    relative_area: bool = False,
+    lattice: bool = False,
+    stream: bool = False,
+    password: Optional[str] = None,
+    silent: Optional[bool] = None,
+    columns: Optional[List[float]] = None,
+    format: Optional[str] = None,
+    batch: Optional[str] = None,
+    output_path: Optional[str] = None,
+    options: str = "",
 ) -> Union[List[pd.DataFrame], Dict[str, Any]]:
     """Read tables in PDF.
 
     Args:
         input_path (str, path object or file-like object):
-            File like object of tareget PDF file.
+            File like object of target PDF file.
             It can be URL, which is downloaded by tabula-py automatically.
         output_format (str, optional):
             Output format for returned object (``dataframe`` or ``json``)
@@ -151,9 +162,65 @@ def read_pdf(
         use_raw_url (bool):
             It enforces to use `input_path` string for url without quoting/dequoting.
             Default: False
-        kwargs:
-            Dictionary of option for tabula-java. Details are shown in
-            :func:`build_options()`
+        pages (str, int, `list` of `int`, optional):
+            An optional values specifying pages to extract from. It allows
+            `str`,`int`, `list` of :`int`. Default: `1`
+
+            Examples:
+                ``'1-2,3'``, ``'all'``, ``[1,2]``
+        guess (bool, optional):
+            Guess the portion of the page to analyze per page. Default `True`
+            If you use "area" option, this option becomes `False`.
+
+            Note:
+                As of tabula-java 1.0.3, guess option becomes independent from
+                lattice and stream option, you can use guess and lattice/stream option
+                at the same time.
+
+        area (list of float, list of list of float, optional):
+            Portion of the page to analyze(top,left,bottom,right).
+            Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
+
+            Examples:
+                ``[269.875,12.75,790.5,561]``,
+                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
+
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
+            input will be taken as % of actual height or width of the page.
+            Default ``False``.
+        lattice (bool, optional):
+            Force PDF to be extracted using lattice-mode extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        stream (bool, optional):
+            Force PDF to be extracted using stream-mode extraction
+            (if there are no ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        password (str, optional):
+            Password to decrypt document. Default: empty
+        silent (bool, optional):
+            Suppress all stderr output.
+        columns (list, optional):
+            X coordinates of column boundaries.
+
+            Example:
+                ``[10.1, 20.2, 30.3]``
+        format (str, optional):
+            Format for output file or extracted object.
+            (``"CSV"``, ``"TSV"``, ``"JSON"``)
+        batch (str, optional):
+            Convert all PDF files in the provided directory. This argument should be
+            directory path.
+        output_path (str, optional):
+            Output file path. File format of it is depends on ``format``.
+            Same as ``--outfile`` option of tabula-java.
+        options (str, optional):
+            Raw option string for tabula-java.
 
     Returns:
         list of DataFrames or dict.
@@ -292,19 +359,37 @@ def read_pdf(
         14    VC]
     """  # noqa
 
+    format = None
     if output_format:
         # Respects explicit output_format
         multiple_tables = False
 
         if output_format.lower() == "dataframe":
-            kwargs.pop("format", None)
+            pass
         elif output_format.lower() == "json":
-            kwargs["format"] = "JSON"
+            format = "JSON"
         else:
             raise ValueError("Unknown output_format {}".format(output_format))
 
     if multiple_tables:
-        kwargs["format"] = "JSON"
+        format = "JSON"
+
+    tabula_options = TabulaOption(
+        pages=pages,
+        guess=guess,
+        area=area,
+        relative_area=relative_area,
+        lattice=lattice,
+        stream=stream,
+        password=password,
+        silent=silent,
+        columns=columns,
+        format=format,
+        batch=batch,
+        output_path=output_path,
+        options=options,
+        multiple_tables=multiple_tables,
+    )
 
     if java_options is None:
         java_options = []
@@ -331,7 +416,7 @@ def read_pdf(
         )
 
     try:
-        output = _run(java_options, kwargs, path, encoding)
+        output = _run(java_options, tabula_options, path, encoding)
     finally:
         if temporary:
             os.unlink(path)
@@ -343,7 +428,7 @@ def read_pdf(
     if pandas_options is None:
         pandas_options = {}
 
-    fmt = kwargs.get("format")
+    fmt = tabula_options.format
     if fmt == "JSON":
         raw_json: List[Any] = json.loads(output.decode(encoding))
         if multiple_tables:
@@ -374,7 +459,19 @@ def read_pdf_with_template(
     java_options: Optional[List[str]] = None,
     user_agent: Optional[str] = None,
     use_raw_url: bool = False,
-    **kwargs,
+    pages: Optional[Union[str, int, List[int]]] = None,
+    guess: bool = False,
+    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
+    relative_area: bool = False,
+    lattice: bool = False,
+    stream: bool = False,
+    password: Optional[str] = None,
+    silent: Optional[bool] = None,
+    columns: Optional[List[float]] = None,
+    format: Optional[str] = None,
+    batch: Optional[str] = None,
+    output_path: Optional[str] = None,
+    options: Optional[str] = None,
 ) -> List[pd.DataFrame]:
     """Read tables in PDF with a Tabula App template.
 
@@ -397,9 +494,65 @@ def read_pdf_with_template(
         use_raw_url (bool):
             It enforces to use `input_path` string for url without quoting/dequoting.
             Default: False
-        kwargs:
-            Dictionary of option for tabula-java. Details are shown in
-            :func:`build_options()`
+        pages (str, int, `list` of `int`, optional):
+            An optional values specifying pages to extract from. It allows
+            `str`,`int`, `list` of :`int`. Default: `1`
+
+            Examples:
+                ``'1-2,3'``, ``'all'``, ``[1,2]``
+        guess (bool, optional):
+            Guess the portion of the page to analyze per page. Default `True`
+            If you use "area" option, this option becomes `False`.
+
+            Note:
+                As of tabula-java 1.0.3, guess option becomes independent from
+                lattice and stream option, you can use guess and lattice/stream option
+                at the same time.
+
+        area (list of float, list of list of float, optional):
+            Portion of the page to analyze(top,left,bottom,right).
+            Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
+
+            Examples:
+                ``[269.875,12.75,790.5,561]``,
+                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
+
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
+            input will be taken as % of actual height or width of the page.
+            Default ``False``.
+        lattice (bool, optional):
+            Force PDF to be extracted using lattice-mode extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        stream (bool, optional):
+            Force PDF to be extracted using stream-mode extraction
+            (if there are no ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        password (str, optional):
+            Password to decrypt document. Default: empty
+        silent (bool, optional):
+            Suppress all stderr output.
+        columns (list, optional):
+            X coordinates of column boundaries.
+
+            Example:
+                ``[10.1, 20.2, 30.3]``
+        format (str, optional):
+            Format for output file or extracted object.
+            (``"CSV"``, ``"TSV"``, ``"JSON"``)
+        batch (str, optional):
+            Convert all PDF files in the provided directory. This argument should be
+            directory path.
+        output_path (str, optional):
+            Output file path. File format of it is depends on ``format``.
+            Same as ``--outfile`` option of tabula-java.
+        options (str, optional):
+            Raw option string for tabula-java.
 
     Returns:
         list of DataFrame.
@@ -495,17 +648,33 @@ def read_pdf_with_template(
     path, temporary = localize_file(
         template_path, user_agent=user_agent, suffix=".json", use_raw_url=use_raw_url
     )
-    options = load_template(path)
+    _options = load_template(path)
+    _force_option = TabulaOption(
+        pages=pages,
+        guess=guess,
+        area=area,
+        relative_area=relative_area,
+        lattice=lattice,
+        stream=stream,
+        password=password,
+        silent=silent,
+        columns=columns,
+        format=format,
+        batch=batch,
+        output_path=output_path,
+        options=options,
+    )
     dataframes = []
 
     try:
-        for option in options:
+        for option in _options:
+
             _df = read_pdf(
                 input_path,
                 pandas_options=pandas_options,
                 encoding=encoding,
                 java_options=java_options,
-                **dict(kwargs, **option),
+                **_force_option.merge(option).to_dict(),
             )
 
             if isinstance(_df, list):
@@ -524,14 +693,25 @@ def convert_into(
     output_path: str,
     output_format: str = "csv",
     java_options: Optional[List[str]] = None,
-    **kwargs,
+    pages: Optional[Union[str, int, List[int]]] = None,
+    guess: bool = True,
+    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
+    relative_area: bool = False,
+    lattice: bool = False,
+    stream: bool = False,
+    password: Optional[str] = None,
+    silent: Optional[bool] = None,
+    columns: Optional[List[float]] = None,
+    format: Optional[str] = None,
+    batch: Optional[str] = None,
+    options: str = "",
 ) -> None:
     """Convert tables from PDF into a file.
     Output file will be saved into `output_path`.
 
     Args:
         input_path (file like obj):
-            File like object of tareget PDF file.
+            File like object of target PDF file.
         output_path (str):
             File path of output file.
         output_format (str, optional):
@@ -542,9 +722,62 @@ def convert_into(
 
             Example:
                 ``"-Xmx256m"``.
-        kwargs:
-            Dictionary of option for tabula-java. Details are shown in
-            :func:`build_options()`
+        pages (str, int, `list` of `int`, optional):
+            An optional values specifying pages to extract from. It allows
+            `str`,`int`, `list` of :`int`. Default: `1`
+
+            Examples:
+                ``'1-2,3'``, ``'all'``, ``[1,2]``
+        guess (bool, optional):
+            Guess the portion of the page to analyze per page. Default `True`
+            If you use "area" option, this option becomes `False`.
+
+            Note:
+                As of tabula-java 1.0.3, guess option becomes independent from
+                lattice and stream option, you can use guess and lattice/stream option
+                at the same time.
+
+        area (list of float, list of list of float, optional):
+            Portion of the page to analyze(top,left,bottom,right).
+            Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
+
+            Examples:
+                ``[269.875,12.75,790.5,561]``,
+                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
+
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
+            input will be taken as % of actual height or width of the page.
+            Default ``False``.
+        lattice (bool, optional):
+            Force PDF to be extracted using lattice-mode extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        stream (bool, optional):
+            Force PDF to be extracted using stream-mode extraction
+            (if there are no ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        password (str, optional):
+            Password to decrypt document. Default: empty
+        silent (bool, optional):
+            Suppress all stderr output.
+        columns (list, optional):
+            X coordinates of column boundaries.
+
+            Example:
+                ``[10.1, 20.2, 30.3]``
+        format (str, optional):
+            Format for output file or extracted object.
+            (``"CSV"``, ``"TSV"``, ``"JSON"``)
+        batch (str, optional):
+            Convert all PDF files in the provided directory. This argument should be
+            directory path.
+        options (str, optional):
+            Raw option string for tabula-java.
 
     Raises:
         FileNotFoundError:
@@ -563,9 +796,23 @@ def convert_into(
     if output_path is None or len(output_path) == 0:
         raise ValueError("'output_path' shoud not be None or empty")
 
-    kwargs["output_path"] = output_path
-    kwargs["format"] = _extract_format_for_conversion(output_format)
+    format = _extract_format_for_conversion(output_format)
 
+    tabula_options = TabulaOption(
+        pages=pages,
+        guess=guess,
+        area=area,
+        relative_area=relative_area,
+        lattice=lattice,
+        stream=stream,
+        password=password,
+        silent=silent,
+        columns=columns,
+        format=format,
+        batch=batch,
+        output_path=output_path,
+        options=options,
+    )
     java_options = _build_java_options(java_options)
 
     path, temporary = localize_file(input_path)
@@ -579,7 +826,7 @@ def convert_into(
         )
 
     try:
-        _run(java_options, kwargs, path)
+        _run(java_options, tabula_options, path)
     finally:
         if temporary:
             os.unlink(path)
@@ -589,7 +836,18 @@ def convert_into_by_batch(
     input_dir: str,
     output_format: str = "csv",
     java_options: Optional[List[str]] = None,
-    **kwargs,
+    pages: Optional[Union[str, int, List[int]]] = None,
+    guess: bool = True,
+    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
+    relative_area: bool = False,
+    lattice: bool = False,
+    stream: bool = False,
+    password: Optional[str] = None,
+    silent: Optional[bool] = None,
+    columns: Optional[List[float]] = None,
+    format: Optional[str] = None,
+    output_path: Optional[str] = None,
+    options: str = "",
 ) -> None:
     """Convert tables from PDFs in a directory.
 
@@ -600,9 +858,59 @@ def convert_into_by_batch(
             Output format of this function (csv, json or tsv)
         java_options (list, optional):
             Set java options like `-Xmx256m`.
-        kwargs:
-            Dictionary of option for tabula-java. Details are shown in
-            :func:`build_options()`
+        pages (str, int, `list` of `int`, optional):
+            An optional values specifying pages to extract from. It allows
+            `str`,`int`, `list` of :`int`. Default: `1`
+
+            Examples:
+                ``'1-2,3'``, ``'all'``, ``[1,2]``
+        guess (bool, optional):
+            Guess the portion of the page to analyze per page. Default `True`
+            If you use "area" option, this option becomes `False`.
+
+            Note:
+                As of tabula-java 1.0.3, guess option becomes independent from
+                lattice and stream option, you can use guess and lattice/stream option
+                at the same time.
+
+        area (list of float, list of list of float, optional):
+            Portion of the page to analyze(top,left,bottom,right).
+            Default is entire page.
+
+            Note:
+                If you want to use multiple area options and extract in one table, it
+                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
+
+            Examples:
+                ``[269.875,12.75,790.5,561]``,
+                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
+
+        relative_area (bool, optional):
+            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
+            input will be taken as % of actual height or width of the page.
+            Default ``False``.
+        lattice (bool, optional):
+            Force PDF to be extracted using lattice-mode extraction
+            (if there are ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        stream (bool, optional):
+            Force PDF to be extracted using stream-mode extraction
+            (if there are no ruling lines separating each cell, as in a PDF of an
+            Excel spreadsheet)
+        password (str, optional):
+            Password to decrypt document. Default: empty
+        silent (bool, optional):
+            Suppress all stderr output.
+        columns (list, optional):
+            X coordinates of column boundaries.
+
+            Example:
+                ``[10.1, 20.2, 30.3]``
+        format (str, optional):
+            Format for output file or extracted object.
+            (``"CSV"``, ``"TSV"``, ``"JSON"``)
+        options (str, optional):
+            Raw option string for tabula-java.
 
     Returns:
         Nothing. Outputs are saved into the same directory with `input_dir`
@@ -621,14 +929,27 @@ def convert_into_by_batch(
     if input_dir is None or not os.path.isdir(input_dir):
         raise ValueError("'input_dir' should be an existing directory path")
 
-    kwargs["format"] = _extract_format_for_conversion(output_format)
+    format = _extract_format_for_conversion(output_format)
 
     java_options = _build_java_options(java_options)
 
-    # Option for batch
-    kwargs["batch"] = input_dir
+    tabula_options = TabulaOption(
+        pages=pages,
+        guess=guess,
+        area=area,
+        relative_area=relative_area,
+        lattice=lattice,
+        stream=stream,
+        password=password,
+        silent=silent,
+        columns=columns,
+        format=format,
+        batch=input_dir,
+        output_path=output_path,
+        options=options,
+    )
 
-    _run(java_options, kwargs)
+    _run(java_options, tabula_options)
 
 
 def _build_java_options(_java_options: Optional[List[str]] = None) -> List[str]:
@@ -740,161 +1061,3 @@ def _convert_pandas_csv_options(
         header_line_number = header
 
     return _columns, header_line_number
-
-
-def build_options(
-    pages: Optional[Union[str, int, List[int]]] = None,
-    guess: bool = True,
-    area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
-    relative_area: bool = False,
-    lattice: bool = False,
-    stream: bool = False,
-    password: Optional[str] = None,
-    silent: Optional[bool] = None,
-    columns: Optional[List[float]] = None,
-    format: Optional[str] = None,
-    batch: Optional[str] = None,
-    output_path: Optional[str] = None,
-    options: str = "",
-) -> List[str]:
-    """Build options for tabula-java
-
-    Args:
-        pages (str, int, `list` of `int`, optional):
-            An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`. Default: `1`
-
-            Examples:
-                ``'1-2,3'``, ``'all'``, ``[1,2]``
-        guess (bool, optional):
-            Guess the portion of the page to analyze per page. Default `True`
-            If you use "area" option, this option becomes `False`.
-
-            Note:
-                As of tabula-java 1.0.3, guess option becomes independent from
-                lattice and stream option, you can use guess and lattice/stream option
-                at the same time.
-
-        area (list of float, list of list of float, optional):
-            Portion of the page to analyze(top,left,bottom,right).
-            Default is entire page.
-
-            Note:
-                If you want to use multiple area options and extract in one table, it
-                should be better to set ``multiple_tables=False`` for :func:`read_pdf()`
-
-            Examples:
-                ``[269.875,12.75,790.5,561]``,
-                ``[[12.1,20.5,30.1,50.2], [1.0,3.2,10.5,40.2]]``
-
-        relative_area (bool, optional):
-            If all area values are between 0-100 (inclusive) and preceded by ``'%'``,
-            input will be taken as % of actual height or width of the page.
-            Default ``False``.
-        lattice (bool, optional):
-            Force PDF to be extracted using lattice-mode extraction
-            (if there are ruling lines separating each cell, as in a PDF of an
-            Excel spreadsheet)
-        stream (bool, optional):
-            Force PDF to be extracted using stream-mode extraction
-            (if there are no ruling lines separating each cell, as in a PDF of an
-            Excel spreadsheet)
-        password (str, optional):
-            Password to decrypt document. Default: empty
-        silent (bool, optional):
-            Suppress all stderr output.
-        columns (list, optional):
-            X coordinates of column boundaries.
-
-            Example:
-                ``[10.1, 20.2, 30.3]``
-        format (str, optional):
-            Format for output file or extracted object.
-            (``"CSV"``, ``"TSV"``, ``"JSON"``)
-        batch (str, optional):
-            Convert all PDF files in the provided directory. This argument should be
-            directory path.
-        output_path (str, optional):
-            Output file path. File format of it is depends on ``format``.
-            Same as ``--outfile`` option of tabula-java.
-        options (str, optional):
-            Raw option string for tabula-java.
-
-    Returns:
-        list:
-            Built list of options
-    """
-
-    __options = []
-    # handle options described in string for backward compatibility
-    __options += shlex.split(options)
-
-    if pages:
-        __pages = pages
-        if isinstance(pages, int):
-            __pages = str(pages)
-        elif type(pages) in [list, tuple]:
-            __pages = ",".join(map(str, pages))
-
-        __pages = cast(str, __pages)
-        __options += ["--pages", __pages]
-    else:
-        logger.warning(
-            "'pages' argument isn't specified."
-            "Will extract only from page 1 by default."
-        )
-
-    multiple_areas = False
-
-    if area:
-        guess = False
-        if type(area) in [list, tuple]:
-            # Check if nested list or tuple for multiple areas
-            if any(type(e) in [list, tuple] for e in area):
-                for e in area:
-                    e = cast(Iterable[float], e)
-                    __area = _format_area(e, relative_area)
-                    __options += ["--area", __area]
-                    multiple_areas = True
-
-            else:
-                area = cast(Iterable[float], area)
-                __area = _format_area(area, relative_area)
-                __options += ["--area", __area]
-
-    if lattice:
-        __options.append("--lattice")
-
-    if stream:
-        __options.append("--stream")
-
-    if guess and not multiple_areas:
-        __options.append("--guess")
-
-    if format:
-        __options += ["--format", format]
-
-    if output_path:
-        __options += ["--outfile", output_path]
-
-    if columns:
-        __columns = ",".join(map(str, columns))
-        __options += ["--columns", __columns]
-
-    if password:
-        __options += ["--password", password]
-
-    if batch:
-        __options += ["--batch", batch]
-
-    if silent:
-        __options.append("--silent")
-
-    return __options
-
-
-def _format_area(area: Iterable[float], relative_area: bool) -> str:
-    percent = "%" if relative_area else ""
-    area_str = ",".join(map(str, area))
-
-    return f"{percent}{area_str}"
