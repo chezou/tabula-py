@@ -23,6 +23,8 @@ If you've installed ``tabula``\ , it will be conflict the namespace. You should 
 I got a empty DataFrame. How can I resolve it?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+tabula-py and tabula-java don't support image based PDF. It should contain text based table information.
+
 Before tuning the tabula-py option, you have to check you set an appropriate `pages` option. By default, tabula-py extracts table from first page of your PDF, with `pages=1` argument.
 If you want to extract from all pages, you need to set pages option like `pages="all"` or `pages=[1, 2, 3]`.
 You might want to extract multiple tables from multiple pages, if so you need to set `multiple_tables=True` together.
