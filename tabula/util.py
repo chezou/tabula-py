@@ -208,12 +208,14 @@ class TabulaOption:
                 if any(type(e) in [list, tuple] for e in self.area):
                     for e in self.area:
                         e = cast(Iterable[float], e)
+                        _validate_area(e)
                         __area = _format_with_relative(e, self.relative_area)
                         __options += ["--area", __area]
                         multiple_areas = True
 
                 else:
                     area = cast(Iterable[float], self.area)
+                    _validate_area(area)
                     __area = _format_with_relative(area, self.relative_area)
                     __options += ["--area", __area]
 
@@ -233,6 +235,9 @@ class TabulaOption:
             __options += ["--outfile", self.output_path]
 
         if self.columns:
+            if self.columns != sorted(self.columns):
+                raise ValueError("columns option should be sorted")
+
             __columns = _format_with_relative(self.columns, self.relative_columns)
             __options += ["--columns", __columns]
 
@@ -253,3 +258,20 @@ def _format_with_relative(values: Iterable[float], is_relative: bool) -> str:
     value_str = ",".join(map(str, values))
 
     return f"{percent}{value_str}"
+
+
+def _validate_area(values: Iterable[float]) -> None:
+    value_length = len(list(values))
+    if value_length != 4:
+        raise ValueError(
+            f"area should have 4 values for each option but {values} has {value_length}"
+        )
+    top, left, bottom, right = values
+    if top >= bottom:
+        raise ValueError(
+            f"area option bottom={bottom} should be greater than top={top}"
+        )
+    if left >= right:
+        raise ValueError(
+            f"area option right={right} should be greater than left={left}"
+        )
