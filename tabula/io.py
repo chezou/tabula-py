@@ -119,6 +119,7 @@ def read_pdf(
     password: Optional[str] = None,
     silent: Optional[bool] = None,
     columns: Optional[List[float]] = None,
+    relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
     output_path: Optional[str] = None,
@@ -211,6 +212,10 @@ def read_pdf(
 
             Example:
                 ``[10.1, 20.2, 30.3]``
+        relative_columns (bool, optional):
+            If all values are between 0-100 (inclusive) and preceded by '%',
+            input will be taken as % of actual width of the page.
+            Default ``False``.
         format (str, optional):
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
@@ -385,6 +390,7 @@ def read_pdf(
         password=password,
         silent=silent,
         columns=columns,
+        relative_columns=relative_columns,
         format=format,
         batch=batch,
         output_path=output_path,
@@ -469,6 +475,7 @@ def read_pdf_with_template(
     password: Optional[str] = None,
     silent: Optional[bool] = None,
     columns: Optional[List[float]] = None,
+    relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
     output_path: Optional[str] = None,
@@ -543,6 +550,10 @@ def read_pdf_with_template(
 
             Example:
                 ``[10.1, 20.2, 30.3]``
+        relative_columns (bool, optional):
+            If all values are between 0-100 (inclusive) and preceded by '%',
+            input will be taken as % of actual width of the page.
+            Default ``False``.
         format (str, optional):
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
@@ -660,6 +671,7 @@ def read_pdf_with_template(
         password=password,
         silent=silent,
         columns=columns,
+        relative_columns=relative_columns,
         format=format,
         batch=batch,
         output_path=output_path,
@@ -703,6 +715,7 @@ def convert_into(
     password: Optional[str] = None,
     silent: Optional[bool] = None,
     columns: Optional[List[float]] = None,
+    relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
     options: str = "",
@@ -809,6 +822,7 @@ def convert_into(
         password=password,
         silent=silent,
         columns=columns,
+        relative_columns=relative_columns,
         format=format,
         batch=batch,
         output_path=output_path,
@@ -846,6 +860,7 @@ def convert_into_by_batch(
     password: Optional[str] = None,
     silent: Optional[bool] = None,
     columns: Optional[List[float]] = None,
+    relative_columns: bool = False,
     format: Optional[str] = None,
     output_path: Optional[str] = None,
     options: str = "",
@@ -907,6 +922,10 @@ def convert_into_by_batch(
 
             Example:
                 ``[10.1, 20.2, 30.3]``
+        relative_columns (bool, optional):
+            If all values are between 0-100 (inclusive) and preceded by '%',
+            input will be taken as % of actual width of the page.
+            Default ``False``.
         format (str, optional):
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
@@ -944,6 +963,7 @@ def convert_into_by_batch(
         password=password,
         silent=silent,
         columns=columns,
+        relative_columns=relative_columns,
         format=format,
         batch=input_dir,
         output_path=output_path,
