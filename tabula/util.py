@@ -120,6 +120,10 @@ class TabulaOption:
 
             Example:
                 ``[10.1, 20.2, 30.3]``
+        relative_columns (bool, optional):
+            If all values are between 0-100 (inclusive) and preceded by '%',
+            input will be taken as % of actual width of the page.
+            Default ``False``.
         format (str, optional):
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
@@ -144,6 +148,7 @@ class TabulaOption:
     password: Optional[str] = None
     silent: Optional[bool] = None
     columns: Optional[List[float]] = None
+    relative_columns: bool = False
     format: Optional[str] = None
     batch: Optional[str] = None
     output_path: Optional[str] = None
@@ -164,6 +169,7 @@ class TabulaOption:
             password=self.password or other.password,
             silent=self.silent or other.silent,
             columns=self.columns or other.columns,
+            relative_columns=self.relative_columns or other.relative_columns,
             format=self.format or other.format,
             batch=self.batch or other.batch,
             output_path=self.output_path or other.output_path,
@@ -202,13 +208,13 @@ class TabulaOption:
                 if any(type(e) in [list, tuple] for e in self.area):
                     for e in self.area:
                         e = cast(Iterable[float], e)
-                        __area = _format_area(e, self.relative_area)
+                        __area = _format_with_relative(e, self.relative_area)
                         __options += ["--area", __area]
                         multiple_areas = True
 
                 else:
                     area = cast(Iterable[float], self.area)
-                    __area = _format_area(area, self.relative_area)
+                    __area = _format_with_relative(area, self.relative_area)
                     __options += ["--area", __area]
 
         if self.lattice:
@@ -227,7 +233,7 @@ class TabulaOption:
             __options += ["--outfile", self.output_path]
 
         if self.columns:
-            __columns = ",".join(map(str, self.columns))
+            __columns = _format_with_relative(self.columns, self.relative_columns)
             __options += ["--columns", __columns]
 
         if self.password:
@@ -242,8 +248,8 @@ class TabulaOption:
         return __options
 
 
-def _format_area(area: Iterable[float], relative_area: bool) -> str:
-    percent = "%" if relative_area else ""
-    area_str = ",".join(map(str, area))
+def _format_with_relative(values: Iterable[float], is_relative: bool) -> str:
+    percent = "%" if is_relative else ""
+    value_str = ",".join(map(str, values))
 
-    return f"{percent}{area_str}"
+    return f"{percent}{value_str}"
