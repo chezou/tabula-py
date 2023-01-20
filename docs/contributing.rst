@@ -9,7 +9,7 @@ You can help by:
 * `Reporting a bug <https://github.com/chezou/tabula-py/issues>`_.
 * Adding or editing documentation.
 * Contributing code via a Pull Request.
-* Write a blog post or spreading the word about ``tabula-py`` to people who might be able to benefit from using it.
+* Write a blog post or spread the word about ``tabula-py`` to people who might be able to benefit from using it.
 
 
 Code formatting and testing
