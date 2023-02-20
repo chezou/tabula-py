@@ -72,9 +72,9 @@ class TabulaOption:
     """Build options for tabula-java
 
     Args:
-        pages (str, int, `list` of `int`, optional):
+        pages (str, int, `iterable` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`. Default: `1`
+            `str`,`int`, `iterable` of :`int`. Default: `1`
 
             Examples:
                 ``'1-2,3'``, ``'all'``, ``[1,2]``
@@ -87,7 +87,7 @@ class TabulaOption:
                 lattice and stream option, you can use guess and lattice/stream option
                 at the same time.
 
-        area (list of float, list of list of float, optional):
+        area (iterable of float, iterable of iterable of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
 
@@ -115,7 +115,7 @@ class TabulaOption:
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (list, optional):
+        columns (iterable, optional):
             X coordinates of column boundaries.
 
             Example:
@@ -139,7 +139,7 @@ class TabulaOption:
             Extract multiple tables into a dataframe. Default: True
     """
 
-    pages: Optional[Union[str, int, List[int]]] = None
+    pages: Optional[Union[str, int, Iterable[int]]] = None
     guess: bool = True
     area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None
     relative_area: bool = False
@@ -147,7 +147,7 @@ class TabulaOption:
     stream: bool = False
     password: Optional[str] = None
     silent: Optional[bool] = None
-    columns: Optional[List[float]] = None
+    columns: Optional[Iterable[float]] = None
     relative_columns: bool = False
     format: Optional[str] = None
     batch: Optional[str] = None
