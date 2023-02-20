@@ -160,12 +160,13 @@ class TestReadPdfTable(unittest.TestCase):
                 self.pdf_path, pages=1, stream=True, pandas_options={"header": "infer"}
             )[0].equals(pd.read_csv(self.expected_csv1, header="infer"))
         )
+        p_opts = {"header": "infer", "names": column_name}
         self.assertTrue(
             tabula.read_pdf(
                 self.pdf_path,
                 pages=1,
                 stream=True,
-                pandas_options={"header": "infer", "names": column_name},
+                pandas_options=p_opts,
             )[0].equals(
                 pd.read_csv(self.expected_csv1, header="infer", names=column_name)
             )
@@ -176,7 +177,7 @@ class TestReadPdfTable(unittest.TestCase):
                 pages=1,
                 stream=True,
                 multiple_tables=True,
-                pandas_options={"header": "infer", "names": column_name},
+                pandas_options=p_opts,
             )[0].equals(
                 pd.read_csv(self.expected_csv1, header="infer", names=column_name)
             )
@@ -187,7 +188,7 @@ class TestReadPdfTable(unittest.TestCase):
                 pages=1,
                 stream=True,
                 multiple_tables=True,
-                pandas_options={"header": "infer", "columns": column_name},
+                pandas_options=p_opts,
             )[0].equals(
                 pd.read_csv(self.expected_csv1, header="infer", names=column_name)
             )
