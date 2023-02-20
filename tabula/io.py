@@ -111,7 +111,7 @@ def read_pdf(
     multiple_tables: bool = True,
     user_agent: Optional[str] = None,
     use_raw_url: bool = False,
-    pages: Optional[Union[str, int, List[int]]] = None,
+    pages: Optional[Union[str, int, Iterable[int]]] = None,
     guess: bool = True,
     area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
     relative_area: bool = False,
@@ -119,7 +119,7 @@ def read_pdf(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[List[float]] = None,
+    columns: Optional[Iterable[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
@@ -165,9 +165,9 @@ def read_pdf(
         use_raw_url (bool):
             It enforces to use `input_path` string for url without quoting/dequoting.
             Default: False
-        pages (str, int, `list` of `int`, optional):
+        pages (str, int, `iterable` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`. Default: `1`
+            `str`,`int`, `iterable` of :`int`. Default: `1`
 
             Examples:
                 ``'1-2,3'``, ``'all'``, ``[1,2]``
@@ -180,7 +180,7 @@ def read_pdf(
                 lattice and stream option, you can use guess and lattice/stream option
                 at the same time.
 
-        area (list of float, list of list of float, optional):
+        area (iterable of float, iterable of iterable of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
 
@@ -208,7 +208,7 @@ def read_pdf(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (list, optional):
+        columns (iterable, optional):
             X coordinates of column boundaries.
 
             Example:
@@ -468,7 +468,7 @@ def read_pdf_with_template(
     java_options: Optional[List[str]] = None,
     user_agent: Optional[str] = None,
     use_raw_url: bool = False,
-    pages: Optional[Union[str, int, List[int]]] = None,
+    pages: Optional[Union[str, int, Iterable[int]]] = None,
     guess: bool = False,
     area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
     relative_area: bool = False,
@@ -504,9 +504,9 @@ def read_pdf_with_template(
         use_raw_url (bool):
             It enforces to use `input_path` string for url without quoting/dequoting.
             Default: False
-        pages (str, int, `list` of `int`, optional):
+        pages (str, int, `iterable` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`. Default: `1`
+            `str`,`int`, `iterable` of :`int`. Default: `1`
 
             Examples:
                 ``'1-2,3'``, ``'all'``, ``[1,2]``
@@ -519,7 +519,7 @@ def read_pdf_with_template(
                 lattice and stream option, you can use guess and lattice/stream option
                 at the same time.
 
-        area (list of float, list of list of float, optional):
+        area (iterable of float, iterable of iterable of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
 
@@ -547,7 +547,7 @@ def read_pdf_with_template(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (list, optional):
+        columns (iterable, optional):
             X coordinates of column boundaries.
 
             Example:
@@ -707,7 +707,7 @@ def convert_into(
     output_path: str,
     output_format: str = "csv",
     java_options: Optional[List[str]] = None,
-    pages: Optional[Union[str, int, List[int]]] = None,
+    pages: Optional[Union[str, int, Iterable[int]]] = None,
     guess: bool = True,
     area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
     relative_area: bool = False,
@@ -715,7 +715,7 @@ def convert_into(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[List[float]] = None,
+    columns: Optional[Iterable[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
@@ -737,9 +737,9 @@ def convert_into(
 
             Example:
                 ``"-Xmx256m"``.
-        pages (str, int, `list` of `int`, optional):
+        pages (str, int, `iterable` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`. Default: `1`
+            `str`,`int`, `iterable` of :`int`. Default: `1`
 
             Examples:
                 ``'1-2,3'``, ``'all'``, ``[1,2]``
@@ -752,7 +752,7 @@ def convert_into(
                 lattice and stream option, you can use guess and lattice/stream option
                 at the same time.
 
-        area (list of float, list of list of float, optional):
+        area (iterable of float, iterable of iterable of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
 
@@ -780,7 +780,7 @@ def convert_into(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (list, optional):
+        columns (iterable, optional):
             X coordinates of column boundaries.
 
             Example:
@@ -852,7 +852,7 @@ def convert_into_by_batch(
     input_dir: str,
     output_format: str = "csv",
     java_options: Optional[List[str]] = None,
-    pages: Optional[Union[str, int, List[int]]] = None,
+    pages: Optional[Union[str, int, Iterable[int]]] = None,
     guess: bool = True,
     area: Optional[Union[Iterable[float], Iterable[Iterable[float]]]] = None,
     relative_area: bool = False,
@@ -860,7 +860,7 @@ def convert_into_by_batch(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[List[float]] = None,
+    columns: Optional[Iterable[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     output_path: Optional[str] = None,
@@ -875,9 +875,9 @@ def convert_into_by_batch(
             Output format of this function (csv, json or tsv)
         java_options (list, optional):
             Set java options like `-Xmx256m`.
-        pages (str, int, `list` of `int`, optional):
+        pages (str, int, `iterable` of `int`, optional):
             An optional values specifying pages to extract from. It allows
-            `str`,`int`, `list` of :`int`. Default: `1`
+            `str`,`int`, `iterable` of :`int`. Default: `1`
 
             Examples:
                 ``'1-2,3'``, ``'all'``, ``[1,2]``
@@ -890,7 +890,7 @@ def convert_into_by_batch(
                 lattice and stream option, you can use guess and lattice/stream option
                 at the same time.
 
-        area (list of float, list of list of float, optional):
+        area (iterable of float, iterable of iterable of float, optional):
             Portion of the page to analyze(top,left,bottom,right).
             Default is entire page.
 
@@ -918,7 +918,7 @@ def convert_into_by_batch(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (list, optional):
+        columns (iterable, optional):
             X coordinates of column boundaries.
 
             Example:
@@ -1062,15 +1062,15 @@ def _extract_from(
 
 
 def _convert_pandas_csv_options(
-    pandas_options: Dict[str, Any], columns: List[str]
+    pandas_options: Dict[str, Any], columns: Iterable[str]
 ) -> Tuple[str, Optional[int]]:
     """Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
     Args:
         pandas_options (dict):
             pandas options like {'header': None}.
-        columns (list):
-            list of column name.
+        columns (iterable):
+            iterable of column name.
     """
 
     _columns = pandas_options.pop("names", columns)
