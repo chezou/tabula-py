@@ -61,9 +61,9 @@ def localize_file(
         parsed_url = urlparse(req.geturl())
         filename = os.path.basename(parsed_url.path)
         fname, ext = os.path.splitext(filename)
-        filename = "{}{}".format(fname[:MAX_FILE_SIZE], ext)
+        filename = f"{fname[:MAX_FILE_SIZE]}{ext}"
         if ext != suffix:
-            filename = "{}{}".format(uuid.uuid4(), suffix)
+            filename = f"{uuid.uuid4()}{suffix}"
 
         filename = os.path.join(gettempdir(), filename)
         with open(filename, "wb") as f:
@@ -72,7 +72,7 @@ def localize_file(
         return filename, True
 
     elif is_file_like(path_or_buffer):
-        filename = os.path.join(gettempdir(), "{}{}".format(uuid.uuid4(), suffix))
+        filename = os.path.join(gettempdir(), f"{uuid.uuid4()}{suffix}")
         path_or_buffer = cast(BinaryIO, path_or_buffer)
         path_or_buffer.seek(0)
 

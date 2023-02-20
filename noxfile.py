@@ -3,7 +3,14 @@ import nox
 
 @nox.session
 def lint(session):
-    lint_tools = ["black", "isort", "flake8", "mypy", "types-setuptools"]
+    lint_tools = [
+        "black",
+        "isort",
+        "flake8",
+        "mypy",
+        "types-setuptools",
+        "Flake8-pyproject",
+    ]
     targets = ["tabula", "tests", "noxfile.py"]
     session.install(*lint_tools)
     session.run("flake8", *targets)

@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tabula-py"
+description = "Simple wrapper for tabula-java, read tables from PDF into DataFrame"
+authors = [
+  {name = "Aki Ariga", email = "chezou@gmail.com"}
+]
+maintainers = [
+  {name ="Aki Ariga", email = "chezou@gmail.com"}
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Topic :: Text Processing :: General",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.8",
+]
+keywords = [
+  "data frame",
+  "pdf",
+  "table",
+]
+requires-python = ">=3.8"
+dependencies = [
+  "pandas >= 0.25.3",
+  "numpy",
+  "distro",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "flake8",
+  "black",
+  "isort",
+  "mypy",
+  "Flake8-pyproject",
+]
+test = ["pytest"]
+doc = [
+  "sphinx",
+  "sphinx_rtd_theme"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/chezou/tabula-py"
+"Bug Reports" = "https://github.com/chezou/tabula-py/issues"
+"Funding" = "https://github.com/sponsors/chezou"
+
+[tool.setuptools_scm]
+
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+ignore = ["E203", "W503"]
+max-line-length = 88
+exclude = [
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  ".venv",
+  "tabula/__init__.py",
+]
+
+[tool.mypy]
+ignore_missing_imports = true

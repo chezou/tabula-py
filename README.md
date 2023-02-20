@@ -15,7 +15,7 @@ You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/ta
 ## Requirements
 
 - Java 8+
-- Python 3.7+
+- Python 3.8+
 
 ### OS
 

@@ -41,7 +41,7 @@ from .util import FileLikeObj, TabulaOption
 logger = getLogger(__name__)
 
 TABULA_JAVA_VERSION = "1.0.5"
-JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
+JAR_NAME = f"tabula-{TABULA_JAVA_VERSION}-jar-with-dependencies.jar"
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
 JAVA_NOT_FOUND_ERROR = (
     "`java` command is not found from this Python process."
@@ -93,12 +93,12 @@ def _run(
             check=True,
         )
         if result.stderr:
-            logger.warning("Got stderr: {}".format(result.stderr.decode(encoding)))
+            logger.warning(f"Got stderr: {result.stderr.decode(encoding)}")
         return result.stdout
     except FileNotFoundError:
         raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
     except subprocess.CalledProcessError as e:
-        logger.error("Error from tabula-java:\n{}\n".format(e.stderr.decode(encoding)))
+        logger.error(f"Error from tabula-java:\n{e.stderr.decode(encoding)}\n")
         raise
 
 
@@ -376,7 +376,7 @@ def read_pdf(
         elif output_format.lower() == "json":
             format = "JSON"
         else:
-            raise ValueError("Unknown output_format {}".format(output_format))
+            raise ValueError(f"Unknown {output_format=}")
 
     if multiple_tables:
         format = "JSON"
@@ -419,9 +419,7 @@ def read_pdf(
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     if os.path.getsize(path) == 0:
-        raise ValueError(
-            "{} is empty. Check the file, or download it manually.".format(path)
-        )
+        raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
         output = _run(java_options, tabula_options, path, encoding)
@@ -837,9 +835,7 @@ def convert_into(
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     if os.path.getsize(path) == 0:
-        raise ValueError(
-            "{} is empty. Check the file, or download it manually.".format(path)
-        )
+        raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
         _run(java_options, tabula_options, path)
@@ -997,7 +993,7 @@ def _extract_format_for_conversion(output_format: str = "csv") -> str:
     elif output_format.lower() == "tsv":
         return "TSV"
     else:
-        raise ValueError("Unknown 'output_format': '{}'".format(output_format))
+        raise ValueError(f"Unknown {output_format=}")
 
 
 def _extract_from(
@@ -1034,7 +1030,7 @@ def _extract_from(
             _unname_idx = 0
             for idx, col in enumerate(_columns):
                 if col is np.nan:
-                    _columns[idx] = "Unnamed: {}".format(_unname_idx)
+                    _columns[idx] = f"Unnamed: {_unname_idx}"
                     _unname_idx += 1
 
             counts: Dict[str, int] = defaultdict(int)
@@ -1045,7 +1041,7 @@ def _extract_from(
 
                 while cur_count > 0:
                     counts[col] = cur_count + 1
-                    col = "{}.{}".format(col, cur_count)
+                    col = f"{col}.{cur_count}"
                     cur_count = counts[col]
 
                 _columns[idx] = col
