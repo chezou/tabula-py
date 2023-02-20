@@ -42,6 +42,7 @@ dev = [
   "black",
   "isort",
   "mypy",
+  "Flake8-pyproject",
 ]
 test = ["pytest"]
 doc = [
@@ -60,7 +61,7 @@ doc = [
 [tool.isort]
 profile = "black"
 
-[tools.flake8]
+[tool.flake8]
 ignore = ["E203", "W503"]
 max-line-length = 88
 exclude = [
