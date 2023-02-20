@@ -72,3 +72,6 @@ exclude = [
   ".venv",
   "tabula/__init__.py",
 ]
+
+[tool.mypy]
+ignore_missing_imports = true
