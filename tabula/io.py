@@ -25,6 +25,7 @@ import platform
 import shlex
 import subprocess
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import asdict
 from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
@@ -435,19 +436,20 @@ def read_pdf(
     if pandas_options is None:
         pandas_options = {}
 
+    _pandas_options = deepcopy(pandas_options)
     fmt = tabula_options.format
     if fmt == "JSON":
         raw_json: List[Any] = json.loads(output.decode(encoding))
         if multiple_tables:
-            return _extract_from(raw_json, pandas_options)
+            return _extract_from(raw_json, _pandas_options)
         else:
             return raw_json
 
     else:
-        pandas_options["encoding"] = pandas_options.get("encoding", encoding)
+        _pandas_options["encoding"] = _pandas_options.get("encoding", encoding)
 
         try:
-            return [pd.read_csv(io.BytesIO(output), **pandas_options)]
+            return [pd.read_csv(io.BytesIO(output), **_pandas_options)]
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
             message += (
@@ -681,7 +683,6 @@ def read_pdf_with_template(
 
     try:
         for option in _options:
-
             _df = read_pdf(
                 input_path,
                 pandas_options=pandas_options,
