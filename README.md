@@ -10,7 +10,7 @@ You can read tables from a PDF and convert them into a pandas DataFrame. tabula-
 
 You can see [the example notebook](https://nbviewer.jupyter.org/github/chezou/tabula-py/blob/master/examples/tabula_example.ipynb) and try it on Google Colab, or we highly recommend reading [our documentation](https://tabula-py.readthedocs.io/en/latest/), especially the FAQ section.
 
-![tabula-py example](./example.png)
+![tabula-py example](https://github.com/chezou/tabula-py/raw/master/example.png)
 
 ## Requirements
 
