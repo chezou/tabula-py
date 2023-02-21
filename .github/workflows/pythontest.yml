@@ -10,7 +10,6 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v3
@@ -19,15 +18,17 @@ jobs:
         java-version: '17'
         java-package: jdk
         distribution: adopt
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+        python-version: |
+          3.8
+          3.9
+          3.10
+          3.11
+    - name: Install dependencies and test
       run: |
         python -m pip install --upgrade pip
         pip install nox
         pip install .
-    - name: Lint and test with nox
-      run: |
         nox
