@@ -1,6 +1,6 @@
 name: Python testing
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -10,24 +10,25 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
       with:
-        java-version: '12'
+        java-version: '17'
         java-package: jdk
         distribution: adopt
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+        python-version: |
+          3.8
+          3.9
+          3.10
+          3.11
+    - name: Install dependencies and test
       run: |
         python -m pip install --upgrade pip
         pip install nox
         pip install .
-    - name: Lint and test with nox
-      run: |
         nox
