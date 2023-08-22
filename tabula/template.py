@@ -78,8 +78,14 @@ def _convert_template_option(
         round(cast(float, template["y2"]), 3),
         round(cast(float, template["x2"]), 3),
     ]
+    relative_area = cast(bool, template.get("relative_area"))
     option = TabulaOption(
-        guess=guess, lattice=lattice, stream=stream, pages=pages, area=area
+        guess=guess,
+        lattice=lattice,
+        stream=stream,
+        pages=pages,
+        area=area,
+        relative_area=relative_area,
     )
 
     return option
