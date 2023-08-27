@@ -1,7 +1,6 @@
 """This module is a wrapper of tabula, which enables table extraction from a PDF.
 
-This module extracts tables from a PDF into a pandas DataFrame. Currently, the
-implementation of this module uses subprocess.
+This module extracts tables from a PDF into a pandas DataFrame via jpype.
 
 Instead of importing this module, you can import public interfaces such as
 :func:`read_pdf()`, :func:`read_pdf_with_template()`, :func:`convert_into()`,
@@ -14,7 +13,7 @@ Note:
 Example:
 
     >>> import tabula
-    >>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
+    >>> dfs = tabula.read_pdf("/path/to/sample.pdf", pages="all")
 """
 
 import errno
