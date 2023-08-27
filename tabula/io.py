@@ -1,7 +1,6 @@
 """This module is a wrapper of tabula, which enables table extraction from a PDF.
 
-This module extracts tables from a PDF into a pandas DataFrame. Currently, the
-implementation of this module uses subprocess.
+This module extracts tables from a PDF into a pandas DataFrame via jpype.
 
 Instead of importing this module, you can import public interfaces such as
 :func:`read_pdf()`, :func:`read_pdf_with_template()`, :func:`convert_into()`,
@@ -14,7 +13,7 @@ Note:
 Example:
 
     >>> import tabula
-    >>> df = tabula.read_pdf("/path/to/sample.pdf", pages="all")
+    >>> dfs = tabula.read_pdf("/path/to/sample.pdf", pages="all")
 """
 
 import errno
@@ -23,17 +22,18 @@ import json
 import os
 import platform
 import shlex
-import subprocess
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import asdict
 from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
+import jpype
+import jpype.imports
 import numpy as np
 import pandas as pd
 
-from .errors import CSVParseError, JavaNotFoundError
+from .errors import CSVParseError
 from .file_util import localize_file
 from .template import load_template
 from .util import FileLikeObj, TabulaOption
@@ -51,55 +51,68 @@ JAVA_NOT_FOUND_ERROR = (
 DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
 
 
-def _jar_path() -> str:
-    return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
+_tabula_vm = None
 
 
 def _run(
     java_options: List[str],
     options: TabulaOption,
     path: Optional[str] = None,
-    encoding: str = "utf-8",
-) -> bytes:
+) -> str:
     """Call tabula-java with the given lists of Java options and tabula-py
     options, as well as an optional path to pass to tabula-java as a regular
-    argument and an optional encoding to use for any required output sent to
-    stderr.
-
-    tabula-py options are translated into tabula-java options, see
-    :func:`build_options` for more information.
+    argument to use for any required output sent to stderr.
     """
-    # Workaround to enforce the silent option. See:
-    # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
-    if options.silent:
-        java_options.extend(
-            (
-                "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
-                "-Dorg.apache.commons.logging.Log"
-                "=org.apache.commons.logging.impl.NoOpLog",
-            )
-        )
+    global _tabula_vm
+    if not _tabula_vm:
+        _tabula_vm = TabulaVm(java_options, options.silent)
 
-    args = ["java"] + java_options + ["-jar", _jar_path()] + options.build_option_list()
-    if path:
-        args.append(path)
+    return _tabula_vm.call_tabula_java(options, path)
 
-    try:
-        result = subprocess.run(
-            args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            stdin=subprocess.DEVNULL,
-            check=True,
-        )
-        if result.stderr:
-            logger.warning(f"Got stderr: {result.stderr.decode(encoding)}")
-        return result.stdout
-    except FileNotFoundError:
-        raise JavaNotFoundError(JAVA_NOT_FOUND_ERROR)
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Error from tabula-java:\n{e.stderr.decode(encoding)}\n")
-        raise
+
+class TabulaVm:
+    def __init__(self, java_options: List[str], silent: Optional[bool]) -> None:
+        if not jpype.isJVMStarted():
+            jpype.addClassPath(TabulaVm._jar_path())
+
+            # Workaround to enforce the silent option. See:
+            # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
+            if silent:
+                java_options.extend(
+                    (
+                        "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+                        "-Dorg.apache.commons.logging.Log"
+                        "=org.apache.commons.logging.impl.NoOpLog",
+                    )
+                )
+
+            jpype.startJVM(*java_options, convertStrings=False)
+
+        from java import lang
+        from org.apache.commons import cli
+        from technology import tabula
+
+        self.tabula = tabula
+        self.cli = cli
+        self.lang = lang
+
+    @staticmethod
+    def _jar_path() -> str:
+        return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
+
+    def call_tabula_java(
+        self, options: TabulaOption, path: Optional[str] = None
+    ) -> str:
+        sb = self.lang.StringBuilder()
+        parser = self.cli.DefaultParser()
+
+        args = options.build_option_list()
+        if path:
+            args.insert(0, path)
+
+        cmd = parser.parse(self.tabula.CommandLineApp.buildOptions(), args)
+        self.tabula.CommandLineApp(sb, cmd).extractTables(cmd)
+        return str(sb.toString())
 
 
 def read_pdf(
@@ -241,12 +254,6 @@ def read_pdf(
 
         tabula.errors.CSVParseError:
             If pandas CSV parsing failed.
-
-        tabula.errors.JavaNotFoundError:
-            If java is not installed or found.
-
-        subprocess.CalledProcessError:
-            If tabula-java execution failed.
 
 
     Examples:
@@ -422,7 +429,7 @@ def read_pdf(
         raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
-        output = _run(java_options, tabula_options, path, encoding)
+        output = _run(java_options, tabula_options, path)
     finally:
         if temporary:
             os.unlink(path)
@@ -437,7 +444,7 @@ def read_pdf(
     _pandas_options = deepcopy(pandas_options)
     fmt = tabula_options.format
     if fmt == "JSON":
-        raw_json: List[Any] = json.loads(output.decode(encoding))
+        raw_json: List[Any] = json.loads(output)
         if multiple_tables:
             return _extract_from(raw_json, _pandas_options)
         else:
@@ -447,7 +454,7 @@ def read_pdf(
         _pandas_options["encoding"] = _pandas_options.get("encoding", encoding)
 
         try:
-            return [pd.read_csv(io.BytesIO(output), **_pandas_options)]
+            return [pd.read_csv(io.StringIO(output), **_pandas_options)]
         except pd.errors.ParserError as e:
             message = "Error failed to create DataFrame with different column tables.\n"
             message += (
@@ -578,12 +585,6 @@ def read_pdf_with_template(
 
         tabula.errors.CSVParseError:
             If pandas CSV parsing failed.
-
-        tabula.errors.JavaNotFoundError:
-            If java is not installed or found.
-
-        subprocess.CalledProcessError:
-            If tabula-java execution failed.
 
 
     Examples:
@@ -798,12 +799,6 @@ def convert_into(
 
         ValueError:
             If output_format is unknown format, or if downloaded remote file size is 0.
-
-        tabula.errors.JavaNotFoundError:
-            If java is not installed or found.
-
-        subprocess.CalledProcessError:
-            If tabula-java execution failed.
     """
 
     if output_path is None or len(output_path) == 0:
@@ -935,12 +930,6 @@ def convert_into_by_batch(
     Raises:
         ValueError:
             If input_dir doesn't exist.
-
-        tabula.errors.JavaNotFoundError:
-            If java is not installed or found.
-
-        subprocess.CalledProcessError:
-            If tabula-java execution failed.
     """
 
     if input_dir is None or not os.path.isdir(input_dir):

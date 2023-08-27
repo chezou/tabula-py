@@ -1,13 +1,10 @@
 import filecmp
 import json
 import os
-import platform
 import shutil
-import subprocess
 import tempfile
 import unittest
 import uuid
-from unittest.mock import patch
 
 import pandas as pd  # type: ignore
 
@@ -287,33 +284,6 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertEqual(len(dfs), 4)
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
-    @patch("subprocess.run")
-    @patch("tabula.io._jar_path")
-    def test_read_pdf_with_jar_path(self, jar_func, mock_fun):
-        jar_func.return_value = "/tmp/tabula-java.jar"
-
-        tabula.read_pdf(self.pdf_path, encoding="utf-8")
-
-        target_args = ["java"]
-        if platform.system() == "Darwin":
-            target_args += ["-Djava.awt.headless=true"]
-        target_args += [
-            "-Dfile.encoding=UTF8",
-            "-jar",
-            "/tmp/tabula-java.jar",
-            "--guess",
-            "--format",
-            "JSON",
-            "tests/resources/data.pdf",
-        ]
-        subp_args = {
-            "stdout": subprocess.PIPE,
-            "stderr": subprocess.PIPE,
-            "stdin": subprocess.DEVNULL,
-            "check": True,
-        }
-        mock_fun.assert_called_with(target_args, **subp_args)
-
     def test_read_pdf_with_dtype_string(self):
         pdf_path = "tests/resources/data_dtype.pdf"
         expected_csv = "tests/resources/data_dtype_expected.csv"
@@ -360,63 +330,6 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(
             dfs_template[0].equals(pd.read_csv(template_expected_csv, **pandas_options))
         )
-
-    @patch("subprocess.run")
-    @patch("tabula.io._jar_path")
-    def test_read_pdf_with_silent_false(self, jar_func, mock_fun):
-        jar_func.return_value = "/tmp/tabula-java.jar"
-
-        tabula.read_pdf(self.pdf_path, encoding="utf-8", silent=False)
-
-        target_args = ["java"]
-        if platform.system() == "Darwin":
-            target_args += ["-Djava.awt.headless=true"]
-        target_args += [
-            "-Dfile.encoding=UTF8",
-            "-jar",
-            "/tmp/tabula-java.jar",
-            "--guess",
-            "--format",
-            "JSON",
-            "tests/resources/data.pdf",
-        ]
-        subp_args = {
-            "stdout": subprocess.PIPE,
-            "stderr": subprocess.PIPE,
-            "stdin": subprocess.DEVNULL,
-            "check": True,
-        }
-        mock_fun.assert_called_with(target_args, **subp_args)
-
-    @patch("subprocess.run")
-    @patch("tabula.io._jar_path")
-    def test_read_pdf_with_silent_true(self, jar_func, mock_fun):
-        jar_func.return_value = "/tmp/tabula-java.jar"
-
-        tabula.read_pdf(self.pdf_path, encoding="utf-8", silent=True)
-
-        target_args = ["java"]
-        if platform.system() == "Darwin":
-            target_args += ["-Djava.awt.headless=true"]
-        target_args += [
-            "-Dfile.encoding=UTF8",
-            "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
-            "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.NoOpLog",
-            "-jar",
-            "/tmp/tabula-java.jar",
-            "--guess",
-            "--format",
-            "JSON",
-            "--silent",
-            "tests/resources/data.pdf",
-        ]
-        subp_args = {
-            "stdout": subprocess.PIPE,
-            "stderr": subprocess.PIPE,
-            "stdin": subprocess.DEVNULL,
-            "check": True,
-        }
-        mock_fun.assert_called_with(target_args, **subp_args)
 
 
 if __name__ == "__main__":

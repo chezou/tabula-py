@@ -22,4 +22,6 @@ def lint(session):
 @nox.session
 def tests(session):
     session.install(".[test]")
-    session.run("pytest", "-v")
+    session.run("pytest", "-v", "tests/test_read_pdf_table.py")
+    session.run("pytest", "-v", "tests/test_read_pdf_jar_path.py")
+    session.run("pytest", "-v", "tests/test_read_pdf_silent.py")
