@@ -2,6 +2,8 @@ import platform
 import unittest
 from unittest.mock import patch
 
+import pytest
+
 import tabula
 
 
@@ -9,10 +11,10 @@ class TestReadPdfJarPath(unittest.TestCase):
     def setUp(self):
         self.pdf_path = "tests/resources/data.pdf"
 
-    @patch("tabula.io._call_tabula_java")
     @patch("tabula.io.jpype.startJVM")
-    def test_read_pdf_with_silent_true(self, jvm_func, mock_fun):
-        tabula.read_pdf(self.pdf_path, encoding="utf-8", silent=True)
+    def test_read_pdf_with_silent_true(self, jvm_func):
+        with pytest.raises(ImportError):
+            tabula.read_pdf(self.pdf_path, encoding="utf-8", silent=True)
 
         target_args = []
         if platform.system() == "Darwin":
@@ -26,5 +28,3 @@ class TestReadPdfJarPath(unittest.TestCase):
             *target_args,
             convertStrings=False,
         )
-
-        mock_fun.assert_called_once()

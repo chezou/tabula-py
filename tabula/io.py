@@ -52,25 +52,7 @@ JAVA_NOT_FOUND_ERROR = (
 DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
 
 
-def _jar_path() -> str:
-    return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
-
-
-def _call_tabula_java(options: TabulaOption, path: Optional[str] = None) -> str:
-    from java.lang import StringBuilder
-    from org.apache.commons.cli import DefaultParser
-    from technology import tabula
-
-    sb = StringBuilder()
-    parser = DefaultParser()
-
-    args = options.build_option_list()
-    if path:
-        args.insert(0, path)
-
-    cmd = parser.parse(tabula.CommandLineApp.buildOptions(), args)
-    tabula.CommandLineApp(sb, cmd).extractTables(cmd)
-    return str(sb.toString())
+_tabula_vm = None
 
 
 def _run(
@@ -82,24 +64,56 @@ def _run(
     options, as well as an optional path to pass to tabula-java as a regular
     argument to use for any required output sent to stderr.
     """
+    global _tabula_vm
+    if not _tabula_vm:
+        _tabula_vm = TabulaVm(java_options, options.silent)
 
-    if not jpype.isJVMStarted():
-        jpype.addClassPath(_jar_path())
+    return _tabula_vm.call_tabula_java(options, path)
 
-        # Workaround to enforce the silent option. See:
-        # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
-        if options.silent:
-            java_options.extend(
-                (
-                    "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
-                    "-Dorg.apache.commons.logging.Log"
-                    "=org.apache.commons.logging.impl.NoOpLog",
+
+class TabulaVm:
+    def __init__(self, java_options: List[str], silent: Optional[bool]) -> None:
+        if not jpype.isJVMStarted():
+            jpype.addClassPath(TabulaVm._jar_path())
+
+            # Workaround to enforce the silent option. See:
+            # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
+            if silent:
+                java_options.extend(
+                    (
+                        "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+                        "-Dorg.apache.commons.logging.Log"
+                        "=org.apache.commons.logging.impl.NoOpLog",
+                    )
                 )
-            )
 
-        jpype.startJVM(*java_options, convertStrings=False)
+            jpype.startJVM(*java_options, convertStrings=False)
 
-    return _call_tabula_java(options, path)
+        from java import lang
+        from org.apache.commons import cli
+        from technology import tabula
+
+        self.tabula = tabula
+        self.cli = cli
+        self.lang = lang
+
+    @staticmethod
+    def _jar_path() -> str:
+        return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
+
+    def call_tabula_java(
+        self, options: TabulaOption, path: Optional[str] = None
+    ) -> str:
+        sb = self.lang.StringBuilder()
+        parser = self.cli.DefaultParser()
+
+        args = options.build_option_list()
+        if path:
+            args.insert(0, path)
+
+        cmd = parser.parse(self.tabula.CommandLineApp.buildOptions(), args)
+        self.tabula.CommandLineApp(sb, cmd).extractTables(cmd)
+        return str(sb.toString())
 
 
 def read_pdf(
@@ -416,7 +430,7 @@ def read_pdf(
         raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
-        output = _run(java_options, tabula_options, path, encoding)
+        output = _run(java_options, tabula_options, path)
     finally:
         if temporary:
             os.unlink(path)
