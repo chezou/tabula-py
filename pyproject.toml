@@ -32,6 +32,7 @@ dependencies = [
   "pandas >= 0.25.3",
   "numpy",
   "distro",
+  "jpype1",
 ]
 dynamic = ["version"]
 
@@ -75,3 +76,7 @@ exclude = [
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# Disable faulthandler plugin on Windows to prevent spurious console noise
+addopts = "-p no:faulthandler"
