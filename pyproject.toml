@@ -47,7 +47,7 @@ dev = [
 ]
 test = ["pytest"]
 doc = [
-  "sphinx",
+  "sphinx>=7",
   "sphinx_rtd_theme"
 ]
 
