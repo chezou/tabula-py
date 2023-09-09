@@ -66,6 +66,8 @@ def _run(
     global _tabula_vm
     if not _tabula_vm:
         _tabula_vm = TabulaVm(java_options, options.silent)
+    elif java_options:
+        logger.warning("java_options is ignored until rebooting the Python process.")
 
     return _tabula_vm.call_tabula_java(options, path)
 
@@ -151,7 +153,7 @@ def read_pdf(
         encoding (str, optional):
             Encoding type for pandas. Default: ``utf-8``
         java_options (list, optional):
-            Set java options.
+            Set java options. This option will be ignored once JVM is launched.
 
             Example:
                 ``["-Xmx256m"]``
@@ -503,6 +505,7 @@ def read_pdf_with_template(
             Encoding type for pandas. Default is 'utf-8'
         java_options (list, optional):
             Set java options like ``["-Xmx256m"]``.
+            This option will be ignored once JVM is launched.
         user_agent (str, optional):
             Set a custom user-agent when download a pdf from a url. Otherwise
             it uses the default ``urllib.request`` user-agent.
@@ -732,7 +735,7 @@ def convert_into(
             Output format of this function (``csv``, ``json`` or ``tsv``).
             Default: ``csv``
         java_options (list, optional):
-            Set java options
+            Set java options. This option will be ignored once JVM is launched.
 
             Example:
                 ``"-Xmx256m"``.
@@ -866,6 +869,7 @@ def convert_into_by_batch(
             Output format of this function (csv, json or tsv)
         java_options (list, optional):
             Set java options like `-Xmx256m`.
+            This option will be ignored once JVM is launched.
         pages (str, int, `iterable` of `int`, optional):
             An optional values specifying pages to extract from. It allows
             `str`,`int`, `iterable` of :`int`. Default: `1`
