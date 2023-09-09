@@ -186,6 +186,7 @@ Sometimes, you might see a message like `` Jul 17, 2019 10:21:25 AM org.apache.p
 
 ``java_options`` is ignored once ``read_pdf`` or similar funcion is called.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Since jpype doesn't support changing JVM options after the JVM is started, ``java_options`` is ignored once ``read_pdf`` or similar funcion is called. If you want to change JVM options, you need to restart the Python process.
 See also: https://jpype.readthedocs.io/en/latest/api.html#jpype.shutdownJVM
 
