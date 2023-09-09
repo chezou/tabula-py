@@ -184,6 +184,12 @@ No.
 
 Sometimes, you might see a message like `` Jul 17, 2019 10:21:25 AM org.apache.pdfbox.pdmodel.font.PDType1Font WARNING: Using fallback font NimbusSanL-Regu for Univers. Nothing was parsed from this one.`` This error message came from Apache PDFBox which is used under tabula-java, and this is caused by the PDF itself. Neither tabula-py nor tabula-java can't handle the warning itself, except for the silent option that suppresses the warning.
 
+``java_options`` is ignored once ``read_pdf`` or similar funcion is called.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Since jpype doesn't support changing JVM options after the JVM is started, ``java_options`` is ignored once ``read_pdf`` or similar funcion is called. If you want to change JVM options, you need to restart the Python process.
+See also: https://jpype.readthedocs.io/en/latest/api.html#jpype.shutdownJVM
+
+
 I can't figure out accurate extraction with tabula-py. Are there any similar Python libraries?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
