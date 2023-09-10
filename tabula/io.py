@@ -63,10 +63,18 @@ def _run(
     options, as well as an optional path to pass to tabula-java as a regular
     argument to use for any required output sent to stderr.
     """
+    # Ignore some options that are set by tabula-py
+    IGNORED_JAVA_OPTIONS = {
+        "-Djava.awt.headless=true",
+        "-Dfile.encoding=UTF8",
+        "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+        "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.NoOpLog",
+    }
+
     global _tabula_vm
     if not _tabula_vm:
         _tabula_vm = TabulaVm(java_options, options.silent)
-    elif java_options:
+    elif set(java_options) - IGNORED_JAVA_OPTIONS:
         logger.warning("java_options is ignored until rebooting the Python process.")
 
     return _tabula_vm.call_tabula_java(options, path)
