@@ -28,11 +28,10 @@ from dataclasses import asdict
 from logging import getLogger
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
-import jpype
-import jpype.imports
 import numpy as np
 import pandas as pd
 
+from .backend import SubprocessTabula, TabulaVm
 from .errors import CSVParseError
 from .file_util import localize_file
 from .template import load_template
@@ -40,24 +39,16 @@ from .util import FileLikeObj, TabulaOption
 
 logger = getLogger(__name__)
 
-TABULA_JAVA_VERSION = "1.0.5"
-JAR_NAME = f"tabula-{TABULA_JAVA_VERSION}-jar-with-dependencies.jar"
-JAR_DIR = os.path.abspath(os.path.dirname(__file__))
-JAVA_NOT_FOUND_ERROR = (
-    "`java` command is not found from this Python process."
-    "Please ensure Java is installed and PATH is set for `java`"
-)
 
-DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
-
-
-_tabula_vm = None
+_tabula_vm: Optional[Union[TabulaVm, SubprocessTabula]] = None
 
 
 def _run(
     java_options: List[str],
     options: TabulaOption,
     path: Optional[str] = None,
+    encoding: str = "utf-8",
+    force_subprocess: bool = False,
 ) -> str:
     """Call tabula-java with the given lists of Java options and tabula-py
     options, as well as an optional path to pass to tabula-java as a regular
@@ -72,57 +63,21 @@ def _run(
     }
 
     global _tabula_vm
+    if force_subprocess:
+        _tabula_vm = SubprocessTabula(
+            java_options=java_options, silent=options.silent, encoding=encoding
+        )
+
     if not _tabula_vm:
-        _tabula_vm = TabulaVm(java_options, options.silent)
+        _tabula_vm = TabulaVm(java_options=java_options, silent=options.silent)
+        if _tabula_vm and not _tabula_vm.tabula:
+            _tabula_vm = SubprocessTabula(
+                java_options=java_options, silent=options.silent, encoding=encoding
+            )
     elif set(java_options) - IGNORED_JAVA_OPTIONS:
         logger.warning("java_options is ignored until rebooting the Python process.")
 
     return _tabula_vm.call_tabula_java(options, path)
-
-
-class TabulaVm:
-    def __init__(self, java_options: List[str], silent: Optional[bool]) -> None:
-        if not jpype.isJVMStarted():
-            jpype.addClassPath(TabulaVm._jar_path())
-
-            # Workaround to enforce the silent option. See:
-            # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
-            if silent:
-                java_options.extend(
-                    (
-                        "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
-                        "-Dorg.apache.commons.logging.Log"
-                        "=org.apache.commons.logging.impl.NoOpLog",
-                    )
-                )
-
-            jpype.startJVM(*java_options, convertStrings=False)
-
-        from java import lang
-        from org.apache.commons import cli
-        from technology import tabula
-
-        self.tabula = tabula
-        self.cli = cli
-        self.lang = lang
-
-    @staticmethod
-    def _jar_path() -> str:
-        return os.environ.get("TABULA_JAR", DEFAULT_CONFIG["JAR_PATH"])
-
-    def call_tabula_java(
-        self, options: TabulaOption, path: Optional[str] = None
-    ) -> str:
-        sb = self.lang.StringBuilder()
-        parser = self.cli.DefaultParser()
-
-        args = options.build_option_list()
-        if path:
-            args.insert(0, path)
-
-        cmd = parser.parse(self.tabula.CommandLineApp.buildOptions(), args)
-        self.tabula.CommandLineApp(sb, cmd).extractTables(cmd)
-        return str(sb.toString())
 
 
 def read_pdf(
@@ -147,6 +102,7 @@ def read_pdf(
     format: Optional[str] = None,
     batch: Optional[str] = None,
     output_path: Optional[str] = None,
+    force_subprocess: bool = False,
     options: str = "",
 ) -> Union[List[pd.DataFrame], Dict[str, Any]]:
     """Read tables in PDF.
@@ -249,6 +205,10 @@ def read_pdf(
         output_path (str, optional):
             Output file path. File format of it is depends on ``format``.
             Same as ``--outfile`` option of tabula-java.
+        force_subprocess (bool):
+            Force to use tabula-java subprocess mode. If you have some issue with
+            jpype, try this option with same environment.
+            Default ``False``.
         options (str, optional):
             Raw option string for tabula-java.
 
@@ -265,6 +225,11 @@ def read_pdf(
         tabula.errors.CSVParseError:
             If pandas CSV parsing failed.
 
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
 
     Examples:
 
@@ -439,7 +404,13 @@ def read_pdf(
         raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
-        output = _run(java_options, tabula_options, path)
+        output = _run(
+            java_options,
+            tabula_options,
+            path,
+            encoding=encoding,
+            force_subprocess=force_subprocess,
+        )
     finally:
         if temporary:
             os.unlink(path)
@@ -496,6 +467,7 @@ def read_pdf_with_template(
     format: Optional[str] = None,
     batch: Optional[str] = None,
     output_path: Optional[str] = None,
+    force_subprocess: bool = False,
     options: Optional[str] = None,
 ) -> List[pd.DataFrame]:
     """Read tables in PDF with a Tabula App template.
@@ -581,6 +553,10 @@ def read_pdf_with_template(
         output_path (str, optional):
             Output file path. File format of it is depends on ``format``.
             Same as ``--outfile`` option of tabula-java.
+        force_subprocess (bool):
+            Force to use tabula-java subprocess mode. If you have some issue with
+            jpype, try this option with same environment.
+            Default ``False``.
         options (str, optional):
             Raw option string for tabula-java.
 
@@ -596,6 +572,12 @@ def read_pdf_with_template(
 
         tabula.errors.CSVParseError:
             If pandas CSV parsing failed.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
 
 
     Examples:
@@ -698,6 +680,7 @@ def read_pdf_with_template(
                 pandas_options=pandas_options,
                 encoding=encoding,
                 java_options=java_options,
+                force_subprocess=force_subprocess,
                 **asdict(_force_option.merge(option)),
             )
 
@@ -729,6 +712,7 @@ def convert_into(
     relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
+    force_subprocess: bool = False,
     options: str = "",
 ) -> None:
     """Convert tables from PDF into a file.
@@ -801,6 +785,10 @@ def convert_into(
         batch (str, optional):
             Convert all PDF files in the provided directory. This argument should be
             directory path.
+        force_subprocess (bool):
+            Force to use tabula-java subprocess mode. If you have some issue with
+            jpype, try this option with same environment.
+            Default ``False``.
         options (str, optional):
             Raw option string for tabula-java.
 
@@ -810,6 +798,12 @@ def convert_into(
 
         ValueError:
             If output_format is unknown format, or if downloaded remote file size is 0.
+
+        tabula.errors.JavaNotFoundError:
+            If java is not installed or found.
+
+        subprocess.CalledProcessError:
+            If tabula-java execution failed.
     """
 
     if output_path is None or len(output_path) == 0:
@@ -844,7 +838,7 @@ def convert_into(
         raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
-        _run(java_options, tabula_options, path)
+        _run(java_options, tabula_options, path, force_subprocess=force_subprocess)
     finally:
         if temporary:
             os.unlink(path)
@@ -866,6 +860,7 @@ def convert_into_by_batch(
     relative_columns: bool = False,
     format: Optional[str] = None,
     output_path: Optional[str] = None,
+    force_subprocess: bool = False,
     options: str = "",
 ) -> None:
     """Convert tables from PDFs in a directory.
@@ -933,6 +928,10 @@ def convert_into_by_batch(
         format (str, optional):
             Format for output file or extracted object.
             (``"CSV"``, ``"TSV"``, ``"JSON"``)
+        force_subprocess (bool):
+            Force to use tabula-java subprocess mode. If you have some issue with
+            jpype, try this option with same environment.
+            Default ``False``.
         options (str, optional):
             Raw option string for tabula-java.
 
@@ -968,7 +967,7 @@ def convert_into_by_batch(
         options=options,
     )
 
-    _run(java_options, tabula_options)
+    _run(java_options, tabula_options, force_subprocess=force_subprocess)
 
 
 def _build_java_options(_java_options: Optional[List[str]] = None) -> List[str]:

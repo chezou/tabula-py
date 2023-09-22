@@ -11,9 +11,9 @@ class TestReadPdfJarPath(unittest.TestCase):
     def setUp(self):
         self.pdf_path = "tests/resources/data.pdf"
 
-    @patch("tabula.io.jpype.startJVM")
+    @patch("tabula.backend.jpype.startJVM")
     def test_read_pdf_with_silent_true(self, jvm_func):
-        with pytest.raises(ImportError):
+        with pytest.raises(RuntimeError):
             tabula.read_pdf(self.pdf_path, encoding="utf-8", silent=True)
 
         target_args = []
