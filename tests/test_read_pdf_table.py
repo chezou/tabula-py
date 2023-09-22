@@ -36,6 +36,12 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(len(df), 1)
         self.assertTrue(isinstance(df[0], pd.DataFrame))
 
+    def test_read_pdf_with_force_subprocess(self):
+        df = tabula.read_pdf(self.pdf_path, stream=True, force_subprocess=True)
+        self.assertTrue(len(df), 1)
+        self.assertTrue(isinstance(df[0], pd.DataFrame))
+        self.assertTrue(df[0].equals(pd.read_csv(self.expected_csv1)))
+
     def test_read_pdf_into_json(self):
         expected_json = "tests/resources/data_1.json"
         json_data = tabula.read_pdf(
