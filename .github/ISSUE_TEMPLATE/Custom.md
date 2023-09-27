@@ -9,6 +9,4 @@ THE ISSUE TRACKER IS NOT FOR QUESTIONS.
 
 DO NOT CREATE A NEW ISSUE TO ASK A QUESTION.
 
-IF YOU ARE HAVING PROBLEMS WITH YOUR TABULA-PY CODE, DO NOT ASK A QUESTION HERE.
-
-Many tabula-py questions have been asked and answered on StackOverflow; see https://stackoverflow.com/search?q=tabula-py . You can ask questions there or on other websites.
+You can use GitHub discussions for question instead. [Search the GH discussion](https://github.com/chezou/tabula-py/discussions?discussions_q=is%3Aopen), or [create a new discussion](https://github.com/chezou/tabula-py/discussions/new/choose).
