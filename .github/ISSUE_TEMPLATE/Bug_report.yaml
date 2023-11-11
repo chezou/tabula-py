@@ -18,8 +18,7 @@ body:
       description: Please read the [FAQ](https://tabula-py.readthedocs.io/en/latest/faq.html)
       options:
       - label: I have read the FAQ
-    validations:
-      required: true
+        required: true
   - type: checkboxes
     id: discussions
     attributes:
@@ -27,8 +26,7 @@ body:
       description: Please search the [discussions](https://github.com/chezou/tabula-py/discussions)
       options:
       - label: I have searched the discussions
-    validations:
-      required: true
+        required: true
   - type: textarea
     id: pdf_url
     attributes:
