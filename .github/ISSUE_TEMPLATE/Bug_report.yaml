@@ -1,0 +1,90 @@
+name: Bug report
+description: File a bug report
+title: "[BUG] <title>"
+labels: ["bug", "triage"]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Write a summary of your issue
+      placeholder: ex. Unable to import `tabula`
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Did you read the FAQ?
+      description: Please read the [FAQ](https://tabula-py.readthedocs.io/en/latest/faq.html)
+      options:
+      - label: I have read the FAQ
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Did you search GitHub Discussions?
+      description: Please search the [discussions](https://github.com/chezou/tabula-py/discussions)
+      options:
+      - label: I have searched the discussions
+    validations:
+      required: true
+  - type: textarea
+    id: pdf_url
+    attributes:
+      label: "(Optional) PDF URL"
+      description: Provide your PDF URL. It's optional, but really helpful.
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: About your environment
+      description: |
+        Paste the output of `import tabula; tabula.environment_info()` on Python REPL.
+        Or, paste the results of `python --version` and `java -version`, and write down your OS version
+      placeholder: |
+        put here if you executed `tabula.environment_info()` or write
+        - Python version: result of `python --version`
+        - Java version: result of `java -version`
+        - OS version: Ubuntu 22.04
+      render: markdown
+    validations:
+      required: true
+   - type: textarea
+     id: reproducible_info
+     attributes:
+       label: What did you do when you faced the problem?
+       description: Provide your information to reproduce the issue
+     validations:
+       required: true
+   - type: textarea
+     id: code
+     attributes:
+       label: Code
+       description: Paste your core code which minimum reproducible for the issue
+       placeholder: Paste your output in text
+     validations:
+       required: true
+   - type: textarea
+     id: expected_behavior
+     attributes:
+       label: Expected behavior
+       description: Write your expected results/outputs
+     validations:
+       required: true
+   - type: textarea
+     id: actuabl_behavior
+     attributes:
+       label: Actual behavior
+       description: Put the actual results/outputs
+       placeholder: Paste your output in text
+     validations:
+       required: true
+   - type: textarea
+     id: related_issues
+     attributes:
+       label: Related issues
+       description: "If there are any related issue, please put them"
+     validations:
+       required: false
