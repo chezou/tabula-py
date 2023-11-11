@@ -51,40 +51,40 @@ body:
       render: markdown
     validations:
       required: true
-   - type: textarea
-     id: reproducible_info
-     attributes:
-       label: What did you do when you faced the problem?
-       description: Provide your information to reproduce the issue
-     validations:
-       required: true
-   - type: textarea
-     id: code
-     attributes:
-       label: Code
-       description: Paste your core code which minimum reproducible for the issue
-       placeholder: Paste your output in text
-     validations:
-       required: true
-   - type: textarea
-     id: expected_behavior
-     attributes:
-       label: Expected behavior
-       description: Write your expected results/outputs
-     validations:
-       required: true
-   - type: textarea
-     id: actuabl_behavior
-     attributes:
-       label: Actual behavior
-       description: Put the actual results/outputs
-       placeholder: Paste your output in text
-     validations:
-       required: true
-   - type: textarea
-     id: related_issues
-     attributes:
-       label: Related issues
-       description: "If there are any related issue, please put them"
-     validations:
-       required: false
+  - type: textarea
+    id: reproducible_info
+    attributes:
+      label: What did you do when you faced the problem?
+      description: Provide your information to reproduce the issue
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Code
+      description: Paste your core code which minimum reproducible for the issue
+      placeholder: Paste your output in text
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: Write your expected results/outputs
+    validations:
+      required: true
+  - type: textarea
+    id: actuabl_behavior
+    attributes:
+      label: Actual behavior
+      description: Put the actual results/outputs
+      placeholder: Paste your output in text
+    validations:
+      required: true
+  - type: textarea
+    id: related_issues
+    attributes:
+      label: Related issues
+      description: "If there are any related issue, please put them"
+    validations:
+      required: false
