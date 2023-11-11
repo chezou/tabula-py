@@ -12,7 +12,7 @@ body:
     validations:
       required: true
   - type: checkboxes
-    id: checklist
+    id: faq
     attributes:
       label: Did you read the FAQ?
       description: Please read the [FAQ](https://tabula-py.readthedocs.io/en/latest/faq.html)
@@ -21,7 +21,7 @@ body:
     validations:
       required: true
   - type: checkboxes
-    id: checklist
+    id: discussions
     attributes:
       label: Did you search GitHub Discussions?
       description: Please search the [discussions](https://github.com/chezou/tabula-py/discussions)
