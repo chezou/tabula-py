@@ -27,7 +27,7 @@ body:
       options:
       - label: I have searched the discussions
         required: true
-  - type: textarea
+  - type: input
     id: pdf_url
     attributes:
       label: "(Optional) PDF URL"
