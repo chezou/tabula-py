@@ -26,6 +26,12 @@ You can install tabula-py from PyPI with ``pip`` command.
    pip install tabula-py
 
 
+If you want to leverage faster execution with jpype, install with `jpype` extra.
+
+.. code-block:: bash
+
+   pip install tabula-py[jpype]
+
 .. Note::
     conda recipe on conda-forge is not maintained by us.
     We recommend installing via ``pip`` to use the latest version of tabula-py.

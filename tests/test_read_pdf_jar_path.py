@@ -3,6 +3,7 @@ from pathlib import Path
 from subprocess import CalledProcessError
 from unittest.mock import patch
 
+import jpype
 import pytest
 
 import tabula
@@ -19,5 +20,5 @@ class TestReadPdfJarPath(unittest.TestCase):
         # Fallback to subprocess
         with pytest.raises(CalledProcessError):
             tabula.read_pdf(self.pdf_path, encoding="utf-8")
-        file_name = Path(tabula.backend.jpype.getClassPath()).name
+        file_name = Path(jpype.getClassPath()).name
         self.assertEqual(file_name, "tabula-java.jar")
