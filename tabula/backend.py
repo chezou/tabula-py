@@ -3,9 +3,6 @@ import subprocess
 from logging import getLogger
 from typing import List, Optional
 
-import jpype
-import jpype.imports
-
 from .errors import JavaNotFoundError
 from .util import TabulaOption
 
@@ -27,23 +24,26 @@ def jar_path() -> str:
 
 class TabulaVm:
     def __init__(self, java_options: List[str], silent: Optional[bool]) -> None:
-        if not jpype.isJVMStarted():
-            jpype.addClassPath(jar_path())
-
-            # Workaround to enforce the silent option. See:
-            # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
-            if silent:
-                java_options.extend(
-                    (
-                        "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
-                        "-Dorg.apache.commons.logging.Log"
-                        "=org.apache.commons.logging.impl.NoOpLog",
-                    )
-                )
-
-            jpype.startJVM(*java_options, convertStrings=False)
-
         try:
+            import jpype
+            import jpype.imports
+
+            if not jpype.isJVMStarted():
+                jpype.addClassPath(jar_path())
+
+                # Workaround to enforce the silent option. See:
+                # https://github.com/tabulapdf/tabula-java/issues/231#issuecomment-397281157
+                if silent:
+                    java_options.extend(
+                        (
+                            "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+                            "-Dorg.apache.commons.logging.Log"
+                            "=org.apache.commons.logging.impl.NoOpLog",
+                        )
+                    )
+
+                jpype.startJVM(*java_options, convertStrings=False)
+
             import java.lang as lang
             import technology.tabula as tabula
             from org.apache.commons.cli import DefaultParser
@@ -51,11 +51,11 @@ class TabulaVm:
             self.tabula = tabula
             self.parser = DefaultParser()
             self.lang = lang
+
         except (ModuleNotFoundError, ImportError) as e:
             logger.warning(
                 "Error importing jpype dependencies. Fallback to subprocess."
             )
-            logger.warning(jpype.java.lang.System.getProperty("java.class.path"))
             logger.warning(e)
             self.tabula = None
             self.parse = None

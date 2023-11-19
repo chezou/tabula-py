@@ -32,11 +32,11 @@ dependencies = [
   "pandas >= 0.25.3",
   "numpy",
   "distro",
-  "jpype1",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
+jpype = ["jpype1"]
 dev = [
   "pytest",
   "flake8",

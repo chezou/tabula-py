@@ -35,6 +35,12 @@ Ensure you have a Java runtime and set the PATH for it.
 pip install tabula-py
 ```
 
+If you want to leverage faster execution with jpype, install with `jpype` extra.
+
+```sh
+pip install tabula-py[jpype]
+```
+
 ### Example
 
 tabula-py enables you to extract tables from a PDF into a DataFrame, or a JSON. It can also extract tables from a PDF and save the file as a CSV, a TSV, or a JSON.  
