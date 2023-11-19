@@ -27,7 +27,7 @@ def lint(session):
         ("3.9", True),
         ("3.10", True),
         ("3.11", True),
-        # ("3.12", False),
+        ("3.12", False),
     ],
 )
 def tests(session, jpype):
