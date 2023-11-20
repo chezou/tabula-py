@@ -391,10 +391,6 @@ def read_pdf(
         if not any("java.awt.headless" in opt for opt in java_options):
             java_options += ["-Djava.awt.headless=true"]
 
-    if encoding == "utf-8":
-        if not any("file.encoding" in opt for opt in java_options):
-            java_options += ["-Dfile.encoding=UTF8"]
-
     path, temporary = localize_file(input_path, user_agent, use_raw_url=use_raw_url)
 
     if not os.path.exists(path):
