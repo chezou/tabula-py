@@ -44,8 +44,8 @@ _tabula_vm: Optional[Union[TabulaVm, SubprocessTabula]] = None
 
 
 def _run(
-    java_options: List[str],
     options: TabulaOption,
+    java_options: Optional[List[str]] = None,
     path: Optional[str] = None,
     encoding: str = "utf-8",
     force_subprocess: bool = False,
@@ -61,6 +61,8 @@ def _run(
         "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
         "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.NoOpLog",
     }
+
+    java_options = _build_java_options(java_options, encoding)
 
     global _tabula_vm
     if force_subprocess:
@@ -381,16 +383,6 @@ def read_pdf(
         multiple_tables=multiple_tables,
     )
 
-    if java_options is None:
-        java_options = []
-    elif isinstance(java_options, str):
-        java_options = shlex.split(java_options)
-
-    # to prevent tabula-py from stealing focus on every call on mac
-    if platform.system() == "Darwin":
-        if not any("java.awt.headless" in opt for opt in java_options):
-            java_options += ["-Djava.awt.headless=true"]
-
     path, temporary = localize_file(input_path, user_agent, use_raw_url=use_raw_url)
 
     if not os.path.exists(path):
@@ -401,8 +393,8 @@ def read_pdf(
 
     try:
         output = _run(
-            java_options,
             tabula_options,
+            java_options,
             path,
             encoding=encoding,
             force_subprocess=force_subprocess,
@@ -823,7 +815,6 @@ def convert_into(
         output_path=output_path,
         options=options,
     )
-    java_options = _build_java_options(java_options)
 
     path, temporary = localize_file(input_path)
 
@@ -834,7 +825,7 @@ def convert_into(
         raise ValueError(f"{path} is empty. Check the file, or download it manually.")
 
     try:
-        _run(java_options, tabula_options, path, force_subprocess=force_subprocess)
+        _run(tabula_options, java_options, path, force_subprocess=force_subprocess)
     finally:
         if temporary:
             os.unlink(path)
@@ -944,8 +935,6 @@ def convert_into_by_batch(
 
     format = _extract_format_for_conversion(output_format)
 
-    java_options = _build_java_options(java_options)
-
     tabula_options = TabulaOption(
         pages=pages,
         guess=guess,
@@ -963,10 +952,12 @@ def convert_into_by_batch(
         options=options,
     )
 
-    _run(java_options, tabula_options, force_subprocess=force_subprocess)
+    _run(tabula_options, java_options, force_subprocess=force_subprocess)
 
 
-def _build_java_options(_java_options: Optional[List[str]] = None) -> List[str]:
+def _build_java_options(
+    _java_options: Optional[List[str]] = None, encoding: str = "utf-8"
+) -> List[str]:
     if _java_options is None:
         _java_options = []
     elif isinstance(_java_options, str):
@@ -977,6 +968,10 @@ def _build_java_options(_java_options: Optional[List[str]] = None) -> List[str]:
         r = "java.awt.headless"
         if not any(filter(r.find, _java_options)):  # type: ignore
             _java_options = _java_options + ["-Djava.awt.headless=true"]
+
+    if encoding == "utf-8":
+        if not any("file.encoding" in opt for opt in _java_options):
+            _java_options += ["-Dfile.encoding=UTF8"]
 
     return _java_options
 

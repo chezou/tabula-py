@@ -89,10 +89,6 @@ class SubprocessTabula:
                 )
             )
 
-        if encoding == "utf-8":
-            if not any("file.encoding" in opt for opt in java_options):
-                java_options += ["-Dfile.encoding=UTF8"]
-
         self.java_options = java_options
         self.encoding = encoding
 
