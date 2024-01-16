@@ -3,7 +3,8 @@
 [![Build Status](https://github.com/chezou/tabula-py/actions/workflows/pythontest.yml/badge.svg)](https://github.com/chezou/tabula-py/actions/workflows/pythontest.yml)
 [![PyPI version](https://badge.fury.io/py/tabula-py.svg)](https://badge.fury.io/py/tabula-py)
 [![Documentation Status](https://readthedocs.org/projects/tabula-py/badge/?version=latest)](https://tabula-py.readthedocs.io/en/latest/?badge=latest)
-[![Patreon](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/chezou)
+[![](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors
+)](https://github.com/sponsors/chezou)
 
 `tabula-py` is a simple Python wrapper of [tabula-java](https://github.com/tabulapdf/tabula-java), which can read tables in a PDF.
 You can read tables from a PDF and convert them into a pandas DataFrame. tabula-py also enables you to convert a PDF file into a CSV, a TSV or a JSON file.
