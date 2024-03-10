@@ -92,6 +92,20 @@ class SubprocessTabula:
         self.java_options = java_options
         self.encoding = encoding
 
+    def update_encoding(
+        self, encoding: str, java_options: List[str], silent: Optional[bool]
+    ) -> None:
+        self.encoding = encoding
+        self.java_options = java_options
+        if silent:
+            self.java_options.extend(
+                (
+                    "-Dorg.slf4j.simpleLogger.defaultLogLevel=off",
+                    "-Dorg.apache.commons.logging.Log"
+                    "=org.apache.commons.logging.impl.NoOpLog",
+                )
+            )
+
     def call_tabula_java(
         self, options: TabulaOption, path: Optional[str] = None
     ) -> str:
