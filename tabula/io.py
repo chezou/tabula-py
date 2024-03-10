@@ -76,6 +76,10 @@ def _run(
             _tabula_vm = SubprocessTabula(
                 java_options=java_options, silent=options.silent, encoding=encoding
             )
+    elif isinstance(_tabula_vm, SubprocessTabula):
+        _tabula_vm.update_encoding(
+            encoding=encoding, java_options=java_options, silent=options.silent
+        )
     elif set(java_options) - IGNORED_JAVA_OPTIONS:
         logger.warning("java_options is ignored until rebooting the Python process.")
 

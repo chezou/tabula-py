@@ -41,6 +41,9 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(len(df), 1)
         self.assertTrue(isinstance(df[0], pd.DataFrame))
         self.assertTrue(df[0].equals(pd.read_csv(self.expected_csv1)))
+        self.assertTrue(tabula.io._tabula_vm.encoding, "utf-8")
+        tabula.read_pdf(self.pdf_path, stream=True, encoding="cp932")
+        self.assertTrue(tabula.io._tabula_vm.encoding, "cp932")
 
     def test_read_pdf_into_json(self):
         expected_json = "tests/resources/data_1.json"
