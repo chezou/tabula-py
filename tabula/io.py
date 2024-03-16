@@ -1046,7 +1046,12 @@ def _extract_from(
 
         if not pandas_options.get("dtype"):
             for c in df.columns:
-                df[c] = pd.to_numeric(df[c], errors="ignore")
+                try:
+                    df[c] = pd.to_numeric(df[c], errors="raise")
+                except (ValueError, TypeError):
+                    # Same logic as errors='ignore' in pd.to_numeric
+                    # https://github.com/pandas-dev/pandas/pull/57361/files#diff-08fed2587c15d0370931a8b02252eb1034d2c0a650df56760974440a5433a6e0L240-L243
+                    pass
         data_frames.append(df)
 
     return data_frames
