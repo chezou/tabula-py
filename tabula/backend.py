@@ -54,7 +54,7 @@ class TabulaVm:
 
         except (ModuleNotFoundError, ImportError) as e:
             logger.warning(
-                "Error importing jpype dependencies. Fallback to subprocess."
+                "Failed to import jpype dependencies. Fallback to subprocess."
             )
             logger.warning(e)
             self.tabula = None
