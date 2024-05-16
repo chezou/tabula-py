@@ -20,6 +20,14 @@ body:
       - label: I have read the FAQ
         required: true
   - type: checkboxes
+    id: issues
+    attributes:
+      label: Did you search GitHub issues?
+      description: Please search the [discussions](https://github.com/chezou/tabula-py/issues)
+      options:
+      - label: I have searched the issues
+        required: true
+  - type: checkboxes
     id: discussions
     attributes:
       label: Did you search GitHub Discussions?
