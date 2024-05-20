@@ -9,7 +9,7 @@ import platform
 import shlex
 from dataclasses import dataclass
 from logging import getLogger
-from typing import IO, Iterable, List, Optional, Union, cast
+from typing import IO, Iterable, List, Optional, Sequence, Union, cast
 
 logger = getLogger(__name__)
 
@@ -115,8 +115,9 @@ class TabulaOption:
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (iterable, optional):
-            X coordinates of column boundaries.
+        columns (Sequence, optional):
+            X coordinates of column boundaries. Must be sorted and of a datatype that
+            preserves order, e.g. tuple or list
 
             Example:
                 ``[10.1, 20.2, 30.3]``
@@ -147,7 +148,7 @@ class TabulaOption:
     stream: bool = False
     password: Optional[str] = None
     silent: Optional[bool] = None
-    columns: Optional[Iterable[float]] = None
+    columns: Optional[Sequence[float]] = None
     relative_columns: bool = False
     format: Optional[str] = None
     batch: Optional[str] = None
@@ -235,7 +236,7 @@ class TabulaOption:
             __options += ["--outfile", self.output_path]
 
         if self.columns:
-            if self.columns != sorted(self.columns):
+            if list(self.columns) != sorted(self.columns):
                 raise ValueError("columns option should be sorted")
 
             __columns = _format_with_relative(self.columns, self.relative_columns)
