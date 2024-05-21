@@ -26,7 +26,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import asdict
 from logging import getLogger
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -103,7 +103,7 @@ def read_pdf(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[Iterable[float]] = None,
+    columns: Optional[Sequence[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
@@ -193,8 +193,9 @@ def read_pdf(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (iterable, optional):
-            X coordinates of column boundaries.
+        columns (Sequence, optional):
+            X coordinates of column boundaries. Must be sorted and of a datatype that
+            preserves order, e.g. tuple or list
 
             Example:
                 ``[10.1, 20.2, 30.3]``
@@ -454,7 +455,7 @@ def read_pdf_with_template(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[List[float]] = None,
+    columns: Optional[Sequence[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
@@ -527,8 +528,9 @@ def read_pdf_with_template(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (iterable, optional):
-            X coordinates of column boundaries.
+        columns (Sequence, optional):
+            X coordinates of column boundaries. Must be sorted and of a datatype that
+            preserves order, e.g. tuple or list
 
             Example:
                 ``[10.1, 20.2, 30.3]``
@@ -700,7 +702,7 @@ def convert_into(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[Iterable[float]] = None,
+    columns: Optional[Sequence[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     batch: Optional[str] = None,
@@ -766,8 +768,9 @@ def convert_into(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (iterable, optional):
-            X coordinates of column boundaries.
+        columns (Sequence, optional):
+            X coordinates of column boundaries. Must be sorted and of a datatype that
+            preserves order, e.g. tuple or list
 
             Example:
                 ``[10.1, 20.2, 30.3]``
@@ -847,7 +850,7 @@ def convert_into_by_batch(
     stream: bool = False,
     password: Optional[str] = None,
     silent: Optional[bool] = None,
-    columns: Optional[Iterable[float]] = None,
+    columns: Optional[Sequence[float]] = None,
     relative_columns: bool = False,
     format: Optional[str] = None,
     output_path: Optional[str] = None,
@@ -907,8 +910,9 @@ def convert_into_by_batch(
             Password to decrypt document. Default: empty
         silent (bool, optional):
             Suppress all stderr output.
-        columns (iterable, optional):
-            X coordinates of column boundaries.
+        columns (Sequence, optional):
+            X coordinates of column boundaries. Must be sorted and of a datatype that
+            preserves order, e.g. tuple or list
 
             Example:
                 ``[10.1, 20.2, 30.3]``
