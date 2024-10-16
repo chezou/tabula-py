@@ -23,12 +23,12 @@ def lint(session):
 @nox.parametrize(
     "python,jpype",
     [
-        ("3.8", True),
         ("3.9", True),
         ("3.10", True),
         ("3.11", True),
-        ("3.12", False),
         ("3.12", True),
+        ("3.13", False),        
+        ("3.13", True),        
     ],
 )
 def tests(session, jpype):
