@@ -4,18 +4,15 @@ import nox
 @nox.session
 def lint(session):
     lint_tools = [
-        "black",
-        "isort",
-        "flake8",
+        "ruff",
         "mypy",
         "types-setuptools",
         "Flake8-pyproject",
     ]
     targets = ["tabula", "tests", "noxfile.py"]
     session.install(*lint_tools)
-    session.run("flake8", *targets)
-    session.run("black", "--diff", "--check", *targets)
-    session.run("isort", "--check-only", *targets)
+    session.run("ruff", "format", "--check", *targets)
+    session.run("ruff", "check", *targets)
     session.run("mypy", *targets)
 
 
@@ -27,7 +24,7 @@ def lint(session):
         ("3.10", True),
         ("3.11", True),
         ("3.12", True),
-        ("3.13", False), # jpype does not support Python 3.13 yet
+        ("3.13", False),  # jpype does not support Python 3.13 yet
         # ("3.13", True),
     ],
 )

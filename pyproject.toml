@@ -40,9 +40,7 @@ dynamic = ["version"]
 jpype = ["jpype1"]
 dev = [
   "pytest",
-  "flake8",
-  "black",
-  "isort",
+  "ruff",
   "mypy",
   "Flake8-pyproject",
 ]
@@ -61,20 +59,19 @@ doc = [
 [tool.setuptools_scm]
 
 
-[tool.isort]
-profile = "black"
-
-[tool.flake8]
-ignore = ["E203", "W503"]
-max-line-length = 88
+[tool.ruff]
+line-length = 88
 exclude = [
   ".git",
   "__pycache__",
   "build",
   "dist",
   ".venv",
-  "tabula/__init__.py",
 ]
+
+[tool.ruff.lint]
+select = ["E", "W"]
+ignore = ["E203"]
 
 [tool.mypy]
 ignore_missing_imports = true
