@@ -49,7 +49,7 @@ def load_template(path_or_buffer: FileLikeObj) -> List[TabulaOption]:
 
 
 def _convert_template_option(
-    template: Dict[str, Union[bool, float, int, str]]
+    template: Dict[str, Union[bool, float, int, str]],
 ) -> TabulaOption:
     """Convert Tabula app template to tabula-py option
 

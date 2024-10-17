@@ -18,7 +18,7 @@ import sys
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import sphinx_rtd_theme
+import sphinx_rtd_theme  # noqa: F401
 
 GH_ORGANIZATION = "chezou"
 GH_PROJECT = "tabula-py"
