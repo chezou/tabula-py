@@ -24,8 +24,8 @@ def lint(session):
         ("3.10", True),
         ("3.11", True),
         ("3.12", True),
-        ("3.13", False),  # jpype does not support Python 3.13 yet
-        # ("3.13", True),
+        ("3.13", False),
+        ("3.13", True),
     ],
 )
 def tests(session, jpype):
