@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=77", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -12,23 +12,23 @@ maintainers = [
   {name ="Aki Ariga", email = "chezou@gmail.com"}
 ]
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Topic :: Text Processing :: General",
-  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.15",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.9",
 ]
 keywords = [
   "data frame",
   "pdf",
   "table",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
   "pandas >= 0.25.3",
   "numpy > 1.24.4",
@@ -41,7 +41,7 @@ jpype = ["jpype1"]
 dev = [
   "pytest",
   "ruff",
-  "mypy",
+  "ty",
   "Flake8-pyproject",
 ]
 test = ["pytest"]
@@ -73,8 +73,19 @@ exclude = [
 select = ["E", "W"]
 ignore = ["E203"]
 
-[tool.mypy]
-ignore_missing_imports = true
+[tool.ty.analysis]
+# Java packages are provided at runtime by jpype
+allowed-unresolved-imports = ["java.**", "technology.**", "org.**"]
+
+[[tool.ty.overrides]]
+include = ["tests/**"]
+# read_pdf() returns `List[DataFrame] | Dict[str, Any]` depending on
+# `output_format`, so tests indexing its result can't be narrowed statically.
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+no-matching-overload = "ignore"
+unknown-argument = "ignore"
 
 [tool.pytest.ini_options]
 # Disable faulthandler plugin on Windows to prevent spurious console noise

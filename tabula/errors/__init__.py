@@ -3,7 +3,7 @@ from typing import Any
 from pandas.errors import ParserError
 
 
-class CSVParseError(ParserError):  # type: ignore
+class CSVParseError(ParserError):
     """Error represents CSV parse error, which mainly caused by pandas."""
 
     def __init__(self, message: Any, cause: Any) -> None:

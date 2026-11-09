@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 import tabula
+import tabula.file_util
 
 
 class TestUtil(unittest.TestCase):

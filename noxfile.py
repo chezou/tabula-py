@@ -5,27 +5,38 @@ import nox
 def lint(session):
     lint_tools = [
         "ruff",
-        "mypy",
-        "types-setuptools",
+        # ty is pre-1.0 and its diagnostics change between releases
+        "ty==0.0.99",
         "Flake8-pyproject",
+        # Required for ty to resolve imports in noxfile.py
+        "nox",
     ]
     targets = ["tabula", "tests", "noxfile.py"]
-    session.install(*lint_tools)
+    # Install tabula-py itself so that ty can resolve its dependencies
+    session.install(".[jpype,test]", *lint_tools)
     session.run("ruff", "format", "--check", *targets)
     session.run("ruff", "check", *targets)
-    session.run("mypy", *targets)
+    session.run(
+        "ty",
+        "check",
+        "--python",
+        session.virtualenv.location,
+        "--output-format",
+        "concise",
+        *targets,
+    )
 
 
 @nox.session
 @nox.parametrize(
     "python,jpype",
     [
-        ("3.9", True),
-        ("3.10", True),
         ("3.11", True),
         ("3.12", True),
-        ("3.13", False),
         ("3.13", True),
+        ("3.14", True),
+        # jpype1 does not support Python 3.15 yet
+        ("3.15", False),
     ],
 )
 def tests(session, jpype):

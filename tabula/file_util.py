@@ -17,7 +17,7 @@ from .util import FileLikeObj
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 _VALID_URLS.discard("")
-MAX_FILE_SIZE = 200
+MAX_FILE_SIZE: int = 200
 
 
 def localize_file(

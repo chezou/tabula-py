@@ -6,16 +6,16 @@ import tempfile
 import unittest
 import uuid
 
-import pandas as pd  # type: ignore
+import pandas as pd
 
 import tabula
+import tabula.errors
 
 
 class TestReadPdfTable(unittest.TestCase):
     def setUp(self):
         self.uri = (
-            "https://github.com/chezou/tabula-py/raw/"
-            "master/tests/resources/12s0324.pdf"
+            "https://github.com/chezou/tabula-py/raw/master/tests/resources/12s0324.pdf"
         )
         self.pdf_path = "tests/resources/data.pdf"
         self.expected_csv1 = "tests/resources/data_1.csv"

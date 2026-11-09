@@ -1,7 +1,7 @@
 import os
 import subprocess
 from logging import getLogger
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from .errors import JavaNotFoundError
 from .util import TabulaOption
@@ -23,6 +23,10 @@ def jar_path() -> str:
 
 
 class TabulaVm:
+    tabula: Any
+    parser: Any
+    lang: Any
+
     def __init__(self, java_options: List[str], silent: Optional[bool]) -> None:
         try:
             import jpype
@@ -58,7 +62,7 @@ class TabulaVm:
             )
             logger.warning(e)
             self.tabula = None
-            self.parse = None
+            self.parser = None
             self.lang = None
 
     def call_tabula_java(
