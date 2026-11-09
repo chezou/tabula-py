@@ -1,7 +1,11 @@
 import nox
 
+PYTHON_VERSIONS = ["3.11", "3.12", "3.13", "3.14", "3.15"]
+# Latest Python version supported by jpype1
+JPYPE_PYTHON_VERSION = "3.14"
 
-@nox.session
+
+@nox.session(python=JPYPE_PYTHON_VERSION)
 def lint(session):
     lint_tools = [
         "ruff",
@@ -27,32 +31,21 @@ def lint(session):
     )
 
 
-@nox.session
-@nox.parametrize(
-    "python,jpype",
-    [
-        ("3.11", True),
-        ("3.12", True),
-        ("3.13", True),
-        ("3.14", True),
-        # jpype1 does not support Python 3.15 yet
-        ("3.15", False),
-    ],
-)
-def tests(session, jpype):
-    if jpype:
-        tests_with_jpype(session)
-    else:
-        tests_without_jpype(session)
-
-
-def tests_without_jpype(session):
+@nox.session(python=PYTHON_VERSIONS)
+def tests(session):
+    """Run tests without jpype, calling tabula-java via subprocess."""
     session.install(".[test]")
-    session.run("pytest", "-v", "tests/test_read_pdf_table.py")
+    session.run("pytest", "-v", "tests/test_read_pdf_table.py", "tests/test_util.py")
 
 
-def tests_with_jpype(session):
+@nox.session(python=JPYPE_PYTHON_VERSION)
+def tests_jpype(session):
+    """Run tests with jpype."""
     session.install(".[jpype,test]")
-    session.run("pytest", "-v", "tests/test_read_pdf_table.py")
-    session.run("pytest", "-v", "tests/test_read_pdf_jar_path.py")
-    session.run("pytest", "-v", "tests/test_read_pdf_silent.py")
+    session.run(
+        "pytest",
+        "-v",
+        "tests/test_read_pdf_table.py",
+        "tests/test_read_pdf_jar_path.py",
+        "tests/test_read_pdf_silent.py",
+    )
