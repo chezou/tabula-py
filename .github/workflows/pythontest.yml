@@ -14,10 +14,9 @@ jobs:
     - uses: actions/setup-python@v7
       with:
         python-version: '3.14'
-    - name: Install nox
-      run: python -m pip install nox
+    - uses: astral-sh/setup-uv@v10
     - name: Lint
-      run: nox -s lint
+      run: uvx nox -s lint
 
   tests:
     runs-on: ${{ matrix.os }}
@@ -36,29 +35,10 @@ jobs:
     - uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python }}
-    - name: Install nox
-      run: python -m pip install nox
+    - uses: astral-sh/setup-uv@v10
     - name: Test
-      run: nox -s tests-${{ matrix.python }}
-
-  tests-jpype:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-java@v6
-      with:
-        java-version: '17'
-        java-package: jdk
-        distribution: temurin
-    - uses: actions/setup-python@v7
-      with:
-        # Keep in sync with JPYPE_PYTHON_VERSION in noxfile.py
-        python-version: '3.14'
-    - name: Install nox
-      run: python -m pip install nox
+      run: uvx nox -s tests-${{ matrix.python }}
     - name: Test with jpype
-      run: nox -s tests_jpype
+      # Keep in sync with JPYPE_PYTHON_VERSION in noxfile.py
+      if: matrix.python == '3.14'
+      run: uvx nox -s tests_jpype

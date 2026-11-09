@@ -1,5 +1,8 @@
 import nox
 
+# Use uv to create virtualenvs and install packages if available
+nox.options.default_venv_backend = "uv|virtualenv"
+
 PYTHON_VERSIONS = ["3.11", "3.12", "3.13", "3.14", "3.15"]
 # Latest Python version supported by jpype1
 JPYPE_PYTHON_VERSION = "3.14"
