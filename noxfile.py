@@ -42,10 +42,8 @@ def tests(session):
 def tests_jpype(session):
     """Run tests with jpype."""
     session.install(".[jpype,test]")
-    session.run(
-        "pytest",
-        "-v",
-        "tests/test_read_pdf_table.py",
-        "tests/test_read_pdf_jar_path.py",
-        "tests/test_read_pdf_silent.py",
-    )
+    # Run each file in a separate process, since jpype can start the JVM
+    # only once per process and these tests check how it is started
+    session.run("pytest", "-v", "tests/test_read_pdf_table.py")
+    session.run("pytest", "-v", "tests/test_read_pdf_jar_path.py")
+    session.run("pytest", "-v", "tests/test_read_pdf_silent.py")
