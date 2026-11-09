@@ -12,6 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      with:
+        python-version: '3.14'
     - name: Lint
       run: uvx nox -s lint
 
@@ -30,6 +32,8 @@ jobs:
         java-package: jdk
         distribution: temurin
     - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      with:
+        python-version: ${{ matrix.python }}
     - name: Test
       run: uvx nox -s tests-${{ matrix.python }}
     - name: Test with jpype
