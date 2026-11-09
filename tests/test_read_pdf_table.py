@@ -6,9 +6,10 @@ import tempfile
 import unittest
 import uuid
 
-import pandas as pd  # type: ignore
+import pandas as pd
 
 import tabula
+import tabula.errors
 
 
 class TestReadPdfTable(unittest.TestCase):

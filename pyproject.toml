@@ -41,7 +41,7 @@ jpype = ["jpype1"]
 dev = [
   "pytest",
   "ruff",
-  "mypy",
+  "ty",
   "Flake8-pyproject",
 ]
 test = ["pytest"]
@@ -73,8 +73,19 @@ exclude = [
 select = ["E", "W"]
 ignore = ["E203"]
 
-[tool.mypy]
-ignore_missing_imports = true
+[tool.ty.analysis]
+# Java packages are provided at runtime by jpype
+allowed-unresolved-imports = ["java.**", "technology.**", "org.**"]
+
+[[tool.ty.overrides]]
+include = ["tests/**"]
+# read_pdf() returns `List[DataFrame] | Dict[str, Any]` depending on
+# `output_format`, so tests indexing its result can't be narrowed statically.
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+no-matching-overload = "ignore"
+unknown-argument = "ignore"
 
 [tool.pytest.ini_options]
 # Disable faulthandler plugin on Windows to prevent spurious console noise

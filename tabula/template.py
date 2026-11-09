@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Iterable, List, TextIO, Union, cast
+from typing import Any, Dict, Iterable, List, TextIO, Tuple, Union, cast
 
 from .file_util import _stringify_path, is_file_like
 from .util import FileLikeObj, TabulaOption
@@ -17,9 +17,9 @@ def load_template(path_or_buffer: FileLikeObj) -> List[TabulaOption]:
     """
 
     from itertools import groupby
-    from operator import itemgetter
 
     path_or_buffer = _stringify_path(path_or_buffer)
+    templates: List[Dict[str, Any]]
 
     if is_file_like(path_or_buffer):
         path_or_buffer = cast(TextIO, path_or_buffer)
@@ -30,7 +30,8 @@ def load_template(path_or_buffer: FileLikeObj) -> List[TabulaOption]:
 
     options = []
 
-    grouper = itemgetter("page", "extraction_method")
+    def grouper(template: Dict[str, Any]) -> Tuple[Any, Any]:
+        return template["page"], template["extraction_method"]
 
     for key, grp in groupby(sorted(templates, key=grouper), grouper):
         tmp_options = [_convert_template_option(e) for e in grp]
