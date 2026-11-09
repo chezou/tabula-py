@@ -3,8 +3,11 @@ import json
 import os
 import shutil
 import tempfile
+import threading
 import unittest
 import uuid
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 import pandas as pd
 
@@ -12,11 +15,35 @@ import tabula
 import tabula.errors
 
 
+RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources")
+
+
+class _QuietHandler(SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
+
 class TestReadPdfTable(unittest.TestCase):
-    def setUp(self):
-        self.uri = (
-            "https://github.com/chezou/tabula-py/raw/master/tests/resources/12s0324.pdf"
+    @classmethod
+    def setUpClass(cls):
+        # Serve test resources locally to test reading remote files
+        # without depending on external network
+        handler = partial(_QuietHandler, directory=RESOURCES_DIR)
+        cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        cls.base_url = f"http://127.0.0.1:{cls.httpd.server_address[1]}"
+        cls.server_thread = threading.Thread(
+            target=cls.httpd.serve_forever, daemon=True
         )
+        cls.server_thread.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.server_thread.join()
+
+    def setUp(self):
+        self.uri = f"{self.base_url}/12s0324.pdf"
         self.pdf_path = "tests/resources/data.pdf"
         self.expected_csv1 = "tests/resources/data_1.csv"
 
@@ -284,10 +311,7 @@ class TestReadPdfTable(unittest.TestCase):
         self.assertTrue(dfs[0].equals(pd.read_csv(self.expected_csv1)))
 
     def test_read_pdf_with_remote_template(self):
-        template_path = (
-            "https://github.com/chezou/tabula-py/raw/master/"
-            "tests/resources/data.tabula-template.json"
-        )
+        template_path = f"{self.base_url}/data.tabula-template.json"
 
         dfs = tabula.read_pdf_with_template(self.pdf_path, template_path)
         self.assertEqual(len(dfs), 4)
