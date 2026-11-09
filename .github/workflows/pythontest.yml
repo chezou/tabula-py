@@ -14,7 +14,7 @@ jobs:
     - uses: actions/setup-python@v7
       with:
         python-version: '3.14'
-    - uses: astral-sh/setup-uv@v10
+    - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
     - name: Lint
       run: uvx nox -s lint
 
@@ -35,7 +35,7 @@ jobs:
     - uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python }}
-    - uses: astral-sh/setup-uv@v10
+    - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
     - name: Test
       run: uvx nox -s tests-${{ matrix.python }}
     - name: Test with jpype
