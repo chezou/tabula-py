@@ -20,12 +20,12 @@ def lint(session):
 @nox.parametrize(
     "python,jpype",
     [
-        ("3.9", True),
-        ("3.10", True),
         ("3.11", True),
         ("3.12", True),
-        ("3.13", False),
         ("3.13", True),
+        ("3.14", True),
+        # jpype1 does not support Python 3.15 yet
+        ("3.15", False),
     ],
 )
 def tests(session, jpype):

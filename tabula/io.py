@@ -1022,20 +1022,20 @@ def _extract_from(
             [np.nan if not e["text"] else e["text"] for e in row]
             for row in table["data"]
         ]
-        _columns = columns
+        _columns: Optional[Iterable[str]] = columns
 
         if isinstance(header_line_number, int) and not columns:
-            _columns = list_data.pop(header_line_number)
+            header = list_data.pop(header_line_number)
             _unname_idx = 0
-            for idx, col in enumerate(_columns):
+            for idx, col in enumerate(header):
                 if col is np.nan:
-                    _columns[idx] = f"Unnamed: {_unname_idx}"
+                    header[idx] = f"Unnamed: {_unname_idx}"
                     _unname_idx += 1
 
             counts: Dict[str, int] = defaultdict(int)
 
             # Avoid duplicate column name adding ".\d" as a suffix
-            for idx, col in enumerate(_columns):
+            for idx, col in enumerate(header):
                 cur_count = counts[col]
 
                 while cur_count > 0:
@@ -1043,8 +1043,9 @@ def _extract_from(
                     col = f"{col}.{cur_count}"
                     cur_count = counts[col]
 
-                _columns[idx] = col
+                header[idx] = col
                 counts[col] = cur_count + 1
+            _columns = header
 
         df = pd.DataFrame(data=list_data, columns=_columns, **pandas_options)
 
@@ -1063,7 +1064,7 @@ def _extract_from(
 
 def _convert_pandas_csv_options(
     pandas_options: Dict[str, Any], columns: Iterable[str]
-) -> Tuple[str, Optional[int]]:
+) -> Tuple[Optional[Iterable[str]], Optional[int]]:
     """Translate `pd.read_csv()` options into `pd.DataFrame()` especially for header.
 
     Args:

@@ -14,8 +14,7 @@ import tabula
 class TestReadPdfTable(unittest.TestCase):
     def setUp(self):
         self.uri = (
-            "https://github.com/chezou/tabula-py/raw/"
-            "master/tests/resources/12s0324.pdf"
+            "https://github.com/chezou/tabula-py/raw/master/tests/resources/12s0324.pdf"
         )
         self.pdf_path = "tests/resources/data.pdf"
         self.expected_csv1 = "tests/resources/data_1.csv"
